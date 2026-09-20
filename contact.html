@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brotein | Contact</title>
+    <meta name="description" content="Frequently asked questions and contact details for Brotein fitness brand inquiries." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --panel: #151515;
+            --panel-alt: #1b1b1b;
+            --text: #f3f3f1;
+            --muted: #b2b2ad;
+            --line: rgba(255, 255, 255, 0.1);
+            --chip: rgba(255, 255, 255, 0.06);
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 28%),
+                linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(120deg, rgba(255,255,255,0.08), transparent 24%, transparent 75%, rgba(255,255,255,0.04));
+            mix-blend-mode: screen;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .page-shell {
+            width: min(1150px, calc(100% - 24px));
+            max-width: 1150px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+            background: rgba(13, 13, 13, 0.7);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .brand-mark {
+            width: 12px;
+            height: 12px;
+            background: #f3f3f1;
+            border-radius: 50%;
+            box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .nav-cta {
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        main {
+            padding: 70px 0 90px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+        }
+
+        h1 {
+            margin: 22px auto 16px;
+            max-width: 820px;
+            font-size: clamp(2.8rem, 5vw, 5.2rem);
+            line-height: 0.95;
+            letter-spacing: -0.08em;
+        }
+
+        .subtext {
+            max-width: 630px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .faq-wrap {
+            margin-top: 42px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .faq-item {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            padding: 22px 20px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .faq-item h3 {
+            margin: 0 0 10px;
+            font-size: clamp(1.1rem, 1.7vw, 1.5rem);
+            letter-spacing: -0.04em;
+        }
+
+        .faq-item p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .cta-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .contact-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 26px;
+            border-radius: 999px;
+            background: var(--text);
+            color: var(--bg);
+            border: 1px solid rgba(255,255,255,0.18);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 12px 26px rgba(0,0,0,0.18);
+            transition: transform 0.2s ease;
+        }
+
+        .contact-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .contact-block {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        .contact-box {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            padding: 26px 22px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .contact-box h2 {
+            margin: 0 0 10px;
+            font-size: clamp(1.7rem, 3vw, 2.8rem);
+            letter-spacing: -0.06em;
+        }
+
+        .contact-email {
+            display: inline-block;
+            margin: 12px 0 18px;
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            color: var(--text);
+            letter-spacing: -0.03em;
+        }
+
+        form {
+            display: grid;
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        input, textarea {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.02);
+            color: var(--text);
+            padding: 14px 14px;
+            font: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.26);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+        }
+
+        .submit-row {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .submit-btn {
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            background: var(--text);
+            color: var(--bg);
+            padding: 14px 22px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .footer {
+            margin-top: 36px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 980px) {
+            .page-shell {
+                width: min(100%, calc(100% - 18px));
+            }
+
+            .nav-links {
+                gap: 14px;
+                font-size: 0.72rem;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .nav-links {
+                display: none;
+            }
+
+            .page-shell {
+                width: min(100%, calc(100% - 18px));
+            }
+
+            .hero {
+                text-align: center;
+            }
+
+            .subtext {
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            .cta-row,
+            .submit-row {
+                justify-content: stretch;
+            }
+
+            .contact-button,
+            .submit-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .hero {
+                text-align: center;
+            }
+
+            .subtext {
+                text-align: center;
+            }
+
+            .contact-box,
+            .faq-item {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-shell nav">
+            <a href="main.html" class="brand" aria-label="Brotein home">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span>Brotein</span>
+            </a>
+
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="main.html">Home</a>
+                <a href="calculators.html">Calculators</a>
+                <a href="plan.html" target="_blank" rel="noreferrer">Workout Plan</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <a href="plan.html" class="nav-cta" target="_blank" rel="noreferrer">Workout Plan</a>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero">
+            <div class="eyebrow">FAQ & Contact</div>
+            <h1>Questions, collabs, and the grind.</h1>
+            <p class="subtext">We keep things direct. If you want brand deals, content support, or a solid training plan, this is the place to reach out.</p>
+        </section>
+
+        <section class="faq-wrap" aria-label="Frequently asked questions">
+            <article class="faq-item">
+                <h3>What kind of content do you post?</h3>
+                <p>Mostly fitness memes, training advice, gym culture, and realistic workout planning designed for people who want results without the fluff.</p>
+            </article>
+
+            <article class="faq-item">
+                <h3>Do you offer coaching or workout plans?</h3>
+                <p>Yes. Brotein focuses on practical, no-BS training structure built around consistency, strength, and sustainable progress.</p>
+            </article>
+
+            <article class="faq-item">
+                <h3>Can I ask about sponsorships or partnerships?</h3>
+                <p>Absolutely. We’re open to brand collaborations, fitness partnerships, and creator opportunities that match the Brotein vibe and audience.</p>
+            </article>
+
+            <article class="faq-item">
+                <h3>Is this for beginners or advanced lifters?</h3>
+                <p>Both. The goal is to make training approachable, useful, and effective whether you’re just starting or trying to push your next PR.</p>
+            </article>
+        </section>
+
+        <div class="cta-row">
+            <a href="#contact-form" class="contact-button">Contact us</a>
+        </div>
+
+        <section id="contact-form" class="contact-block" aria-label="Contact form">
+            <div class="contact-box">
+                <h2>Let’s talk.</h2>
+                <a href="mailto:brotein.contact@gmail.com" class="contact-email">brotein.contact@gmail.com</a>
+                <p class="subtext" style="margin: 0; text-align: left; max-width: 100%;">Send a message for training, collabs, content, or anything related to the Brotein brand.</p>
+
+                <form action="mailto:brotein.contact@gmail.com" method="post" enctype="text/plain">
+                    <div class="field">
+                        <label for="name">Name</label>
+                        <input id="name" name="name" type="text" placeholder="Your name" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" placeholder="you@example.com" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Tell us what you need..." required></textarea>
+                    </div>
+
+                    <div class="submit-row">
+                        <button type="submit" class="submit-btn">Send message</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <div class="footer">Brotein • Fitness memes & workout plans</div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brotein | Calculators</title>
+    <meta name="description" content="Brotein calculators for BMI and calorie intake, built for fitness progress and meal planning." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --panel: #151515;
+            --panel-alt: #1b1b1b;
+            --text: #f3f3f1;
+            --muted: #b2b2ad;
+            --line: rgba(255, 255, 255, 0.1);
+            --chip: rgba(255, 255, 255, 0.06);
+            --accent: #f3f3f1;
+            --success: #d7f4d0;
+            --warning: #f6d7a3;
+            --danger: #f4b0a6;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 28%),
+                linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(120deg, rgba(255,255,255,0.08), transparent 24%, transparent 75%, rgba(255,255,255,0.04));
+            mix-blend-mode: screen;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .page-shell {
+            width: min(1180px, calc(100% - 24px));
+            max-width: 1180px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+            background: rgba(13, 13, 13, 0.7);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .brand-mark {
+            width: 12px;
+            height: 12px;
+            background: #f3f3f1;
+            border-radius: 50%;
+            box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .nav-cta {
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        main {
+            padding: 64px 0 90px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 34px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+        }
+
+        h1 {
+            margin: 22px auto 18px;
+            font-size: clamp(2.8rem, 6vw, 6rem);
+            line-height: 0.95;
+            letter-spacing: -0.08em;
+            max-width: 760px;
+        }
+
+        .subtext {
+            max-width: 680px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .calculator-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            padding: 26px 22px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .panel h2 {
+            margin: 0 0 18px;
+            font-size: clamp(1.5rem, 2vw, 2.1rem);
+            letter-spacing: -0.05em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        input, select, button {
+            font: inherit;
+        }
+
+        input, select {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.02);
+            color: var(--text);
+            padding: 14px 14px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: rgba(255,255,255,0.28);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+
+        .calc-button {
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            background: var(--text);
+            color: var(--bg);
+            padding: 14px 24px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .calc-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            margin-top: 22px;
+            padding: 20px 18px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+        }
+
+        .result-box h3 {
+            margin: 0 0 14px;
+            font-size: 0.82rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .big-result {
+            font-size: clamp(2rem, 3vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.06em;
+            line-height: 1;
+        }
+
+        .result-copy {
+            margin-top: 10px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .mini-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px 16px;
+        }
+
+        .mini-card .label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .mini-card .value {
+            font-size: clamp(1.3rem, 2vw, 2rem);
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .status-pill.healthy {
+            color: #8afaa0;
+            border-color: #8afaa0;
+            background: rgba(138, 250, 160, 0.08);
+        }
+
+        .status-pill.overweight {
+            color: #ff6a6a;
+            border-color: #ff6a6a;
+            background: rgba(255, 106, 106, 0.08);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 980px) {
+            .page-shell {
+                width: min(100%, calc(100% - 18px));
+            }
+
+            .nav-links {
+                gap: 16px;
+                font-size: 0.72rem;
+            }
+
+            .calculator-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .nav-links {
+                display: none;
+            }
+
+            .form-grid,
+            .mini-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-shell {
+                width: min(100%, calc(100% - 18px));
+            }
+
+            .hero {
+                text-align: left;
+            }
+
+            .subtext {
+                margin: 0;
+                text-align: left;
+            }
+
+            .button-row {
+                justify-content: stretch;
+            }
+
+            .calc-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-shell nav">
+            <a href="main.html" class="brand" aria-label="Brotein home">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span>Brotein</span>
+            </a>
+
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="main.html">Home</a>
+                <a href="calculators.html">Calculators</a>
+                <a href="plan.html" target="_blank" rel="noreferrer">Workout Plan</a>
+            </nav>
+
+            <a href="plan.html" class="nav-cta" target="_blank" rel="noreferrer">Workout Plan</a>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero">
+            <div class="eyebrow">Fitness tools</div>
+            <h1>Body stats that actually matter.</h1>
+            <p class="subtext">Track your body composition, set realistic nutrition targets, and decide whether you need to cut, bulk, or maintain without the fluff.</p>
+        </section>
+
+        <section class="calculator-layout">
+            <div class="panel">
+                <h2>BMI calculator</h2>
+                <form id="bmiForm">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="bmiAge">Age</label>
+                            <input id="bmiAge" name="age" type="number" min="10" max="100" value="28" required />
+                        </div>
+                        <div class="field">
+                            <label for="bmiWeight">Weight (kg)</label>
+                            <input id="bmiWeight" name="weight" type="number" min="30" step="0.1" value="75" required />
+                        </div>
+                        <div class="field full">
+                            <label for="bmiHeight">Height (cm)</label>
+                            <input id="bmiHeight" name="height" type="number" min="100" max="250" step="0.1" value="178" required />
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="submit" class="calc-button">Calculate BMI</button>
+                    </div>
+                </form>
+
+                <div class="result-box">
+                    <h3>BMI result</h3>
+                    <div id="bmiResult" class="big-result">24.9</div>
+                    <div id="bmiStatus" class="status-pill">Healthy range</div>
+                    <div id="bmiSummary" class="result-copy">You’re in a solid range for most gym-goers. Keep your training and nutrition consistent.</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Calorie intake calculator</h2>
+                <form id="calorieForm">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="calAge">Age</label>
+                            <input id="calAge" type="number" min="10" max="100" value="28" required />
+                        </div>
+                        <div class="field">
+                            <label for="calWeight">Weight (kg)</label>
+                            <input id="calWeight" type="number" min="30" step="0.1" value="75" required />
+                        </div>
+                        <div class="field">
+                            <label for="calHeight">Height (cm)</label>
+                            <input id="calHeight" type="number" min="100" max="250" step="0.1" value="178" required />
+                        </div>
+                        <div class="field">
+                            <label for="calWorkout">Workout frequency</label>
+                            <select id="calWorkout">
+                                <option value="1.2">None / very low</option>
+                                <option value="1.375">1–2x / week</option>
+                                <option value="1.55" selected>3–4x / week</option>
+                                <option value="1.725">5–6x / week</option>
+                                <option value="1.9">7x+ / week</option>
+                            </select>
+                        </div>
+                        <div class="field full">
+                            <label for="calGoal">Goal</label>
+                            <select id="calGoal">
+                                <option value="loss">Weight loss</option>
+                                <option value="maintain" selected>Maintain</option>
+                                <option value="gain">Weight gain</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="submit" class="calc-button">Calculate calories</button>
+                    </div>
+                </form>
+
+                <div class="result-box">
+                    <h3>Daily intake</h3>
+                    <div id="calorieTarget" class="big-result">2450 kcal</div>
+                    <div id="calorieHeadline" class="status-pill">Maintain</div>
+                    <div id="calorieSummary" class="result-copy">Your maintenance target is 2,450 kcal per day based on your current bodyweight and training frequency.</div>
+                </div>
+
+                <div class="mini-grid">
+                    <div class="mini-card">
+                        <span class="label">Weight loss</span>
+                        <span id="lossValue" class="value">1,800 kcal</span>
+                    </div>
+                    <div class="mini-card">
+                        <span class="label">Maintain</span>
+                        <span id="maintainValue" class="value">2,450 kcal</span>
+                    </div>
+                    <div class="mini-card">
+                        <span class="label">Weight gain</span>
+                        <span id="gainValue" class="value">2,800 kcal</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-links">
+            <a href="main.html">Back to home</a>
+            <a href="plan.html" target="_blank" rel="noreferrer">Workout plan</a>
+        </div>
+    </main>
+
+    <script>
+        function calculateBMI(weightKg, heightCm) {
+            const heightM = heightCm / 100;
+            return weightKg / (heightM * heightM);
+        }
+
+        function bmiCategory(bmi) {
+            if (bmi < 18.5) return { label: 'Underweight', summary: 'You are below the usual healthy range for your height. Consider a small calorie surplus and more strength-focused fuel.' };
+            if (bmi < 25) return { label: 'Healthy range', summary: 'You’re in a solid range for most gym-goers. Keep your training and nutrition consistent.' };
+            if (bmi < 30) return { label: 'Overweight', summary: 'You are above the healthy range. A slight calorie deficit, higher protein, and steady cardio can help.' };
+            return { label: 'Obesity', summary: 'This BMI sits in the higher range. Prioritize sustainable fat loss, strength work, and consistent recovery.' };
+        }
+
+        function calculateCalories(age, weight, height, activityMultiplier, goal) {
+            const sexAdjustment = 5;
+            const bmr = (10 * weight) + (6.25 * height) - (5 * age) + sexAdjustment;
+            const maintenance = bmr * activityMultiplier;
+
+            const goalConfig = {
+                loss: { multiplier: 0.8, label: 'Weight loss' },
+                maintain: { multiplier: 1, label: 'Maintain' },
+                gain: { multiplier: 1.15, label: 'Weight gain' }
+            };
+
+            const goalData = goalConfig[goal];
+            const targetCalories = Math.round(maintenance * goalData.multiplier);
+            const lossCalories = Math.round(maintenance * 0.8);
+            const maintainCalories = Math.round(maintenance);
+            const gainCalories = Math.round(maintenance * 1.15);
+
+            return {
+                maintenance,
+                targetCalories,
+                lossCalories,
+                maintainCalories,
+                gainCalories,
+                goalLabel: goalData.label
+            };
+        }
+
+        function formatCalories(value) {
+            return `${new Intl.NumberFormat('en-US').format(value)} kcal`;
+        }
+
+        function updateBMI() {
+            const age = Number(document.getElementById('bmiAge').value || 0);
+            const weight = Number(document.getElementById('bmiWeight').value || 0);
+            const height = Number(document.getElementById('bmiHeight').value || 0);
+
+            if (!weight || !height) {
+                document.getElementById('bmiResult').textContent = '—';
+                return;
+            }
+
+            const bmi = calculateBMI(weight, height);
+            const info = bmiCategory(bmi);
+            const statusEl = document.getElementById('bmiStatus');
+
+            statusEl.textContent = info.label;
+            statusEl.classList.remove('healthy', 'overweight');
+
+            if (info.label === 'Healthy range') {
+                statusEl.classList.add('healthy');
+            } else if (info.label === 'Overweight' || info.label === 'Obesity') {
+                statusEl.classList.add('overweight');
+            }
+
+            document.getElementById('bmiResult').textContent = bmi.toFixed(1);
+            document.getElementById('bmiSummary').textContent = info.summary;
+        }
+
+        function updateCalories() {
+            const age = Number(document.getElementById('calAge').value || 0);
+            const weight = Number(document.getElementById('calWeight').value || 0);
+            const height = Number(document.getElementById('calHeight').value || 0);
+            const activity = Number(document.getElementById('calWorkout').value || 1.55);
+            const goal = document.getElementById('calGoal').value || 'maintain';
+
+            if (!weight || !height) {
+                document.getElementById('calorieTarget').textContent = '—';
+                return;
+            }
+
+            const results = calculateCalories(age, weight, height, activity, goal);
+            document.getElementById('calorieTarget').textContent = formatCalories(results.targetCalories);
+            document.getElementById('calorieHeadline').textContent = results.goalLabel;
+            document.getElementById('calorieSummary').textContent = `Your ${results.goalLabel.toLowerCase()} target is ${formatCalories(results.targetCalories)} per day based on your bodyweight, age, height, and training frequency.`;
+            document.getElementById('lossValue').textContent = formatCalories(results.lossCalories);
+            document.getElementById('maintainValue').textContent = formatCalories(results.maintainCalories);
+            document.getElementById('gainValue').textContent = formatCalories(results.gainCalories);
+        }
+
+        document.getElementById('bmiForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            updateBMI();
+        });
+
+        document.getElementById('calorieForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            updateCalories();
+        });
+
+        ['bmiAge', 'bmiWeight', 'bmiHeight'].forEach((id) => {
+            document.getElementById(id).addEventListener('input', updateBMI);
+        });
+
+        ['calAge', 'calWeight', 'calHeight', 'calWorkout', 'calGoal'].forEach((id) => {
+            document.getElementById(id).addEventListener('input', updateCalories);
+            document.getElementById(id).addEventListener('change', updateCalories);
+        });
+
+        updateBMI();
+        updateCalories();
+    </script>
+</body>
+</html>
