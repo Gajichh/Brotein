@@ -26,22 +26,38 @@
             color: var(--text);
         }
 
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
         .page-shell {
-            width: min(1000px, calc(100% - 24px));
-            max-width: 1000px;
+            width: min(1180px, calc(100% - 24px));
+            max-width: 1180px;
             margin: 0 auto;
         }
 
         header {
-            padding: 28px 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+            background: rgba(13, 13, 13, 0.7);
             border-bottom: 1px solid var(--line);
+        }
+
+        .nav {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
         }
 
         .brand {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            text-decoration: none;
             color: var(--text);
             font-size: 1.05rem;
             font-weight: 700;
@@ -54,6 +70,35 @@
             height: 12px;
             background: #fff;
             border-radius: 50%;
+            box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .nav-cta {
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
         }
 
         main {
@@ -325,11 +370,20 @@
 </head>
 <body>
     <header>
-        <div class="page-shell">
-            <a class="brand" href="main.html" target="_blank" rel="noreferrer">
+        <div class="page-shell nav">
+            <a href="index.html" class="brand" aria-label="Brotein home">
                 <span class="brand-mark" aria-hidden="true"></span>
                 <span>Brotein</span>
             </a>
+
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="calculators.html">Calculators</a>
+                <a href="plan.html">Plans</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <a href="plan.html" class="nav-cta">Workout Plan</a>
         </div>
     </header>
 
@@ -394,7 +448,7 @@
         </section>
 
         <div style="text-align: center; margin-top: 28px;">
-            <a href="main.html" class="cta" target="_blank" rel="noreferrer">Back to home</a>
+            <a href="index.html" class="cta" target="_blank" rel="noreferrer">Back to home</a>
         </div>
     </main>
 
