@@ -82,14 +82,15 @@
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
+            min-width: 0;
         }
 
-        .brand-mark {
-            width: 12px;
-            height: 12px;
-            background: #f3f3f1;
-            border-radius: 50%;
-            box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+        .brand-logo {
+            display: block;
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(1.05);
         }
 
         .nav-links {
@@ -377,8 +378,7 @@
     <header>
         <div class="page-shell nav">
             <a href="index.html" class="brand" aria-label="Brotein home">
-                <span class="brand-mark" aria-hidden="true"></span>
-                <span>Brotein</span>
+                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
             </a>
 
             <nav class="nav-links" aria-label="Main navigation">

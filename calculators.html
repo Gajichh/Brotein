@@ -84,14 +84,15 @@
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
+            min-width: 0;
         }
 
-        .brand-mark {
-            width: 12px;
-            height: 12px;
-            background: #f3f3f1;
-            border-radius: 50%;
-            box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+        .brand-logo {
+            display: block;
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(1.05);
         }
 
         .nav-links {
@@ -222,11 +223,28 @@
             width: 100%;
             border-radius: 14px;
             border: 1px solid var(--line);
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.04);
             color: var(--text);
             padding: 14px 14px;
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            color-scheme: dark;
+        }
+
+        select {
+            appearance: none;
+            background-image:
+                linear-gradient(45deg, transparent 50%, var(--text) 50%),
+                linear-gradient(135deg, var(--text) 50%, transparent 50%);
+            background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+            padding-right: 36px;
+        }
+
+        select option {
+            background: #171717;
+            color: var(--text);
         }
 
         input:focus, select:focus {
@@ -409,8 +427,7 @@
     <header>
         <div class="page-shell nav">
             <a href="index.html" class="brand" aria-label="Brotein home">
-                <span class="brand-mark" aria-hidden="true"></span>
-                <span>Brotein</span>
+                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
             </a>
 
             <nav class="nav-links" aria-label="Main navigation">
@@ -437,12 +454,26 @@
                 <form id="bmiForm">
                     <div class="form-grid">
                         <div class="field">
+                            <label for="bmiGender">Gender</label>
+                            <select id="bmiGender" name="gender">
+                                <option value="male" selected>Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="field">
                             <label for="bmiAge">Age</label>
                             <input id="bmiAge" name="age" type="number" min="10" max="100" value="28" required />
                         </div>
                         <div class="field">
-                            <label for="bmiWeight">Weight (kg)</label>
+                            <label for="bmiWeight">Weight</label>
                             <input id="bmiWeight" name="weight" type="number" min="30" step="0.1" value="75" required />
+                        </div>
+                        <div class="field">
+                            <label for="bmiWeightUnit">Weight unit</label>
+                            <select id="bmiWeightUnit">
+                                <option value="kg" selected>Kgs</option>
+                                <option value="lbs">Lbs</option>
+                            </select>
                         </div>
                         <div class="field full">
                             <label for="bmiHeight">Height (cm)</label>
@@ -468,12 +499,26 @@
                 <form id="calorieForm">
                     <div class="form-grid">
                         <div class="field">
+                            <label for="calGender">Gender</label>
+                            <select id="calGender">
+                                <option value="male" selected>Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="field">
                             <label for="calAge">Age</label>
                             <input id="calAge" type="number" min="10" max="100" value="28" required />
                         </div>
                         <div class="field">
-                            <label for="calWeight">Weight (kg)</label>
+                            <label for="calWeight">Weight</label>
                             <input id="calWeight" type="number" min="30" step="0.1" value="75" required />
+                        </div>
+                        <div class="field">
+                            <label for="calWeightUnit">Weight unit</label>
+                            <select id="calWeightUnit">
+                                <option value="kg" selected>Kgs</option>
+                                <option value="lbs">Lbs</option>
+                            </select>
                         </div>
                         <div class="field">
                             <label for="calHeight">Height (cm)</label>
@@ -535,6 +580,10 @@
     </main>
 
     <script>
+        function convertWeightToKg(weight, unit) {
+            return unit === 'lbs' ? weight / 2.20462 : weight;
+        }
+
         function calculateBMI(weightKg, heightCm) {
             const heightM = heightCm / 100;
             return weightKg / (heightM * heightM);
@@ -547,8 +596,8 @@
             return { label: 'Obesity', summary: 'This BMI sits in the higher range. Prioritize sustainable fat loss, strength work, and consistent recovery.' };
         }
 
-        function calculateCalories(age, weight, height, activityMultiplier, goal) {
-            const sexAdjustment = 5;
+        function calculateCalories(age, weight, height, activityMultiplier, goal, gender) {
+            const sexAdjustment = gender === 'female' ? -161 : 5;
             const bmr = (10 * weight) + (6.25 * height) - (5 * age) + sexAdjustment;
             const maintenance = bmr * activityMultiplier;
 
@@ -581,6 +630,7 @@
         function updateBMI() {
             const age = Number(document.getElementById('bmiAge').value || 0);
             const weight = Number(document.getElementById('bmiWeight').value || 0);
+            const weightUnit = document.getElementById('bmiWeightUnit').value || 'kg';
             const height = Number(document.getElementById('bmiHeight').value || 0);
 
             if (!weight || !height) {
@@ -588,7 +638,8 @@
                 return;
             }
 
-            const bmi = calculateBMI(weight, height);
+            const weightKg = convertWeightToKg(weight, weightUnit);
+            const bmi = calculateBMI(weightKg, height);
             const info = bmiCategory(bmi);
             const statusEl = document.getElementById('bmiStatus');
 
@@ -608,19 +659,22 @@
         function updateCalories() {
             const age = Number(document.getElementById('calAge').value || 0);
             const weight = Number(document.getElementById('calWeight').value || 0);
+            const weightUnit = document.getElementById('calWeightUnit').value || 'kg';
             const height = Number(document.getElementById('calHeight').value || 0);
             const activity = Number(document.getElementById('calWorkout').value || 1.55);
             const goal = document.getElementById('calGoal').value || 'maintain';
+            const gender = document.getElementById('calGender').value || 'male';
 
             if (!weight || !height) {
                 document.getElementById('calorieTarget').textContent = '—';
                 return;
             }
 
-            const results = calculateCalories(age, weight, height, activity, goal);
+            const weightKg = convertWeightToKg(weight, weightUnit);
+            const results = calculateCalories(age, weightKg, height, activity, goal, gender);
             document.getElementById('calorieTarget').textContent = formatCalories(results.targetCalories);
             document.getElementById('calorieHeadline').textContent = results.goalLabel;
-            document.getElementById('calorieSummary').textContent = `Your ${results.goalLabel.toLowerCase()} target is ${formatCalories(results.targetCalories)} per day based on your bodyweight, age, height, and training frequency.`;
+            document.getElementById('calorieSummary').textContent = `Your ${results.goalLabel.toLowerCase()} target is ${formatCalories(results.targetCalories)} per day based on your gender, bodyweight, age, height, and training frequency.`;
             document.getElementById('lossValue').textContent = formatCalories(results.lossCalories);
             document.getElementById('maintainValue').textContent = formatCalories(results.maintainCalories);
             document.getElementById('gainValue').textContent = formatCalories(results.gainCalories);
@@ -636,11 +690,12 @@
             updateCalories();
         });
 
-        ['bmiAge', 'bmiWeight', 'bmiHeight'].forEach((id) => {
+        ['bmiGender', 'bmiAge', 'bmiWeight', 'bmiWeightUnit', 'bmiHeight'].forEach((id) => {
             document.getElementById(id).addEventListener('input', updateBMI);
+            document.getElementById(id).addEventListener('change', updateBMI);
         });
 
-        ['calAge', 'calWeight', 'calHeight', 'calWorkout', 'calGoal'].forEach((id) => {
+        ['calGender', 'calAge', 'calWeight', 'calWeightUnit', 'calHeight', 'calWorkout', 'calGoal'].forEach((id) => {
             document.getElementById(id).addEventListener('input', updateCalories);
             document.getElementById(id).addEventListener('change', updateCalories);
         });

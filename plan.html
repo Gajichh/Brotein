@@ -63,14 +63,15 @@
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
+            min-width: 0;
         }
 
-        .brand-mark {
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+        .brand-logo {
+            display: block;
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(1.05);
         }
 
         .nav-links {
@@ -189,9 +190,26 @@
             width: 100%;
             border: 1px solid var(--line);
             border-radius: 14px;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.04);
             color: var(--text);
             padding: 14px 14px;
+            color-scheme: dark;
+        }
+
+        select {
+            appearance: none;
+            background-image:
+                linear-gradient(45deg, transparent 50%, var(--text) 50%),
+                linear-gradient(135deg, var(--text) 50%, transparent 50%);
+            background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+            padding-right: 36px;
+        }
+
+        select option {
+            background: #171717;
+            color: var(--text);
         }
 
         input:focus, select:focus {
@@ -372,8 +390,7 @@
     <header>
         <div class="page-shell nav">
             <a href="index.html" class="brand" aria-label="Brotein home">
-                <span class="brand-mark" aria-hidden="true"></span>
-                <span>Brotein</span>
+                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
             </a>
 
             <nav class="nav-links" aria-label="Main navigation">
@@ -404,8 +421,24 @@
                     </div>
 
                     <div class="field">
-                        <label for="weight">Weight (kg)</label>
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="male" selected>Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="weight">Weight</label>
                         <input id="weight" name="weight" type="number" min="30" step="0.1" value="75" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="weightUnit">Weight unit</label>
+                        <select id="weightUnit" name="weightUnit">
+                            <option value="kg" selected>Kgs</option>
+                            <option value="lbs">Lbs</option>
+                        </select>
                     </div>
 
                     <div class="field">
@@ -454,35 +487,64 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-        function getGoalPlan(goal, days) {
+        function convertWeightToKg(weight, unit) {
+            return unit === 'lbs' ? weight / 2.20462 : weight;
+        }
+
+        function getGoalPlan(goal, days, gender) {
+            const femaleFocus = gender === 'female';
             const goalMap = {
                 loss: {
                     label: 'Weight loss',
-                    focus: 'Create a calorie deficit while keeping training performance high and protecting muscle.',
-                    weekly: 'Use 2–3 short conditioning blocks and prioritize compound lifts with controlled volume.',
+                    focus: femaleFocus
+                        ? 'Create a calorie deficit while prioritizing lower-body strength and keeping the overall program sustainable.'
+                        : 'Create a calorie deficit while keeping training performance high and protecting muscle.',
+                    weekly: femaleFocus
+                        ? 'Keep leg sessions hard and frequent, then use shorter upper-body work with controlled volume.'
+                        : 'Use 2–3 short conditioning blocks and prioritize compound lifts with controlled volume.',
                     nutrition: 'Keep protein high, carbs around your training, and aim for a modest deficit.',
-                    split: days >= 5 ? ['Upper', 'Lower', 'Upper', 'Lower', 'Conditioning'] : days >= 3 ? ['Full Body', 'Full Body', 'Conditioning'] : ['Full Body', 'Conditioning']
+                    split: femaleFocus
+                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Lower', 'Conditioning'] : ['Legs', 'Conditioning'])
+                        : (days >= 5 ? ['Upper', 'Lower', 'Upper', 'Lower', 'Conditioning'] : days >= 3 ? ['Full Body', 'Full Body', 'Conditioning'] : ['Full Body', 'Conditioning'])
                 },
                 maintain: {
                     label: 'Maintain',
-                    focus: 'Keep your bodyweight stable while improving performance and strength.',
-                    weekly: 'Use a balanced split with moderate volume and enough recovery between hard sessions.',
+                    focus: femaleFocus
+                        ? 'Keep energy stable while leaning into leg development, muscle retention, and overall athletic performance.'
+                        : 'Keep your bodyweight stable while improving performance and strength.',
+                    weekly: femaleFocus
+                        ? 'Train your lower body with strong weekly frequency and keep upper-body work more supportive than dominant.'
+                        : 'Use a balanced split with moderate volume and enough recovery between hard sessions.',
                     nutrition: 'Match calories to maintenance and keep protein steady at 1.6–2.2g/kg.',
-                    split: days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body']
+                    split: femaleFocus
+                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Upper', 'Lower'] : ['Legs', 'Full Body'])
+                        : (days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body'])
                 },
                 gain: {
                     label: 'Weight gain',
-                    focus: 'Aim for a consistent calorie surplus with extra emphasis on progressive overload.',
-                    weekly: 'Use slightly higher work capacity and keep hard sets close to failure while preserving recovery.',
+                    focus: femaleFocus
+                        ? 'Drive a small calorie surplus while building a stronger lower body and improving overall squat and hinge strength.'
+                        : 'Aim for a consistent calorie surplus with extra emphasis on progressive overload.',
+                    weekly: femaleFocus
+                        ? 'Keep the lower-body work dense and progressive while keeping upper-body work efficient and recovery-friendly.'
+                        : 'Use slightly higher work capacity and keep hard sets close to failure while preserving recovery.',
                     nutrition: 'Add 200–300 kcal per day, keep protein high, and prioritize carbs around training.',
-                    split: days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body']
+                    split: femaleFocus
+                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Lower', 'Upper'] : ['Legs', 'Full Body'])
+                        : (days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body'])
                 },
                 muscle: {
                     label: 'Muscle gain',
-                    focus: 'Prioritize progressive overload, extra quality volume, and high-protein nutrition.',
-                    weekly: 'Train each muscle group with enough frequency to stimulate growth without crushing recovery.',
+                    focus: femaleFocus
+                        ? 'Prioritize leg-driven hypertrophy, glute and hamstring growth, and enough recovery to keep performance climbing.'
+                        : 'Prioritize progressive overload, extra quality volume, and high-protein nutrition.',
+                    weekly: femaleFocus
+                        ? 'Legs should lead the week with higher frequency and a little more total volume than the upper body.'
+                        : 'Train each muscle group with enough frequency to stimulate growth without crushing recovery.',
                     nutrition: 'Target 1.6–2.2g of protein per kg of bodyweight and a small calorie surplus if needed.',
-                    split: days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body']
+                    split: femaleFocus
+                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Lower', 'Upper'] : ['Legs', 'Full Body'])
+                        : (days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body'])
                 }
             };
 
@@ -490,9 +552,10 @@
         }
 
         function buildPlan(data) {
-            const { name, weight, height, age, days, goal } = data;
-            const goalPlan = getGoalPlan(goal, Number(days));
-            const bmi = weight / ((height / 100) * (height / 100));
+            const { name, weight, height, age, days, goal, gender, weightUnit } = data;
+            const weightKg = convertWeightToKg(weight, weightUnit);
+            const goalPlan = getGoalPlan(goal, Number(days), gender);
+            const bmi = weightKg / ((height / 100) * (height / 100));
 
             const sessions = [];
             const split = goalPlan.split;
@@ -519,7 +582,8 @@
             const planText = [
                 `${nameLine} Brotein training plan`,
                 `Goal: ${goalPlan.label}`,
-                `Weight: ${weight} kg | Height: ${height} cm | Age: ${age}`,
+                `Gender: ${gender === 'female' ? 'Female' : 'Male'}`,
+                `Weight: ${weightKg.toFixed(1)} kg | Height: ${height} cm | Age: ${age}`,
                 `Training days: ${days} / week`,
                 `Estimated BMI: ${bmi.toFixed(1)}`,
                 '',
@@ -572,13 +636,17 @@
         function generatePdf() {
             const form = document.getElementById('planForm');
             const formData = new FormData(form);
+            const weight = Number(formData.get('weight'));
+            const weightUnit = formData.get('weightUnit') || 'kg';
+            const weightKg = convertWeightToKg(weight, weightUnit);
             const payload = {
                 name: formData.get('name').trim(),
-                weight: Number(formData.get('weight')),
+                weight: weightKg,
                 height: Number(formData.get('height')),
                 age: Number(formData.get('age')),
                 days: Number(formData.get('days')),
-                goal: formData.get('goal')
+                goal: formData.get('goal'),
+                gender: formData.get('gender') || 'male'
             };
 
             const { jsPDF } = window.jspdf;
@@ -621,14 +689,15 @@
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(10.5);
             doc.text(`Training days: ${payload.days} / week`, margin + 16, y + 36);
-            doc.text(`Weight: ${payload.weight} kg`, margin + 16, y + 50);
+            doc.text(`Gender: ${payload.gender === 'female' ? 'Female' : 'Male'}`, margin + 220, y + 36);
+            doc.text(`Weight: ${payload.weight.toFixed(1)} kg`, margin + 16, y + 50);
             doc.text(`Height: ${payload.height} cm`, margin + 180, y + 50);
             doc.text(`Age: ${payload.age}`, margin + 300, y + 50);
             doc.text(`Estimated BMI: ${(payload.weight / ((payload.height / 100) * (payload.height / 100))).toFixed(1)}`, margin + 16, y + 64);
 
             y += 90;
 
-            const goalPlan = getGoalPlan(payload.goal, payload.days);
+            const goalPlan = getGoalPlan(payload.goal, payload.days, payload.gender);
             const overviewLines = [goalPlan.focus, goalPlan.weekly, goalPlan.nutrition];
             y = drawSection(doc, 'Plan Focus', overviewLines, y, margin, width);
 

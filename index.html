@@ -84,14 +84,15 @@
             font-weight: 700;
             letter-spacing: 0.1em;
             text-transform: uppercase;
+            min-width: 0;
         }
 
-        .brand-mark {
-            width: 12px;
-            height: 12px;
-            background: #f3f3f1;
-            border-radius: 50%;
-            box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+        .brand-logo {
+            display: block;
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(1.05);
         }
 
         .nav-links {
@@ -166,7 +167,7 @@
 
         .hero-number {
             display: block;
-            font-size: clamp(3.2rem, 7.2vw, 8.5rem);
+            font-size: clamp(2.56rem, 5.76vw, 6.8rem);
             line-height: 0.82;
             letter-spacing: -0.08em;
             font-weight: 900;
@@ -544,16 +545,18 @@
             }
 
             .hero-number {
-                font-size: clamp(2.8rem, 18vw, 5rem);
+                font-size: clamp(1.76rem, 11.2vw, 3.2rem);
+                letter-spacing: -0.07em;
             }
 
             .hero-subtitle {
                 margin-top: 12px;
-                font-size: 0.78rem;
+                font-size: 0.7rem;
+                line-height: 1.5;
             }
 
             .subtext {
-                font-size: 0.96rem;
+                font-size: 0.88rem;
             }
 
             .feature-card,
@@ -574,8 +577,7 @@
     <header>
         <div class="page-shell nav">
             <a href="index.html" class="brand" aria-label="Brotein home">
-                <span class="brand-mark" aria-hidden="true"></span>
-                <span>Brotein</span>
+                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
             </a>
 
             <nav class="nav-links" aria-label="Main navigation">
