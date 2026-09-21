@@ -197,6 +197,11 @@
             margin-top: 10px;
         }
 
+        .account-menu .profile-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
         .brand-logo {
             display: block;
             width: 110px;
@@ -735,6 +740,7 @@
                     </button>
                     <div class="account-menu">
                         <div class="account-name" id="accountName">Guest</div>
+                        <button class="menu-btn profile-btn" type="button">Profile</button>
                         <button class="menu-btn upgrade-btn" type="button">Upgrade</button>
                         <button class="menu-btn login-btn" type="button">Log in</button>
                         <button class="menu-btn logout-btn" type="button">Log out</button>
@@ -866,6 +872,8 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script>
         const CURRENT_USER_KEY = 'brotein_current_user';
 
@@ -886,6 +894,9 @@
             const upgradeBtn = document.querySelector('.upgrade-btn');
 
             if (!nameEl || !loginBtn || !logoutBtn) return;
+
+            const profileBtn = document.querySelector('.profile-btn');
+            if (profileBtn) profileBtn.style.display = user && !user.guest ? 'block' : 'none';
 
             const isGuest = !!user && user.guest === true;
             const packageName = (user && user.package) ? String(user.package).toUpperCase() : 'FREE';
@@ -927,13 +938,18 @@
             window.location.href = 'login.html';
         });
 
+        document.querySelector('.profile-btn')?.addEventListener('click', function () {
+            window.location.href = 'profile.html';
+        });
+
         document.querySelector('.upgrade-btn')?.addEventListener('click', function () {
             window.location.href = 'upgrade.html';
         });
 
         document.querySelector('.logout-btn')?.addEventListener('click', function () {
             localStorage.removeItem(CURRENT_USER_KEY);
-            window.location.reload();
+            const signOut = window.broteinSupabase ? window.broteinSupabase.auth.signOut() : Promise.resolve();
+            signOut.finally(() => window.location.reload());
         });
 
         document.querySelector('.account-trigger')?.addEventListener('click', function (event) {

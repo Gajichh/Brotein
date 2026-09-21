@@ -485,9 +485,11 @@
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script>
-        const USERS_KEY = 'brotein_users';
         const CURRENT_USER_KEY = 'brotein_current_user';
+        const db = window.broteinSupabase;
 
         function getCurrentUser() {
             try {
@@ -498,26 +500,6 @@
             }
         }
 
-        function readUsers() {
-            try {
-                const stored = localStorage.getItem(USERS_KEY);
-                const users = stored ? JSON.parse(stored) : [];
-                return users.map((user) => ({
-                    name: user.name || 'Unknown',
-                    email: user.email || '',
-                    password: user.password || '',
-                    package: user.package || 'FREE',
-                    createdAt: user.createdAt || new Date().toISOString()
-                }));
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function writeUsers(users) {
-            localStorage.setItem(USERS_KEY, JSON.stringify(users));
-        }
-
         function setStatus(message, type = '') {
             const statusEl = document.getElementById('upgradeStatus');
             if (!statusEl) return;
@@ -526,64 +508,52 @@
             if (type) statusEl.classList.add(type);
         }
 
-        function isFreeUser() {
-            const user = getCurrentUser();
-            return !!user && String(user.package || 'FREE').toUpperCase() === 'FREE';
-        }
-
-        document.getElementById('goBackButton')?.addEventListener('click', function () {
-            window.history.back();
-        });
-
-        document.getElementById('upgradeButton')?.addEventListener('click', function () {
-            const currentUser = getCurrentUser();
-
-            if (!currentUser) {
-                setStatus('Please log in before upgrading.', 'error');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            const users = readUsers();
-            const emailKey = (currentUser.email || '').toLowerCase();
-            const matchIndex = users.findIndex((user) => (user.email || '').toLowerCase() === emailKey);
-
-            const updatedUser = {
-                name: currentUser.name || 'User',
-                email: currentUser.email || '',
-                package: 'PREMIUM',
-                guest: false,
-                loggedIn: true
-            };
-
-            if (matchIndex >= 0) {
-                users[matchIndex].package = 'PREMIUM';
-            } else {
-                users.push({
-                    name: updatedUser.name,
-                    email: updatedUser.email,
-                    password: '',
-                    package: 'PREMIUM',
-                    createdAt: new Date().toISOString()
-                });
-            }
-
-            writeUsers(users);
-            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
-            setStatus('Premium activated successfully.', 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 600);
-        });
-
-        if (!isFreeUser()) {
-            setStatus('You are already on a premium plan or not logged in.', 'error');
+        function disableUpgrade() {
             const upgradeButton = document.getElementById('upgradeButton');
             if (upgradeButton) {
                 upgradeButton.disabled = true;
                 upgradeButton.style.opacity = '0.6';
                 upgradeButton.style.cursor = 'not-allowed';
             }
+        }
+
+        document.getElementById('goBackButton')?.addEventListener('click', function () {
+            window.history.back();
+        });
+
+        document.getElementById('upgradeButton')?.addEventListener('click', async function () {
+            const currentUser = getCurrentUser();
+            const session = db ? (await db.auth.getSession()).data.session : null;
+
+            if (!currentUser || currentUser.guest || !session) {
+                setStatus('Please log in with an account before upgrading.', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            this.disabled = true;
+            const { error } = await db.rpc('upgrade_to_premium');
+
+            if (error) {
+                this.disabled = false;
+                setStatus('Could not upgrade: ' + error.message, 'error');
+                return;
+            }
+
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ ...currentUser, package: 'PREMIUM' }));
+            setStatus('Premium activated successfully.', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 600);
+        });
+
+        const user = getCurrentUser();
+        if (!user || user.guest) {
+            setStatus('Log in with an account to upgrade.', 'error');
+            disableUpgrade();
+        } else if (String(user.package || 'FREE').toUpperCase() !== 'FREE') {
+            setStatus('You are already on the premium plan.', 'error');
+            disableUpgrade();
         }
     </script>
 </body>

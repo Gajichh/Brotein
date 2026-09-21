@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Brotein | Workout Plan</title>
+    <title>Brotein | Profile</title>
     <link rel="icon" type="image/x-icon" href="broteinico.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -555,6 +555,146 @@
                 min-width: 0;
             }
         }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .profile-panel {
+            padding: 26px 22px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .profile-panel h2 {
+            margin: 0 0 18px;
+            font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+            letter-spacing: -0.05em;
+        }
+
+        .detail-list {
+            display: grid;
+            gap: 14px;
+            margin: 0;
+        }
+
+        .detail-list dt {
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .detail-list dd {
+            margin: 4px 0 0;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .package-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+        }
+
+        .package-tag.premium {
+            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            border-color: rgba(251,191,36,0.6);
+            color: #1b1208;
+        }
+
+        .plan-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .plan-summary span {
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--chip);
+            font-size: 0.74rem;
+            color: var(--muted);
+        }
+
+        .plan-text {
+            color: var(--muted);
+            line-height: 1.7;
+            margin: 0 0 12px;
+        }
+
+        .session-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .session-grid .plan-card h3 {
+            margin: 0 0 12px;
+            font-size: 1.2rem;
+            letter-spacing: -0.03em;
+        }
+
+        .plan-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-top: 22px;
+        }
+
+        .plan-actions .generate-button {
+            margin-top: 0;
+        }
+
+        .ghost-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,142,142,0.5);
+            border-radius: 999px;
+            background: transparent;
+            color: #ff8e8e;
+            padding: 15px 24px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .ghost-button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .empty-plan p {
+            color: var(--muted);
+            line-height: 1.7;
+            margin: 0 0 18px;
+        }
+
+        .empty-plan .generate-button {
+            text-decoration: none;
+        }
+
+        @media (max-width: 860px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -592,90 +732,51 @@
 
     <main class="page-shell">
         <section class="hero">
-            <div class="eyebrow">Workout plan</div>
-            <h1>Generate your personal plan</h1>
-            <p class="subtitle">Tell us what you can train, what your goal is, and we’ll build a plan based on your body and your schedule.</p>
+            <div class="eyebrow">Profile</div>
+            <h1>Your profile</h1>
+            <p class="subtitle">Your account details and your saved workout plan, all in one place.</p>
         </section>
 
-        <section class="custom-plan" aria-labelledby="custom-plan-heading">
-            <h2 id="custom-plan-heading">Build your plan</h2>
-            <form id="planForm">
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="name">Name (optional)</label>
-                        <input id="name" name="name" type="text" placeholder="Your name" />
-                    </div>
+        <div id="profileMessage" class="profile-panel" style="display:none; text-align:center;">
+            <p id="profileMessageText" class="plan-text"></p>
+            <a href="login.html" class="generate-button" style="text-decoration:none;">Log in</a>
+        </div>
 
-                    <div class="field">
-                        <label for="gender">Gender</label>
-                        <select id="gender" name="gender">
-                            <option value="male" selected>Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
+        <div id="profileContent" class="profile-grid" style="display:none;">
+            <section class="profile-panel" aria-labelledby="account-heading">
+                <h2 id="account-heading">Account</h2>
+                <dl class="detail-list">
+                    <div><dt>Name</dt><dd id="profileName"></dd></div>
+                    <div><dt>Email</dt><dd id="profileEmail"></dd></div>
+                    <div><dt>Package</dt><dd><span id="profilePackage" class="package-tag"></span></dd></div>
+                    <div><dt>Member since</dt><dd id="profileJoined"></dd></div>
+                </dl>
+            </section>
 
-                    <div class="field">
-                        <label for="weight">Weight</label>
-                        <input id="weight" name="weight" type="number" min="0" step="0.1" value="0" required />
-                    </div>
+            <section class="profile-panel" aria-labelledby="plan-heading">
+                <h2 id="plan-heading">Your workout plan</h2>
 
-                    <div class="field">
-                        <label for="weightUnit">Weight unit</label>
-                        <select id="weightUnit" name="weightUnit">
-                            <option value="kg" selected>Kgs</option>
-                            <option value="lbs">Lbs</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="height">Height (cm)</label>
-                        <input id="height" name="height" type="number" min="0" step="0.1" value="0" required />
-                    </div>
-
-                    <div class="field">
-                        <label for="age">Age</label>
-                        <input id="age" name="age" type="number" min="0" max="80" value="0" required />
-                    </div>
-
-                    <div class="field">
-                        <label for="days">Training days per week</label>
-                        <select id="days" name="days">
-                            <option value="0" selected>0 days</option>
-                            <option value="2">2 days</option>
-                            <option value="3">3 days</option>
-                            <option value="4">4 days</option>
-                            <option value="5">5 days</option>
-                            <option value="6">6 days</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="goal">Goal</label>
-                        <select id="goal" name="goal">
-                            <option value="" selected>Select goal</option>
-                            <option value="loss">Weight loss</option>
-                            <option value="maintain">Maintain</option>
-                            <option value="gain">Weight gain</option>
-                            <option value="muscle">Muscle gain</option>
-                        </select>
-                    </div>
+                <div id="planEmpty" class="empty-plan" style="display:none;">
+                    <p id="planEmptyText"></p>
+                    <a id="planEmptyLink" href="plan.html" class="generate-button"></a>
                 </div>
 
-                <button type="button" class="generate-button" aria-label="Generate the plan as PDF">
-                    <svg class="pdf-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M7 2.5h7.5L19.5 7v12.5A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 7 2.5zm7 1.2v4.3h4.3L14 3.7zm-1.1 7.8c-1.1 0-1.8.7-1.8 1.9v1.3h1.3v-1.2c0-.5.2-.8.7-.8h.6c.5 0 .8.3.8.8v1.2H15v-1.3c0-1.2-.7-1.9-1.9-1.9zm-3.4 0h1.7v4.6H9.5v-1.6H8.4v1.6H7.1v-4.6h1.3v1.5h1.1v-1.5zm6.2 0h2.2v.9h-1.2v3.7h-1.2v-3.7h-1.1v-.9z" fill="#D93025"/>
-                        <path d="M7 2.5h7.5L19.5 7v12.5A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 7 2.5Zm7 1.2v4.3h4.3L14 3.7z" fill="#F4B7B0" opacity="0.35"/>
-                    </svg>
-                    <span>Generate the plan</span>
-                </button>
-                <a id="openPdfFallback" href="#" style="display:none; margin-top:12px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#dfe9ff; text-decoration:underline;" target="_blank" rel="noreferrer">Can't download? Open pdf</a>
-                <div id="planStatus" class="plan-status" aria-live="polite" role="status"></div>
-                <a id="profilePlanLink" href="profile.html" style="display:none; margin-top:8px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#dfe9ff; text-decoration:underline;">Go to your profile</a>
-            </form>
-        </section>
+                <div id="planDetails" style="display:none;">
+                    <div id="planSummary" class="plan-summary"></div>
+                    <p id="planFocus" class="plan-text"></p>
+                    <p id="planWeekly" class="plan-text"></p>
+                    <p id="planNutrition" class="plan-text"></p>
+                    <div id="planSessions" class="session-grid"></div>
 
-        <div style="text-align: center; margin-top: 28px;">
-            <a href="index.html" class="cta" target="_blank" rel="noreferrer">Back to home</a>
+                    <div class="plan-actions">
+                        <button type="button" id="downloadPlanButton" class="generate-button">Download PDF</button>
+                        <button type="button" id="deletePlanButton" class="ghost-button">Delete plan</button>
+                    </div>
+                    <a id="openPdfFallback" href="#" style="display:none; margin-top:12px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#dfe9ff; text-decoration:underline;" target="_blank" rel="noreferrer">Can't download? Open pdf</a>
+                </div>
+
+                <div id="planStatus" class="plan-status" aria-live="polite" role="status"></div>
+            </section>
         </div>
     </main>
 
@@ -684,160 +785,9 @@
     <script src="supabase-client.js"></script>
     <script src="plan-builder.js"></script>
     <script>
-        function setPlanStatus(message, type = '') {
-            const statusEl = document.getElementById('planStatus');
-            if (!statusEl) return;
-            statusEl.textContent = message;
-            statusEl.className = 'plan-status';
-            if (type) statusEl.classList.add(type);
-        }
-
-        function isPremiumAccount() {
-            const user = getCurrentUser();
-            return String(user?.package || 'FREE').toUpperCase() === 'PREMIUM';
-        }
-
-        function canGeneratePlan() {
-            const weight = Number(document.getElementById('weight')?.value || 0);
-            const height = Number(document.getElementById('height')?.value || 0);
-            const days = Number(document.getElementById('days')?.value || 0);
-            const goal = document.getElementById('goal')?.value || '';
-
-            return weight > 0 && height > 0 && days > 0 && goal !== '';
-        }
-
-        function updateGenerateButtonState() {
-            const button = document.querySelector('.generate-button');
-            if (!button) return;
-
-            const hasInputs = canGeneratePlan();
-            const isPremium = isPremiumAccount();
-            const allowed = hasInputs && isPremium && !hasSavedPlan;
-
-            button.disabled = !allowed;
-            button.style.opacity = allowed ? '1' : '0.7';
-            button.style.cursor = allowed ? 'pointer' : 'not-allowed';
-
-            const label = button.querySelector('span');
-            if (label) {
-                label.textContent = isPremium ? 'Generate the plan' : 'ONLY 0.99$';
-            }
-
-            const profileLink = document.getElementById('profilePlanLink');
-            if (profileLink) profileLink.style.display = hasSavedPlan ? 'inline-block' : 'none';
-
-            if (hasSavedPlan) {
-                setPlanStatus('You already have a saved plan. Delete it on your profile to make a new one.', 'error');
-            } else if (!hasInputs && isPremium) {
-                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
-            } else if (!isPremium) {
-                setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
-            } else {
-                setPlanStatus('');
-            }
-        }
-
-        function showOpenPdfFallback(pdfUrl) {
-            const fallback = document.getElementById('openPdfFallback');
-            if (!fallback) return;
-            fallback.href = pdfUrl;
-            fallback.style.display = 'inline-block';
-        }
-
-        async function generatePdf() {
-            if (!isPremiumAccount()) {
-                setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
-                updateGenerateButtonState();
-                return;
-            }
-
-            if (!canGeneratePlan()) {
-                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
-                return;
-            }
-
-            const form = document.getElementById('planForm');
-            const formData = new FormData(form);
-            const weight = Number(formData.get('weight'));
-            const weightUnit = formData.get('weightUnit') || 'kg';
-            const weightKg = convertWeightToKg(weight, weightUnit);
-            const payload = {
-                name: formData.get('name').trim(),
-                weight: weightKg,
-                height: Number(formData.get('height')),
-                age: Number(formData.get('age')),
-                days: Number(formData.get('days')),
-                goal: formData.get('goal'),
-                gender: formData.get('gender') || 'male'
-            };
-
-            const db = window.broteinSupabase;
-            const session = db ? (await db.auth.getSession()).data.session : null;
-            if (!session) {
-                setPlanStatus('Log in with your account to generate and save a plan.', 'error');
-                return;
-            }
-
-            const generateButton = document.querySelector('.generate-button');
-            if (generateButton) generateButton.disabled = true;
-            setPlanStatus('Saving your plan...', 'success');
-
-            try {
-                const { error: saveError } = await db.from('workout_plans').insert(planToRow(payload, session.user.id));
-                if (saveError) {
-                    if (saveError.code === '23505') {
-                        hasSavedPlan = true;
-                        updateGenerateButtonState();
-                    } else if (saveError.code === '42501') {
-                        setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
-                    } else {
-                        setPlanStatus('Could not save your plan: ' + saveError.message, 'error');
-                    }
-                    return;
-                }
-                hasSavedPlan = true;
-
-                const doc = createPlanPdf(payload);
-                const filename = getPlanPdfFilename(payload);
-                const pdfBlob = doc.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-
-                try {
-                    const link = document.createElement('a');
-                    link.href = pdfUrl;
-                    link.download = filename;
-                    link.style.display = 'none';
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                    setPlanStatus('Plan saved to your profile and PDF downloaded.', 'success');
-                } catch (error) {
-                    showOpenPdfFallback(pdfUrl);
-                    setPlanStatus('Download blocked by your browser. Use the link below.', 'error');
-                }
-
-                setTimeout(() => URL.revokeObjectURL(pdfUrl), 2000);
-            } catch (error) {
-                console.error('PDF generation failed:', error);
-                setPlanStatus('Something went wrong. Please try again.', 'error');
-            } finally {
-                if (generateButton) generateButton.disabled = hasSavedPlan;
-                const profileLink = document.getElementById('profilePlanLink');
-                if (profileLink) profileLink.style.display = hasSavedPlan ? 'inline-block' : 'none';
-            }
-        }
-
         const CURRENT_USER_KEY = 'brotein_current_user';
-        let hasSavedPlan = false;
-
-        async function checkSavedPlan() {
-            const db = window.broteinSupabase;
-            const session = db ? (await db.auth.getSession()).data.session : null;
-            if (!session) return;
-            const { data } = await db.from('workout_plans').select('id').eq('user_id', session.user.id).maybeSingle();
-            hasSavedPlan = Boolean(data);
-            updateGenerateButtonState();
-        }
+        const db = window.broteinSupabase;
+        let savedPlan = null;
 
         function getCurrentUser() {
             try {
@@ -928,40 +878,158 @@
             }
         });
 
-        updateGenerateButtonState();
+        function escapeHtml(value) {
+            return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
 
-        const planForm = document.getElementById('planForm');
-        const generateButton = document.querySelector('.generate-button');
+        function setPlanStatus(message, type = '') {
+            const statusEl = document.getElementById('planStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'plan-status';
+            if (type) statusEl.classList.add(type);
+        }
 
-        ['weight', 'height', 'days', 'goal'].forEach((id) => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('input', updateGenerateButtonState);
-                el.addEventListener('change', updateGenerateButtonState);
-            }
-        });
+        function showProfileMessage(message) {
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('profileMessage').style.display = 'block';
+            document.getElementById('profileMessageText').textContent = message;
+        }
 
-        planForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-        });
+        function renderPlan(profile) {
+            const empty = document.getElementById('planEmpty');
+            const details = document.getElementById('planDetails');
 
-        generateButton.addEventListener('click', async function () {
-            if (!canGeneratePlan()) {
-                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
+            if (!savedPlan) {
+                details.style.display = 'none';
+                empty.style.display = 'block';
+                const isPremium = String(profile?.package || 'FREE').toUpperCase() === 'PREMIUM';
+                document.getElementById('planEmptyText').textContent = isPremium
+                    ? 'You don\'t have a saved plan yet. Generate one and it will be kept here.'
+                    : 'Workout plans are a Premium feature. Upgrade to generate your personal plan.';
+                const link = document.getElementById('planEmptyLink');
+                link.textContent = isPremium ? 'Generate a plan' : 'Upgrade';
+                link.href = isPremium ? 'plan.html' : 'upgrade.html';
                 return;
             }
 
+            const plan = rowToPlan(savedPlan);
+            const goalPlan = getGoalPlan(plan.goal, plan.days, plan.gender);
+
+            empty.style.display = 'none';
+            details.style.display = 'block';
+
+            document.getElementById('planSummary').innerHTML = [
+                goalPlan.label,
+                `${plan.days} days / week`,
+                plan.gender === 'female' ? 'Female' : 'Male',
+                `${plan.weight.toFixed(1)} kg`,
+                `${plan.height} cm`,
+                `Age ${plan.age}`,
+                `BMI ${getPlanBmi(plan).toFixed(1)}`,
+                `Created ${new Date(savedPlan.created_at).toLocaleDateString()}`
+            ].map((item) => `<span>${escapeHtml(item)}</span>`).join('');
+
+            document.getElementById('planFocus').textContent = goalPlan.focus;
+            document.getElementById('planWeekly').textContent = goalPlan.weekly;
+            document.getElementById('planNutrition').textContent = goalPlan.nutrition;
+
+            document.getElementById('planSessions').innerHTML = getPlanSessions(plan).map((session, index) => `
+                <div class="plan-card">
+                    <span class="day">Day ${index + 1}</span>
+                    <h3>${escapeHtml(session.title)}</h3>
+                    <ul>${session.exercises.map((exercise) => `<li>${escapeHtml(exercise)}</li>`).join('')}</ul>
+                </div>
+            `).join('');
+        }
+
+        async function loadProfile() {
+            if (!db) {
+                showProfileMessage('Could not connect to the server. Please try again later.');
+                return;
+            }
+
+            const { data: { session } } = await db.auth.getSession();
+            if (!session) {
+                showProfileMessage('Log in with your account to see your profile and saved plan.');
+                return;
+            }
+
+            const [{ data: profile }, { data: plan, error: planError }] = await Promise.all([
+                db.from('profiles').select('name, email, package, created_at').eq('id', session.user.id).maybeSingle(),
+                db.from('workout_plans').select('*').eq('user_id', session.user.id).maybeSingle()
+            ]);
+
+            const packageName = String(profile?.package || 'FREE').toUpperCase();
+            document.getElementById('profileName').textContent = profile?.name || session.user.user_metadata?.name || 'User';
+            document.getElementById('profileEmail').textContent = profile?.email || session.user.email;
+            const packageEl = document.getElementById('profilePackage');
+            packageEl.textContent = packageName;
+            packageEl.classList.toggle('premium', packageName === 'PREMIUM');
+            document.getElementById('profileJoined').textContent = profile?.created_at
+                ? new Date(profile.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+                : 'N/A';
+
+            document.getElementById('profileMessage').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'grid';
+
+            if (planError) {
+                setPlanStatus('Could not load your plan: ' + planError.message, 'error');
+            }
+            savedPlan = plan || null;
+            renderPlan(profile);
+        }
+
+        document.getElementById('downloadPlanButton').addEventListener('click', function () {
+            if (!savedPlan) return;
+            const plan = rowToPlan(savedPlan);
             try {
-                await generatePdf();
+                const doc = createPlanPdf(plan, new Date(savedPlan.created_at));
+                const pdfUrl = URL.createObjectURL(doc.output('blob'));
+                try {
+                    const link = document.createElement('a');
+                    link.href = pdfUrl;
+                    link.download = getPlanPdfFilename(plan);
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setPlanStatus('PDF downloaded.', 'success');
+                } catch (error) {
+                    const fallback = document.getElementById('openPdfFallback');
+                    fallback.href = pdfUrl;
+                    fallback.style.display = 'inline-block';
+                    setPlanStatus('Download blocked by your browser. Use the link below.', 'error');
+                    return;
+                }
+                setTimeout(() => URL.revokeObjectURL(pdfUrl), 2000);
             } catch (error) {
-                console.error('Plan generation failed:', error);
+                console.error('PDF generation failed:', error);
                 setPlanStatus('Something went wrong. Please try again.', 'error');
             }
         });
 
-        updateGenerateButtonState();
+        document.getElementById('deletePlanButton').addEventListener('click', async function () {
+            if (!savedPlan) return;
+            if (!confirm('Delete your workout plan? You can generate a new one afterwards.')) return;
+
+            this.disabled = true;
+            const { error } = await db.from('workout_plans').delete().eq('id', savedPlan.id);
+            this.disabled = false;
+
+            if (error) {
+                setPlanStatus('Could not delete your plan: ' + error.message, 'error');
+                return;
+            }
+
+            savedPlan = null;
+            document.getElementById('openPdfFallback').style.display = 'none';
+            const { data: profile } = await db.from('profiles').select('package').eq('id', (await db.auth.getSession()).data.session.user.id).maybeSingle();
+            renderPlan(profile);
+            setPlanStatus('Plan deleted. You can now generate a new one.', 'success');
+        });
+
         updateAccountMenu();
-        checkSavedPlan();
+        loadProfile();
     </script>
 </body>
 </html>

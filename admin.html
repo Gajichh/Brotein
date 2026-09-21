@@ -188,17 +188,13 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script>
-        const USERS_KEY = 'brotein_users';
+        const db = window.broteinSupabase;
 
-        function readUsers() {
-            try {
-                const stored = localStorage.getItem(USERS_KEY);
-                const users = stored ? JSON.parse(stored) : [];
-                return Array.isArray(users) ? users : [];
-            } catch (error) {
-                return [];
-            }
+        function escapeHtml(value) {
+            return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function formatDate(dateString) {
@@ -212,8 +208,41 @@
             });
         }
 
-        function renderAdminTable() {
-            const users = readUsers();
+        function showMessage(message) {
+            document.getElementById('adminTableBody').innerHTML = '';
+            const emptyState = document.getElementById('emptyState');
+            emptyState.textContent = message;
+            emptyState.style.display = 'block';
+        }
+
+        async function renderAdminTable() {
+            if (!db) {
+                showMessage('Could not connect to the server.');
+                return;
+            }
+
+            const { data: { session } } = await db.auth.getSession();
+            if (!session) {
+                showMessage('Log in with an admin account to view users.');
+                return;
+            }
+
+            const { data: isAdmin } = await db.rpc('is_admin');
+            if (!isAdmin) {
+                showMessage('This account does not have admin access.');
+                return;
+            }
+
+            const { data: users, error } = await db
+                .from('profiles')
+                .select('id, name, email, package, created_at')
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                showMessage('Could not load users: ' + error.message);
+                return;
+            }
+
             const tbody = document.getElementById('adminTableBody');
             const emptyState = document.getElementById('emptyState');
             const chip = document.querySelector('.chip');
@@ -225,30 +254,35 @@
             }
 
             if (!users.length) {
-                tbody.innerHTML = '';
-                emptyState.style.display = 'block';
+                showMessage('No accounts found.');
                 return;
             }
 
             emptyState.style.display = 'none';
-            tbody.innerHTML = users.map((user, index) => `
+            tbody.innerHTML = users.map((user) => `
                 <tr>
-                    <td data-label="Name">${(user.name || 'Unknown').replace(/</g, '&lt;')}</td>
-                    <td data-label="Email">${(user.email || 'N/A').replace(/</g, '&lt;')}</td>
-                    <td data-label="Package"><span class="package-badge">${(user.package || 'FREE').toUpperCase()}</span></td>
-                    <td data-label="Joined">${formatDate(user.createdAt)}</td>
+                    <td data-label="Name">${escapeHtml(user.name || 'Unknown')}</td>
+                    <td data-label="Email">${escapeHtml(user.email || 'N/A')}</td>
+                    <td data-label="Package"><span class="package-badge">${escapeHtml((user.package || 'FREE').toUpperCase())}</span></td>
+                    <td data-label="Joined">${formatDate(user.created_at)}</td>
                     <td data-label="Action">
-                        <button class="remove-btn" type="button" data-index="${index}">Remove</button>
+                        ${user.id === session.user.id
+                            ? ''
+                            : `<button class="remove-btn" type="button" data-id="${user.id}">Remove</button>`}
                     </td>
                 </tr>
             `).join('');
 
             document.querySelectorAll('.remove-btn').forEach((button) => {
-                button.addEventListener('click', function () {
-                    const index = Number(this.dataset.index);
-                    const users = readUsers();
-                    users.splice(index, 1);
-                    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+                button.addEventListener('click', async function () {
+                    if (!confirm('Permanently delete this account?')) return;
+                    this.disabled = true;
+                    const { error } = await db.rpc('admin_delete_user', { target_id: this.dataset.id });
+                    if (error) {
+                        alert('Could not remove user: ' + error.message);
+                        this.disabled = false;
+                        return;
+                    }
                     renderAdminTable();
                 });
             });

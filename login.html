@@ -603,8 +603,8 @@
                 <div id="loginPanel" class="form-panel active">
                     <form id="loginForm">
                         <div class="field">
-                            <label for="loginEmail">Email or username</label>
-                            <input id="loginEmail" name="loginEmail" type="text" placeholder="you@example.com" required />
+                            <label for="loginEmail">Email</label>
+                            <input id="loginEmail" name="loginEmail" type="email" placeholder="you@example.com" required />
                         </div>
 
                         <div class="field">
@@ -698,29 +698,11 @@
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script>
-        const USERS_KEY = 'brotein_users';
         const CURRENT_USER_KEY = 'brotein_current_user';
-
-        function readUsers() {
-            try {
-                const stored = localStorage.getItem(USERS_KEY);
-                const users = stored ? JSON.parse(stored) : [];
-                return users.map((user) => ({
-                    name: user.name || 'Unknown',
-                    email: user.email || '',
-                    password: user.password || '',
-                    package: user.package || 'FREE',
-                    createdAt: user.createdAt || new Date().toISOString()
-                }));
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function writeUsers(users) {
-            localStorage.setItem(USERS_KEY, JSON.stringify(users));
-        }
+        const db = window.broteinSupabase;
 
         function setStatus(message, type = '') {
             const statusEl = document.getElementById('authStatus');
@@ -758,6 +740,28 @@
             setStatus('');
         }
 
+        function setBusy(form, busy) {
+            form.querySelector('.submit-btn').disabled = busy;
+        }
+
+        // Loads the profile row for a signed-in Supabase user and marks them as the current user.
+        async function saveCurrentUser(authUser) {
+            const { data: profile } = await db
+                .from('profiles')
+                .select('name, package, is_admin')
+                .eq('id', authUser.id)
+                .maybeSingle();
+
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
+                name: profile?.name || authUser.user_metadata?.name || 'User',
+                email: authUser.email,
+                package: profile?.package || 'FREE',
+                isAdmin: Boolean(profile?.is_admin),
+                guest: false,
+                loggedIn: true
+            }));
+        }
+
         document.querySelectorAll('.tab-button').forEach((button) => {
             button.addEventListener('click', () => switchTab(button.dataset.tab));
         });
@@ -768,7 +772,7 @@
 
         updateRegisterButtonState();
 
-        document.getElementById('registerForm').addEventListener('submit', function (event) {
+        document.getElementById('registerForm').addEventListener('submit', async function (event) {
             event.preventDefault();
 
             const name = document.getElementById('registerName').value.trim();
@@ -792,79 +796,78 @@
                 return;
             }
 
-            const users = readUsers();
-            const existingUser = users.find((user) => user.email.toLowerCase() === email.toLowerCase());
+            if (!db) {
+                setStatus('Could not connect to the server. Please try again later.', 'error');
+                return;
+            }
 
-            if (existingUser) {
+            setBusy(this, true);
+            const { data, error } = await db.auth.signUp({
+                email,
+                password,
+                options: { data: { name, package: selectedPlan } }
+            });
+
+            if (error) {
+                setBusy(this, false);
+                setStatus(error.message, 'error');
+                return;
+            }
+
+            // Supabase returns a user with no identities when the email is already registered.
+            if (data.user && data.user.identities && data.user.identities.length === 0) {
+                setBusy(this, false);
                 setStatus('An account with that email already exists.', 'error');
                 return;
             }
 
-            users.push({
-                name,
-                email,
-                password,
-                package: selectedPlan,
-                createdAt: new Date().toISOString()
-            });
-
-            writeUsers(users);
-
-            if (selectedPlan === 'PREMIUM') {
-                const premiumUser = {
-                    name,
-                    email,
-                    package: 'PREMIUM',
-                    guest: false,
-                    loggedIn: true
-                };
-
-                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(premiumUser));
-                setStatus('Premium registration successful. Redirecting...', 'success');
+            // Email confirmation is off: the user is signed in straight away.
+            if (data.session) {
+                await saveCurrentUser(data.user);
+                setStatus(selectedPlan === 'PREMIUM' ? 'Premium registration successful. Redirecting...' : 'Registration successful. Redirecting...', 'success');
                 window.location.href = 'index.html';
                 return;
             }
 
-            setStatus('Registration successful. You can now log in.', 'success');
-            document.getElementById('registerForm').reset();
+            setBusy(this, false);
+            this.reset();
+            updateRegisterButtonState();
             switchTab('login');
+            setStatus('Registration successful. Check your email to confirm your account, then log in.', 'success');
         });
 
-        document.getElementById('loginForm').addEventListener('submit', function (event) {
+        document.getElementById('loginForm').addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            const loginInput = document.getElementById('loginEmail').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
-            if (!loginInput || !password) {
-                setStatus('Enter your email/username and password.', 'error');
+            if (!email || !password) {
+                setStatus('Enter your email and password.', 'error');
                 return;
             }
 
-            const users = readUsers();
-            const user = users.find((entry) =>
-                (entry.email && entry.email.toLowerCase() === loginInput.toLowerCase()) ||
-                (entry.name && entry.name.toLowerCase() === loginInput.toLowerCase())
-            );
-
-            if (!user || user.password !== password) {
-                setStatus('Incorrect email or password.', 'error');
+            if (!db) {
+                setStatus('Could not connect to the server. Please try again later.', 'error');
                 return;
             }
 
-            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
-                name: user.name,
-                email: user.email,
-                package: user.package || 'FREE',
-                guest: false,
-                loggedIn: true
-            }));
+            setBusy(this, true);
+            const { data, error } = await db.auth.signInWithPassword({ email, password });
 
+            if (error) {
+                setBusy(this, false);
+                setStatus(error.message === 'Invalid login credentials' ? 'Incorrect email or password.' : error.message, 'error');
+                return;
+            }
+
+            await saveCurrentUser(data.user);
             setStatus('Login successful. Redirecting...', 'success');
             window.location.href = 'index.html';
         });
 
-        document.getElementById('guestLogin').addEventListener('click', function () {
+        document.getElementById('guestLogin').addEventListener('click', async function () {
+            if (db) await db.auth.signOut();
             localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
                 name: 'Guest',
                 email: 'guest@brotein.com',
