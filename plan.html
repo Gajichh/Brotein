@@ -140,6 +140,13 @@
             text-align: center;
         }
 
+        .account-name.premium-user {
+            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
         .account-menu .menu-btn {
             width: 100%;
             border: 1px solid rgba(255,255,255,0.12);
@@ -153,6 +160,15 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
             cursor: pointer;
+        }
+
+        .account-menu .upgrade-btn {
+            display: none;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            border-color: rgba(251,191,36,0.6);
+            color: #1b1208;
+            box-shadow: 0 10px 20px rgba(249,115,22,0.18);
         }
 
         .account-menu .logout-btn {
@@ -546,6 +562,7 @@
                     </button>
                     <div class="account-menu">
                         <div class="account-name" id="accountName">Guest</div>
+                        <button class="menu-btn upgrade-btn" type="button">Upgrade</button>
                         <button class="menu-btn login-btn" type="button">Log in</button>
                         <button class="menu-btn logout-btn" type="button">Log out</button>
                     </div>
@@ -827,6 +844,11 @@
             if (type) statusEl.classList.add(type);
         }
 
+        function isPremiumAccount() {
+            const user = getCurrentUser();
+            return String(user?.package || 'FREE').toUpperCase() === 'PREMIUM';
+        }
+
         function canGeneratePlan() {
             const weight = Number(document.getElementById('weight')?.value || 0);
             const height = Number(document.getElementById('height')?.value || 0);
@@ -840,13 +862,23 @@
             const button = document.querySelector('.generate-button');
             if (!button) return;
 
-            const enabled = canGeneratePlan();
-            button.disabled = !enabled;
-            button.style.opacity = enabled ? '1' : '0.6';
-            button.style.cursor = enabled ? 'pointer' : 'not-allowed';
+            const hasInputs = canGeneratePlan();
+            const isPremium = isPremiumAccount();
+            const allowed = hasInputs && isPremium;
 
-            if (!enabled) {
+            button.disabled = !allowed;
+            button.style.opacity = allowed ? '1' : '0.7';
+            button.style.cursor = allowed ? 'pointer' : 'not-allowed';
+
+            const label = button.querySelector('span');
+            if (label) {
+                label.textContent = isPremium ? 'Generate the plan' : 'ONLY 0.99$';
+            }
+
+            if (!hasInputs && isPremium) {
                 setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
+            } else if (!isPremium) {
+                setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
             } else {
                 setPlanStatus('');
             }
@@ -860,6 +892,12 @@
         }
 
         async function generatePdf() {
+            if (!isPremiumAccount()) {
+                setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
+                updateGenerateButtonState();
+                return;
+            }
+
             if (!canGeneratePlan()) {
                 setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
                 return;
@@ -1012,18 +1050,43 @@
             const nameEl = document.getElementById('accountName');
             const loginBtn = document.querySelector('.login-btn');
             const logoutBtn = document.querySelector('.logout-btn');
+            const upgradeBtn = document.querySelector('.upgrade-btn');
 
             if (!nameEl || !loginBtn || !logoutBtn) return;
+
+            const isGuest = !!user && user.guest === true;
+            const packageName = (user && user.package) ? String(user.package).toUpperCase() : 'FREE';
+            const isPremium = packageName === 'PREMIUM';
+            nameEl.classList.toggle('premium-user', isPremium);
+
+            if (isGuest) {
+                nameEl.textContent = 'Guest';
+                loginBtn.textContent = 'LOG IN';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                if (upgradeBtn) {
+                    upgradeBtn.style.display = 'none';
+                }
+                return;
+            }
 
             if (user) {
                 const displayName = user.name || 'User';
                 nameEl.textContent = displayName;
+                loginBtn.textContent = 'Log in';
                 loginBtn.style.display = 'none';
                 logoutBtn.style.display = 'block';
+                if (upgradeBtn) {
+                    upgradeBtn.style.display = isPremium ? 'none' : 'block';
+                }
             } else {
                 nameEl.textContent = 'Guest';
+                loginBtn.textContent = 'LOG IN';
                 loginBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
+                if (upgradeBtn) {
+                    upgradeBtn.style.display = 'none';
+                }
             }
         }
 
@@ -1031,9 +1094,13 @@
             window.location.href = 'login.html';
         });
 
+        document.querySelector('.upgrade-btn')?.addEventListener('click', function () {
+            window.location.href = 'upgrade.html';
+        });
+
         document.querySelector('.logout-btn')?.addEventListener('click', function () {
             localStorage.removeItem(CURRENT_USER_KEY);
-            updateAccountMenu();
+            window.location.reload();
         });
 
         document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
@@ -1049,6 +1116,8 @@
                 accountWrap.classList.remove('is-open');
             }
         });
+
+        updateGenerateButtonState();
 
         const planForm = document.getElementById('planForm');
         const generateButton = document.querySelector('.generate-button');

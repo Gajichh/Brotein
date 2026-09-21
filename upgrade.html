@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brotein | Upgrade</title>
+    <meta name="description" content="Upgrade to Brotein Premium and unlock workout plan generation." />
+    <link rel="icon" type="image/x-icon" href="broteinico.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --panel: #151515;
+            --panel-alt: #1b1b1b;
+            --text: #f3f3f1;
+            --muted: #b2b2ad;
+            --line: rgba(255,255,255,0.1);
+            --chip: rgba(255,255,255,0.06);
+            --success: #d9f99d;
+            --danger: #ff9b9b;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: "Inter", sans-serif;
+            background: linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .page-shell {
+            width: min(1180px, calc(100% - 24px));
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+            background: rgba(13, 13, 13, 0.7);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            display: block;
+            width: 110px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .nav-cta {
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 76px);
+            padding: 48px 0 80px;
+        }
+
+        .upgrade-shell {
+            width: min(560px, 100%);
+        }
+
+        .logo-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 26px;
+        }
+
+        .center-logo {
+            width: 220px;
+            max-width: 72%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .upgrade-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            padding: 28px 22px 22px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            margin: 0 0 18px;
+            text-align: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: -0.06em;
+        }
+
+        .subtitle {
+            margin: 0 0 20px;
+            text-align: center;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 0.96rem;
+        }
+
+        .plan-option {
+            position: relative;
+            display: block;
+            cursor: pointer;
+        }
+
+        .plan-option input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .plan-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 230px;
+            padding: 16px 14px 14px;
+            border-radius: 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .plan-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.12), transparent 42%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .plan-option input:checked + .plan-card {
+            border-color: rgba(255,255,255,0.28);
+            box-shadow: 0 16px 28px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+        }
+
+        .plan-option input:checked + .plan-card::before {
+            opacity: 1;
+        }
+
+        .plan-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .plan-name {
+            display: inline-block;
+            font-size: 0.96rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .premium-card .plan-name {
+            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .plan-badge,
+        .plan-price {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 10px;
+            border-radius: 999px;
+            line-height: 1;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .plan-badge {
+            background: rgba(255,255,255,0.07);
+            color: var(--muted);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .plan-meta {
+            display: block;
+            margin-top: 10px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+        }
+
+        .plan-list {
+            list-style: none;
+            display: grid;
+            gap: 8px;
+            margin: 14px 0 0;
+            padding: 0;
+            color: var(--muted);
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .plan-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .plan-list li::before {
+            content: "✓";
+            color: #4ade80;
+            font-weight: 800;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            margin-top: 1px;
+        }
+
+        .premium-card {
+            border: 1px solid transparent;
+            background: linear-gradient(180deg, rgba(16,16,16,0.96), rgba(16,16,16,0.96)) padding-box,
+                linear-gradient(135deg, rgba(251,191,36,1), rgba(245,158,11,0.96), rgba(249,115,22,0.92)) border-box;
+            background-clip: padding-box, border-box;
+            background-origin: padding-box, border-box;
+            box-shadow: inset 0 0 0 1px rgba(251,191,36,0.18);
+        }
+
+        .plan-price {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(249,115,22,0.34));
+            border: 1px solid rgba(251,191,36,0.68);
+            color: #fef3c7;
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: 0 8px 18px rgba(249,115,22,0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+
+        .button-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .button {
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            background: var(--text);
+            color: var(--bg);
+            padding: 14px 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        .button.premium {
+            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            color: #1b1208;
+            border-color: rgba(251,191,36,0.7);
+            box-shadow: 0 12px 24px rgba(249,115,22,0.22);
+        }
+
+        .button.ghost {
+            background: #4a4a4a;
+            border-color: rgba(255,255,255,0.12);
+            color: #f2f2f2;
+            font-size: 0.66rem;
+            letter-spacing: 0.09em;
+            padding: 10px 14px;
+        }
+
+        .button.ghost span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .button.ghost svg {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+        }
+
+        .status {
+            min-height: 22px;
+            margin-top: 14px;
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        .status.success {
+            color: var(--success);
+        }
+
+        .status.error {
+            color: var(--danger);
+        }
+
+        @media (max-width: 820px) {
+            .nav {
+                height: auto;
+                min-height: 76px;
+                padding: 12px 0;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-cta {
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-shell {
+                width: min(100%, calc(100% - 18px));
+            }
+
+            .upgrade-card {
+                padding: 20px 16px 18px;
+            }
+
+            .center-logo {
+                width: 180px;
+            }
+
+            .button-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-shell nav">
+            <a href="index.html" class="brand" aria-label="Brotein home">
+                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
+            </a>
+
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="calculators.html">Calculators</a>
+                <a href="plan.html">Plans</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <a href="login.html" class="nav-cta">Login</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="upgrade-shell">
+            <div class="logo-wrap">
+                <img src="broteinlogo.png" alt="Brotein logo" class="center-logo" />
+            </div>
+
+            <div class="upgrade-card">
+                <h1>Upgrade to Premium</h1>
+                <p class="subtitle">Unlock custom workout plan generation and keep everything premium-focused.</p>
+
+                <label class="plan-option" aria-label="Premium plan">
+                    <input type="radio" name="planType" value="PREMIUM" checked />
+                    <span class="plan-card premium-card">
+                        <span class="plan-top">
+                            <span class="plan-name">Premium</span>
+                        </span>
+                        <span class="plan-meta">Best for serious progress</span>
+                        <ul class="plan-list">
+                            <li>Unlimited workout plan generation</li>
+                            <li>BMI calculator</li>
+                            <li>Calorie intake tools</li>
+                            <li>Basic fitness tracking</li>
+                            <li>Full access to premium features</li>
+                        </ul>
+                        <span class="plan-price" aria-label="Price: only 0.99 dollars">ONLY 0.99$</span>
+                    </span>
+                </label>
+
+                <div class="button-row">
+                    <button type="button" id="upgradeButton" class="button premium">Upgrade</button>
+                    <button type="button" id="goBackButton" class="button ghost" aria-label="Go back">
+                        <span>
+                            <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 4 4 10l6 6"></path>
+                                <path d="M4 10h11"></path>
+                            </svg>
+                            Go back
+                        </span>
+                    </button>
+                </div>
+
+                <div id="upgradeStatus" class="status" aria-live="polite"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const USERS_KEY = 'brotein_users';
+        const CURRENT_USER_KEY = 'brotein_current_user';
+
+        function getCurrentUser() {
+            try {
+                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
+                return user && user.loggedIn ? user : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function readUsers() {
+            try {
+                const stored = localStorage.getItem(USERS_KEY);
+                const users = stored ? JSON.parse(stored) : [];
+                return users.map((user) => ({
+                    name: user.name || 'Unknown',
+                    email: user.email || '',
+                    password: user.password || '',
+                    package: user.package || 'FREE',
+                    createdAt: user.createdAt || new Date().toISOString()
+                }));
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writeUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function setStatus(message, type = '') {
+            const statusEl = document.getElementById('upgradeStatus');
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.className = 'status';
+            if (type) statusEl.classList.add(type);
+        }
+
+        function isFreeUser() {
+            const user = getCurrentUser();
+            return !!user && String(user.package || 'FREE').toUpperCase() === 'FREE';
+        }
+
+        document.getElementById('goBackButton')?.addEventListener('click', function () {
+            window.history.back();
+        });
+
+        document.getElementById('upgradeButton')?.addEventListener('click', function () {
+            const currentUser = getCurrentUser();
+
+            if (!currentUser) {
+                setStatus('Please log in before upgrading.', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const users = readUsers();
+            const emailKey = (currentUser.email || '').toLowerCase();
+            const matchIndex = users.findIndex((user) => (user.email || '').toLowerCase() === emailKey);
+
+            const updatedUser = {
+                name: currentUser.name || 'User',
+                email: currentUser.email || '',
+                package: 'PREMIUM',
+                guest: false,
+                loggedIn: true
+            };
+
+            if (matchIndex >= 0) {
+                users[matchIndex].package = 'PREMIUM';
+            } else {
+                users.push({
+                    name: updatedUser.name,
+                    email: updatedUser.email,
+                    password: '',
+                    package: 'PREMIUM',
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            writeUsers(users);
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+            setStatus('Premium activated successfully.', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 600);
+        });
+
+        if (!isFreeUser()) {
+            setStatus('You are already on a premium plan or not logged in.', 'error');
+            const upgradeButton = document.getElementById('upgradeButton');
+            if (upgradeButton) {
+                upgradeButton.disabled = true;
+                upgradeButton.style.opacity = '0.6';
+                upgradeButton.style.cursor = 'not-allowed';
+            }
+        }
+    </script>
+</body>
+</html>
