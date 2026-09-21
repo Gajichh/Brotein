@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brotein | Gym Memes & Workout Plans</title>
     <meta name="description" content="Brotein is a fitness meme and workout plan brand built around gym culture, training motivation, and no-excuses performance content.">
+    <link rel="icon" type="image/x-icon" href="broteinico.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -33,6 +34,8 @@
                 linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
             color: var(--text);
             position: relative;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
         }
 
         body::before {
@@ -87,9 +90,100 @@
             min-width: 0;
         }
 
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-wrap {
+            position: relative;
+            padding-bottom: 14px;
+            margin-bottom: -14px;
+        }
+
+        .account-trigger {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .account-trigger:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .account-trigger svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .account-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            opacity: 0;
+            pointer-events: none;
+            width: 190px;
+            background: rgba(18,18,18,0.98);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition-delay: 0.08s;
+        }
+
+        .account-wrap:hover .account-menu,
+        .account-wrap:focus-within .account-menu,
+        .account-wrap.is-open .account-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .account-name {
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .account-menu .menu-btn {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            border-radius: 999px;
+            padding: 10px 12px;
+            font: inherit;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .account-menu .logout-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
         .brand-logo {
             display: block;
-            width: 130px;
+            width: 110px;
             height: auto;
             object-fit: contain;
             filter: brightness(1.05);
@@ -307,6 +401,7 @@
 
         .stat-card strong {
             display: block;
+            margin-bottom: 10px;
             font-size: clamp(1.6rem, 2vw, 2.1rem);
             letter-spacing: -0.06em;
         }
@@ -488,6 +583,15 @@
                 flex-wrap: wrap;
             }
 
+            .nav-left {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .nav-cta {
+                margin-left: auto;
+            }
+
             .nav-links {
                 display: none;
             }
@@ -495,6 +599,11 @@
             .nav-cta {
                 width: auto;
                 padding: 10px 16px;
+                font-size: 0.68rem;
+            }
+
+            .brand-logo {
+                width: 104px;
             }
 
             .hero {
@@ -530,9 +639,36 @@
                 width: min(100%, calc(100% - 18px));
             }
 
+            .nav {
+                gap: 8px;
+            }
+
+            .nav-left {
+                gap: 8px;
+            }
+
+            .account-trigger {
+                width: 34px;
+                height: 34px;
+            }
+
+            .account-menu {
+                width: 170px;
+            }
+
             .brand {
                 font-size: 0.88rem;
                 letter-spacing: 0.08em;
+            }
+
+            .brand-logo {
+                width: 82px;
+            }
+
+            .nav-cta {
+                padding: 9px 12px;
+                font-size: 0.62rem;
+                letter-spacing: 0.06em;
             }
 
             .eyebrow {
@@ -576,9 +712,22 @@
 <body>
     <header>
         <div class="page-shell nav">
-            <a href="index.html" class="brand" aria-label="Brotein home">
-                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
-            </a>
+            <div class="nav-left">
+                <div class="account-wrap">
+                    <button class="account-trigger" type="button" aria-label="Account menu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/></svg>
+                    </button>
+                    <div class="account-menu">
+                        <div class="account-name" id="accountName">Guest</div>
+                        <button class="menu-btn login-btn" type="button">Log in</button>
+                        <button class="menu-btn logout-btn" type="button">Log out</button>
+                    </div>
+                </div>
+
+                <a href="index.html" class="brand" aria-label="Brotein home">
+                    <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
+                </a>
+            </div>
 
             <nav class="nav-links" aria-label="Main navigation">
                 <a href="index.html">Home</a>
@@ -598,7 +747,7 @@
                 <div class="hero-title-wrap">
                     <h1 id="hero-title" aria-label="2,000,000 plus views across all platforms">
                         <span class="hero-number" data-target="2000000" data-suffix="+">0+</span>
-                        <span class="hero-subtitle">views accross all platforms</span>
+                        <span class="hero-subtitle">views across all platforms</span>
                     </h1>
                 </div>
                 <p class="subtext">Brotein: your gymbro for memes, workouts, and no-excuse gains.</p>
@@ -701,6 +850,63 @@
     </footer>
 
     <script>
+        const CURRENT_USER_KEY = 'brotein_current_user';
+
+        function getCurrentUser() {
+            try {
+                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
+                return user && user.loggedIn ? user : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function updateAccountMenu() {
+            const user = getCurrentUser();
+            const nameEl = document.getElementById('accountName');
+            const loginBtn = document.querySelector('.login-btn');
+            const logoutBtn = document.querySelector('.logout-btn');
+
+            if (!nameEl || !loginBtn || !logoutBtn) return;
+
+            if (user) {
+                const displayName = user.name || 'User';
+                nameEl.textContent = displayName;
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+            } else {
+                nameEl.textContent = 'Guest';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        document.querySelector('.login-btn')?.addEventListener('click', function () {
+            window.location.href = 'login.html';
+        });
+
+        document.querySelector('.logout-btn')?.addEventListener('click', function () {
+            localStorage.removeItem(CURRENT_USER_KEY);
+            updateAccountMenu();
+        });
+
+        document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
+            const accountWrap = this.closest('.account-wrap');
+            if (!accountWrap) return;
+            const isOpen = accountWrap.classList.toggle('is-open');
+            if (isOpen) {
+                accountWrap.querySelector('.account-menu')?.focus();
+            }
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function (event) {
+            const accountWrap = document.querySelector('.account-wrap');
+            if (accountWrap && !accountWrap.contains(event.target)) {
+                accountWrap.classList.remove('is-open');
+            }
+        });
+
         const counter = document.querySelector('.hero-number');
         if (counter) {
             const target = Number(counter.dataset.target || 0);
@@ -730,6 +936,8 @@
 
             requestAnimationFrame(animateCounter);
         }
+
+        updateAccountMenu();
     </script>
 </body>
 </html>

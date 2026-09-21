@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brotein | Login</title>
+    <meta name="description" content="Login or register for a Brotein account and continue to your training dashboard." />
+    <link rel="icon" type="image/x-icon" href="broteinico.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --panel: #151515;
+            --panel-alt: #1b1b1b;
+            --text: #f3f3f1;
+            --muted: #b2b2ad;
+            --line: rgba(255,255,255,0.1);
+            --chip: rgba(255,255,255,0.06);
+            --success: #d9f99d;
+            --danger: #ff9b9b;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: "Inter", sans-serif;
+            background: linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .page-shell {
+            width: min(1180px, calc(100% - 24px));
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+            background: rgba(13, 13, 13, 0.7);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            display: block;
+            width: 110px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .nav-cta {
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 76px);
+            padding: 48px 0 80px;
+        }
+
+        .auth-shell {
+            width: min(560px, 100%);
+        }
+
+        .logo-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 26px;
+        }
+
+        .center-logo {
+            width: 220px;
+            max-width: 72%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .auth-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            padding: 28px 22px 22px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .tab-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 22px;
+        }
+
+        .tab-button {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            border-radius: 12px;
+            padding: 12px 10px;
+            font: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+
+        .form-panel {
+            display: none;
+        }
+
+        .form-panel.active {
+            display: block;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        label {
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        input, button {
+            font: inherit;
+        }
+
+        input {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            padding: 14px 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            color-scheme: dark;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.28);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+        }
+
+        .inline-btn, .submit-btn, .guest-btn {
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            background: var(--text);
+            color: var(--bg);
+            padding: 14px 20px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover, .guest-btn:hover, .inline-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .muted-link {
+            display: inline-block;
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .auth-status {
+            min-height: 22px;
+            margin-top: 10px;
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        .auth-status.success {
+            color: var(--success);
+        }
+
+        .auth-status.error {
+            color: var(--danger);
+        }
+
+        .guest-row {
+            margin-top: 18px;
+        }
+
+        .guest-btn {
+            width: 100%;
+            background: transparent;
+            color: var(--text);
+        }
+
+        @media (max-width: 820px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-shell {
+                width: min(100%, calc(100% - 18px));
+            }
+
+            .auth-card {
+                padding: 20px 16px 18px;
+            }
+
+            .center-logo {
+                width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-shell nav">
+            <a href="index.html" class="brand" aria-label="Brotein home">
+                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
+            </a>
+
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="calculators.html">Calculators</a>
+                <a href="plan.html">Plans</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <a href="login.html" class="nav-cta">Login</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="auth-shell">
+            <div class="logo-wrap">
+                <img src="broteinlogo.png" alt="Brotein logo" class="center-logo" />
+            </div>
+
+            <div class="auth-card">
+                <div class="tab-row" role="tablist" aria-label="Authentication tabs">
+                    <button class="tab-button active" type="button" data-tab="login" aria-selected="true">Login</button>
+                    <button class="tab-button" type="button" data-tab="register" aria-selected="false">Register</button>
+                </div>
+
+                <div id="loginPanel" class="form-panel active">
+                    <form id="loginForm">
+                        <div class="field">
+                            <label for="loginEmail">Email or username</label>
+                            <input id="loginEmail" name="loginEmail" type="text" placeholder="you@example.com" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="loginPassword">Password</label>
+                            <input id="loginPassword" name="loginPassword" type="password" placeholder="Enter your password" required />
+                        </div>
+
+                        <button type="submit" class="submit-btn">Log in</button>
+                    </form>
+                </div>
+
+                <div id="registerPanel" class="form-panel">
+                    <form id="registerForm">
+                        <div class="field">
+                            <label for="registerName">Full name</label>
+                            <input id="registerName" name="registerName" type="text" placeholder="Your name" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="registerEmail">Email</label>
+                            <input id="registerEmail" name="registerEmail" type="email" placeholder="you@example.com" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="registerPassword">Password</label>
+                            <input id="registerPassword" name="registerPassword" type="password" placeholder="Create a password" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="registerConfirmPassword">Confirm password</label>
+                            <input id="registerConfirmPassword" name="registerConfirmPassword" type="password" placeholder="Repeat your password" required />
+                        </div>
+
+                        <button type="submit" class="submit-btn">Create account</button>
+                    </form>
+                </div>
+
+                <div class="guest-row">
+                    <button type="button" id="guestLogin" class="guest-btn">Continue as guest</button>
+                </div>
+
+                <div id="authStatus" class="auth-status" aria-live="polite"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const USERS_KEY = 'brotein_users';
+        const CURRENT_USER_KEY = 'brotein_current_user';
+
+        function readUsers() {
+            try {
+                const stored = localStorage.getItem(USERS_KEY);
+                const users = stored ? JSON.parse(stored) : [];
+                return users.map((user) => ({
+                    name: user.name || 'Unknown',
+                    email: user.email || '',
+                    password: user.password || '',
+                    package: user.package || 'FREE',
+                    createdAt: user.createdAt || new Date().toISOString()
+                }));
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writeUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function setStatus(message, type = '') {
+            const statusEl = document.getElementById('authStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'auth-status';
+            if (type) statusEl.classList.add(type);
+        }
+
+        function switchTab(tabName) {
+            const loginPanel = document.getElementById('loginPanel');
+            const registerPanel = document.getElementById('registerPanel');
+            const tabs = document.querySelectorAll('.tab-button');
+
+            const isLogin = tabName === 'login';
+            loginPanel.classList.toggle('active', isLogin);
+            registerPanel.classList.toggle('active', !isLogin);
+
+            tabs.forEach((tab) => {
+                const active = tab.dataset.tab === tabName;
+                tab.classList.toggle('active', active);
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+
+            setStatus('');
+        }
+
+        document.querySelectorAll('.tab-button').forEach((button) => {
+            button.addEventListener('click', () => switchTab(button.dataset.tab));
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+            if (!name || !email || !password || !confirmPassword) {
+                setStatus('Please fill in all fields.', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                setStatus('Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                setStatus('Passwords do not match.', 'error');
+                return;
+            }
+
+            const users = readUsers();
+            const existingUser = users.find((user) => user.email.toLowerCase() === email.toLowerCase());
+
+            if (existingUser) {
+                setStatus('An account with that email already exists.', 'error');
+                return;
+            }
+
+            users.push({
+                name,
+                email,
+                password,
+                package: 'FREE',
+                createdAt: new Date().toISOString()
+            });
+
+            writeUsers(users);
+            setStatus('Registration successful. You can now log in.', 'success');
+            document.getElementById('registerForm').reset();
+            switchTab('login');
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const loginInput = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!loginInput || !password) {
+                setStatus('Enter your email/username and password.', 'error');
+                return;
+            }
+
+            const users = readUsers();
+            const user = users.find((entry) =>
+                (entry.email && entry.email.toLowerCase() === loginInput.toLowerCase()) ||
+                (entry.name && entry.name.toLowerCase() === loginInput.toLowerCase())
+            );
+
+            if (!user || user.password !== password) {
+                setStatus('Incorrect email or password.', 'error');
+                return;
+            }
+
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
+                name: user.name,
+                email: user.email,
+                loggedIn: true
+            }));
+
+            setStatus('Login successful. Redirecting...', 'success');
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById('guestLogin').addEventListener('click', function () {
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
+                name: 'Guest',
+                email: 'guest@brotein.com',
+                guest: true,
+                loggedIn: true
+            }));
+
+            setStatus('Continuing as guest...', 'success');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

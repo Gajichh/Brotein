@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Brotein | Workout Plan</title>
+    <link rel="icon" type="image/x-icon" href="broteinico.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -24,6 +25,8 @@
             font-family: "Inter", sans-serif;
             background: linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
             color: var(--text);
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
         }
 
         a {
@@ -66,9 +69,100 @@
             min-width: 0;
         }
 
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-wrap {
+            position: relative;
+            padding-bottom: 14px;
+            margin-bottom: -14px;
+        }
+
+        .account-trigger {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .account-trigger:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .account-trigger svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .account-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            opacity: 0;
+            pointer-events: none;
+            width: 190px;
+            background: rgba(18,18,18,0.98);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition-delay: 0.08s;
+        }
+
+        .account-wrap:hover .account-menu,
+        .account-wrap:focus-within .account-menu,
+        .account-wrap.is-open .account-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .account-name {
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .account-menu .menu-btn {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            border-radius: 999px;
+            padding: 10px 12px;
+            font: inherit;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .account-menu .logout-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
         .brand-logo {
             display: block;
-            width: 130px;
+            width: 110px;
             height: auto;
             object-fit: contain;
             filter: brightness(1.05);
@@ -194,6 +288,7 @@
             color: var(--text);
             padding: 14px 14px;
             color-scheme: dark;
+            font-size: 16px;
         }
 
         select {
@@ -219,7 +314,7 @@
         }
 
         .generate-button {
-            margin-top: 20px;
+            margin-top: 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -235,39 +330,40 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-        .generate-button:hover {
+        .generate-button:hover:not(:disabled) {
             transform: translateY(-1px);
         }
 
+        .generate-button:disabled {
+            opacity: 0.75;
+            cursor: wait;
+        }
+
         .pdf-icon {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 18px;
             display: inline-block;
-            position: relative;
             flex-shrink: 0;
         }
 
-        .pdf-icon::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border: 1.5px solid var(--bg);
-            border-radius: 2px;
-            background: rgba(0,0,0,0.03);
+        .plan-status {
+            min-height: 20px;
+            margin-top: 14px;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--muted);
         }
 
-        .pdf-icon::after {
-            content: "";
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 5px;
-            height: 5px;
-            background: var(--bg);
-            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        .plan-status.error {
+            color: #ff8e8e;
+        }
+
+        .plan-status.success {
+            color: #9ce6b4;
         }
 
         .plan-card {
@@ -337,6 +433,33 @@
         }
 
         @media (max-width: 820px) {
+            .nav {
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .nav-left {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .nav-cta {
+                margin-left: auto;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-cta {
+                padding: 10px 14px;
+                font-size: 0.68rem;
+            }
+
+            .brand-logo {
+                width: 90px;
+            }
+
             .plan-grid,
             .form-grid {
                 grid-template-columns: 1fr;
@@ -358,9 +481,36 @@
                 padding-top: 18px;
             }
 
+            .nav {
+                gap: 8px;
+            }
+
+            .nav-left {
+                gap: 8px;
+            }
+
+            .account-trigger {
+                width: 34px;
+                height: 34px;
+            }
+
+            .account-menu {
+                width: 170px;
+            }
+
             .brand {
                 font-size: 0.86rem;
                 letter-spacing: 0.08em;
+            }
+
+            .brand-logo {
+                width: 82px;
+            }
+
+            .nav-cta {
+                padding: 9px 12px;
+                font-size: 0.62rem;
+                letter-spacing: 0.06em;
             }
 
             h1 {
@@ -389,9 +539,22 @@
 <body>
     <header>
         <div class="page-shell nav">
-            <a href="index.html" class="brand" aria-label="Brotein home">
-                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
-            </a>
+            <div class="nav-left">
+                <div class="account-wrap">
+                    <button class="account-trigger" type="button" aria-label="Account menu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/></svg>
+                    </button>
+                    <div class="account-menu">
+                        <div class="account-name" id="accountName">Guest</div>
+                        <button class="menu-btn login-btn" type="button">Log in</button>
+                        <button class="menu-btn logout-btn" type="button">Log out</button>
+                    </div>
+                </div>
+
+                <a href="index.html" class="brand" aria-label="Brotein home">
+                    <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
+                </a>
+            </div>
 
             <nav class="nav-links" aria-label="Main navigation">
                 <a href="index.html">Home</a>
@@ -430,7 +593,7 @@
 
                     <div class="field">
                         <label for="weight">Weight</label>
-                        <input id="weight" name="weight" type="number" min="30" step="0.1" value="75" required />
+                        <input id="weight" name="weight" type="number" min="0" step="0.1" value="0" required />
                     </div>
 
                     <div class="field">
@@ -443,21 +606,22 @@
 
                     <div class="field">
                         <label for="height">Height (cm)</label>
-                        <input id="height" name="height" type="number" min="100" step="0.1" value="178" required />
+                        <input id="height" name="height" type="number" min="0" step="0.1" value="0" required />
                     </div>
 
                     <div class="field">
                         <label for="age">Age</label>
-                        <input id="age" name="age" type="number" min="16" max="80" value="28" required />
+                        <input id="age" name="age" type="number" min="0" max="80" value="0" required />
                     </div>
 
                     <div class="field">
                         <label for="days">Training days per week</label>
                         <select id="days" name="days">
+                            <option value="0" selected>0 days</option>
                             <option value="2">2 days</option>
                             <option value="3">3 days</option>
                             <option value="4">4 days</option>
-                            <option value="5" selected>5 days</option>
+                            <option value="5">5 days</option>
                             <option value="6">6 days</option>
                         </select>
                     </div>
@@ -465,18 +629,24 @@
                     <div class="field">
                         <label for="goal">Goal</label>
                         <select id="goal" name="goal">
+                            <option value="" selected>Select goal</option>
                             <option value="loss">Weight loss</option>
                             <option value="maintain">Maintain</option>
                             <option value="gain">Weight gain</option>
-                            <option value="muscle" selected>Muscle gain</option>
+                            <option value="muscle">Muscle gain</option>
                         </select>
                     </div>
                 </div>
 
-                <button type="submit" class="generate-button">
-                    <span class="pdf-icon" aria-hidden="true"></span>
+                <button type="button" class="generate-button" aria-label="Generate the plan as PDF">
+                    <svg class="pdf-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M7 2.5h7.5L19.5 7v12.5A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 7 2.5zm7 1.2v4.3h4.3L14 3.7zm-1.1 7.8c-1.1 0-1.8.7-1.8 1.9v1.3h1.3v-1.2c0-.5.2-.8.7-.8h.6c.5 0 .8.3.8.8v1.2H15v-1.3c0-1.2-.7-1.9-1.9-1.9zm-3.4 0h1.7v4.6H9.5v-1.6H8.4v1.6H7.1v-4.6h1.3v1.5h1.1v-1.5zm6.2 0h2.2v.9h-1.2v3.7h-1.2v-3.7h-1.1v-.9z" fill="#D93025"/>
+                        <path d="M7 2.5h7.5L19.5 7v12.5A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 7 2.5Zm7 1.2v4.3h4.3L14 3.7z" fill="#F4B7B0" opacity="0.35"/>
+                    </svg>
                     <span>Generate the plan</span>
                 </button>
+                <a id="openPdfFallback" href="#" style="display:none; margin-top:12px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#dfe9ff; text-decoration:underline;" target="_blank" rel="noreferrer">Can't download? Open pdf</a>
+                <div id="planStatus" class="plan-status" aria-live="polite" role="status"></div>
             </form>
         </section>
 
@@ -501,11 +671,15 @@
                         : 'Create a calorie deficit while keeping training performance high and protecting muscle.',
                     weekly: femaleFocus
                         ? 'Keep leg sessions hard and frequent, then use shorter upper-body work with controlled volume.'
-                        : 'Use 2–3 short conditioning blocks and prioritize compound lifts with controlled volume.',
+                        : 'Use conditioning sparingly and prioritize compound work that keeps muscle while improving conditioning.',
                     nutrition: 'Keep protein high, carbs around your training, and aim for a modest deficit.',
-                    split: femaleFocus
-                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Lower', 'Conditioning'] : ['Legs', 'Conditioning'])
-                        : (days >= 5 ? ['Upper', 'Lower', 'Upper', 'Lower', 'Conditioning'] : days >= 3 ? ['Full Body', 'Full Body', 'Conditioning'] : ['Full Body', 'Conditioning'])
+                    split: days >= 5
+                        ? (femaleFocus ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : ['Push', 'Pull', 'Legs', 'Upper', 'Lower'])
+                        : days === 4
+                            ? (femaleFocus ? ['Legs', 'Upper', 'Lower', 'Conditioning'] : ['Push', 'Pull', 'Legs', 'Full Body'])
+                            : days === 3
+                                ? (femaleFocus ? ['Legs', 'Lower', 'Upper'] : ['Push', 'Pull', 'Legs'])
+                                : ['Full Body', 'Full Body']
                 },
                 maintain: {
                     label: 'Maintain',
@@ -516,9 +690,13 @@
                         ? 'Train your lower body with strong weekly frequency and keep upper-body work more supportive than dominant.'
                         : 'Use a balanced split with moderate volume and enough recovery between hard sessions.',
                     nutrition: 'Match calories to maintenance and keep protein steady at 1.6–2.2g/kg.',
-                    split: femaleFocus
-                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Upper', 'Lower'] : ['Legs', 'Full Body'])
-                        : (days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body'])
+                    split: days >= 5
+                        ? (femaleFocus ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : ['Push', 'Pull', 'Legs', 'Upper', 'Lower'])
+                        : days === 4
+                            ? (femaleFocus ? ['Legs', 'Upper', 'Lower', 'Full Body'] : ['Push', 'Pull', 'Legs', 'Full Body'])
+                            : days === 3
+                                ? (femaleFocus ? ['Legs', 'Upper', 'Lower'] : ['Push', 'Pull', 'Legs'])
+                                : ['Full Body', 'Full Body']
                 },
                 gain: {
                     label: 'Weight gain',
@@ -529,9 +707,13 @@
                         ? 'Keep the lower-body work dense and progressive while keeping upper-body work efficient and recovery-friendly.'
                         : 'Use slightly higher work capacity and keep hard sets close to failure while preserving recovery.',
                     nutrition: 'Add 200–300 kcal per day, keep protein high, and prioritize carbs around training.',
-                    split: femaleFocus
-                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Lower', 'Upper'] : ['Legs', 'Full Body'])
-                        : (days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body'])
+                    split: days >= 5
+                        ? (femaleFocus ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : ['Push', 'Pull', 'Legs', 'Upper', 'Lower'])
+                        : days === 4
+                            ? (femaleFocus ? ['Legs', 'Upper', 'Lower', 'Full Body'] : ['Push', 'Pull', 'Legs', 'Full Body'])
+                            : days === 3
+                                ? (femaleFocus ? ['Legs', 'Lower', 'Upper'] : ['Push', 'Pull', 'Legs'])
+                                : ['Full Body', 'Full Body']
                 },
                 muscle: {
                     label: 'Muscle gain',
@@ -542,9 +724,13 @@
                         ? 'Legs should lead the week with higher frequency and a little more total volume than the upper body.'
                         : 'Train each muscle group with enough frequency to stimulate growth without crushing recovery.',
                     nutrition: 'Target 1.6–2.2g of protein per kg of bodyweight and a small calorie surplus if needed.',
-                    split: femaleFocus
-                        ? (days >= 5 ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : days >= 3 ? ['Legs', 'Lower', 'Upper'] : ['Legs', 'Full Body'])
-                        : (days >= 5 ? ['Push', 'Pull', 'Legs', 'Upper', 'Lower'] : days >= 3 ? ['Push', 'Pull', 'Legs'] : ['Full Body', 'Full Body'])
+                    split: days >= 5
+                        ? (femaleFocus ? ['Legs', 'Upper', 'Legs', 'Lower', 'Conditioning'] : ['Push', 'Pull', 'Legs', 'Upper', 'Lower'])
+                        : days === 4
+                            ? (femaleFocus ? ['Legs', 'Upper', 'Lower', 'Full Body'] : ['Push', 'Pull', 'Legs', 'Full Body'])
+                            : days === 3
+                                ? (femaleFocus ? ['Legs', 'Lower', 'Upper'] : ['Push', 'Pull', 'Legs'])
+                                : ['Full Body', 'Full Body']
                 }
             };
 
@@ -562,19 +748,19 @@
             for (let i = 0; i < Math.min(Number(days), split.length); i++) {
                 const session = split[i];
                 if (session === 'Push') {
-                    sessions.push({ day: `Day ${i + 1}`, title: 'Push', exercises: ['Barbell Bench Press — 4 x 6', 'Incline DB Press — 3 x 8', 'Seated Overhead Press — 3 x 8', 'Cable Triceps Pressdown — 3 x 12'] });
+                    sessions.push({ day: `Day ${i + 1}`, title: 'Push', exercises: ['Barbell Bench Press — 3 x 6', 'Incline DB Press — 3 x 8', 'Seated Overhead Press — 2 x 8', 'Cable Triceps Pressdown — 2 x 10'] });
                 } else if (session === 'Pull') {
-                    sessions.push({ day: `Day ${i + 1}`, title: 'Pull', exercises: ['Weighted Pull-Up or Lat Pulldown — 4 x 8', 'Single-Arm Row — 4 x 10', 'Chest-Supported Row — 3 x 10', 'Face Pulls — 3 x 15'] });
+                    sessions.push({ day: `Day ${i + 1}`, title: 'Pull', exercises: ['Weighted Pull-Up or Lat Pulldown — 3 x 6', 'Single-Arm Row — 3 x 8', 'Chest-Supported Row — 2 x 10', 'Face Pulls — 2 x 12'] });
                 } else if (session === 'Legs') {
-                    sessions.push({ day: `Day ${i + 1}`, title: 'Legs', exercises: ['Back Squat — 4 x 6', 'Romanian Deadlift — 3 x 8', 'Leg Press — 3 x 10', 'Walking Lunges — 3 x 12'] });
+                    sessions.push({ day: `Day ${i + 1}`, title: 'Legs', exercises: ['Back Squat — 3 x 6', 'Romanian Deadlift — 3 x 8', 'Leg Press — 2 x 10', 'Walking Lunges — 2 x 10'] });
                 } else if (session === 'Upper') {
-                    sessions.push({ day: `Day ${i + 1}`, title: 'Upper', exercises: ['Bench Press — 4 x 6', 'Pull-Up or Lat Pulldown — 4 x 8', 'Shoulder Press — 3 x 8', 'Cable Row — 3 x 10'] });
+                    sessions.push({ day: `Day ${i + 1}`, title: 'Upper', exercises: ['Bench Press — 3 x 6', 'Pull-Up or Lat Pulldown — 3 x 8', 'Shoulder Press — 2 x 8', 'Cable Row — 2 x 10'] });
                 } else if (session === 'Lower') {
-                    sessions.push({ day: `Day ${i + 1}`, title: 'Lower', exercises: ['Front Squat or Goblet Squat — 4 x 6', 'Hip Thrust — 3 x 8', 'Leg Curl — 3 x 10', 'Split Squat — 3 x 12'] });
+                    sessions.push({ day: `Day ${i + 1}`, title: 'Lower', exercises: ['Front Squat or Goblet Squat — 3 x 6', 'Hip Thrust — 3 x 8', 'Leg Curl — 2 x 10', 'Split Squat — 2 x 10'] });
                 } else if (session === 'Conditioning') {
-                    sessions.push({ day: `Day ${i + 1}`, title: 'Conditioning', exercises: ['Bike Intervals — 8 rounds of 30s hard / 60s easy', 'Rowing — 5 x 500m', 'Core Circuit — 3 rounds of 15 reps each'] });
+                    sessions.push({ day: `Day ${i + 1}`, title: 'Conditioning', exercises: ['Bike Intervals — 6 rounds of 30s hard / 60s easy', 'Rowing — 4 x 500m moderate', 'Core Circuit — 2 x 10 reps each'] });
                 } else {
-                    sessions.push({ day: `Day ${i + 1}`, title: 'Full Body', exercises: ['Squat or Leg Press — 4 x 8', 'Bench Press or Dumbbell Press — 4 x 8', 'Lat Pulldown — 3 x 10', 'Romanian Deadlift — 3 x 8', 'Planks — 3 x 45s'] });
+                    sessions.push({ day: `Day ${i + 1}`, title: 'Full Body', exercises: ['Squat or Leg Press — 3 x 6', 'Bench Press or Dumbbell Press — 3 x 8', 'Lat Pulldown — 2 x 10', 'Romanian Deadlift — 2 x 8', 'Planks — 2 x 30s'] });
                 }
             }
 
@@ -611,7 +797,7 @@
 
         function drawSection(doc, title, lines, startY, leftMargin, width) {
             doc.setDrawColor(255, 255, 255);
-            doc.setFillColor(19, 19, 19);
+            doc.setFillColor(22, 22, 22);
             doc.roundedRect(leftMargin, startY, width, 22, 8, 8, 'F');
             doc.setTextColor(243, 243, 241);
             doc.setFont('helvetica', 'bold');
@@ -633,7 +819,52 @@
             return y + 12;
         }
 
-        function generatePdf() {
+        function setPlanStatus(message, type = '') {
+            const statusEl = document.getElementById('planStatus');
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.className = 'plan-status';
+            if (type) statusEl.classList.add(type);
+        }
+
+        function canGeneratePlan() {
+            const weight = Number(document.getElementById('weight')?.value || 0);
+            const height = Number(document.getElementById('height')?.value || 0);
+            const days = Number(document.getElementById('days')?.value || 0);
+            const goal = document.getElementById('goal')?.value || '';
+
+            return weight > 0 && height > 0 && days > 0 && goal !== '';
+        }
+
+        function updateGenerateButtonState() {
+            const button = document.querySelector('.generate-button');
+            if (!button) return;
+
+            const enabled = canGeneratePlan();
+            button.disabled = !enabled;
+            button.style.opacity = enabled ? '1' : '0.6';
+            button.style.cursor = enabled ? 'pointer' : 'not-allowed';
+
+            if (!enabled) {
+                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
+            } else {
+                setPlanStatus('');
+            }
+        }
+
+        function showOpenPdfFallback(pdfUrl) {
+            const fallback = document.getElementById('openPdfFallback');
+            if (!fallback) return;
+            fallback.href = pdfUrl;
+            fallback.style.display = 'inline-block';
+        }
+
+        async function generatePdf() {
+            if (!canGeneratePlan()) {
+                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
+                return;
+            }
+
             const form = document.getElementById('planForm');
             const formData = new FormData(form);
             const weight = Number(formData.get('weight'));
@@ -649,29 +880,28 @@
                 gender: formData.get('gender') || 'male'
             };
 
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 52;
-            const width = pageWidth - (margin * 2);
-            let y = 52;
+            const generateButton = document.querySelector('.generate-button');
+            if (generateButton) generateButton.disabled = true;
+            setPlanStatus('Generating your PDF...', 'success');
 
-            doc.setFillColor(13, 13, 13);
-            doc.rect(0, 0, pageWidth, pageHeight, 'F');
-            doc.setDrawColor(255, 255, 255);
-            doc.setLineWidth(1);
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 52;
+                const width = pageWidth - (margin * 2);
+                let y = 52;
 
-            doc.setTextColor(243, 243, 241);
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(26);
-            doc.text('Brotein Training Plan', margin, y);
+                doc.setFillColor(13, 13, 13);
+                doc.rect(0, 0, pageWidth, pageHeight, 'F');
+                doc.setDrawColor(255, 255, 255);
+                doc.setLineWidth(1);
 
-            doc.setTextColor(255, 255, 255, 0.08);
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(52);
-            doc.text('Brotein', 150, 760, { angle: 45 });
-            doc.setTextColor(243, 243, 241);
+                doc.setTextColor(243, 243, 241);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(26);
+                doc.text('Brotein Training Plan', margin, y);
 
             y += 30;
             doc.setFont('helvetica', 'normal');
@@ -681,7 +911,8 @@
 
             y += 26;
             doc.setDrawColor(255, 255, 255);
-            doc.roundedRect(margin, y, width, 70, 10, 10, 'S');
+            doc.setFillColor(20, 20, 20);
+            doc.roundedRect(margin, y, width, 70, 10, 10, 'FD');
             doc.setTextColor(243, 243, 241);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
@@ -706,19 +937,19 @@
             for (let i = 0; i < Math.min(Number(payload.days), split.length); i++) {
                 const session = split[i];
                 if (session === 'Push') {
-                    sessions.push({ title: 'Push', exercises: ['Barbell Bench Press — 4 x 6', 'Incline DB Press — 3 x 8', 'Seated Overhead Press — 3 x 8', 'Cable Triceps Pressdown — 3 x 12'] });
+                    sessions.push({ title: 'Push', exercises: ['Barbell Bench Press — 3 x 6', 'Incline DB Press — 3 x 8', 'Seated Overhead Press — 2 x 8', 'Cable Triceps Pressdown — 2 x 10'] });
                 } else if (session === 'Pull') {
-                    sessions.push({ title: 'Pull', exercises: ['Weighted Pull-Up or Lat Pulldown — 4 x 8', 'Single-Arm Row — 4 x 10', 'Chest-Supported Row — 3 x 10', 'Face Pulls — 3 x 15'] });
+                    sessions.push({ title: 'Pull', exercises: ['Weighted Pull-Up or Lat Pulldown — 3 x 6', 'Single-Arm Row — 3 x 8', 'Chest-Supported Row — 2 x 10', 'Face Pulls — 2 x 12'] });
                 } else if (session === 'Legs') {
-                    sessions.push({ title: 'Legs', exercises: ['Back Squat — 4 x 6', 'Romanian Deadlift — 3 x 8', 'Leg Press — 3 x 10', 'Walking Lunges — 3 x 12'] });
+                    sessions.push({ title: 'Legs', exercises: ['Back Squat — 3 x 6', 'Romanian Deadlift — 3 x 8', 'Leg Press — 2 x 10', 'Walking Lunges — 2 x 10'] });
                 } else if (session === 'Upper') {
-                    sessions.push({ title: 'Upper', exercises: ['Bench Press — 4 x 6', 'Pull-Up or Lat Pulldown — 4 x 8', 'Shoulder Press — 3 x 8', 'Cable Row — 3 x 10'] });
+                    sessions.push({ title: 'Upper', exercises: ['Bench Press — 3 x 6', 'Pull-Up or Lat Pulldown — 3 x 8', 'Shoulder Press — 2 x 8', 'Cable Row — 2 x 10'] });
                 } else if (session === 'Lower') {
-                    sessions.push({ title: 'Lower', exercises: ['Front Squat or Goblet Squat — 4 x 6', 'Hip Thrust — 3 x 8', 'Leg Curl — 3 x 10', 'Split Squat — 3 x 12'] });
+                    sessions.push({ title: 'Lower', exercises: ['Front Squat or Goblet Squat — 3 x 6', 'Hip Thrust — 3 x 8', 'Leg Curl — 2 x 10', 'Split Squat — 2 x 10'] });
                 } else if (session === 'Conditioning') {
-                    sessions.push({ title: 'Conditioning', exercises: ['Bike Intervals — 8 rounds of 30s hard / 60s easy', 'Rowing — 5 x 500m', 'Core Circuit — 3 rounds of 15 reps each'] });
+                    sessions.push({ title: 'Conditioning', exercises: ['Bike Intervals — 6 rounds of 30s hard / 60s easy', 'Rowing — 4 x 500m moderate', 'Core Circuit — 2 x 10 reps each'] });
                 } else {
-                    sessions.push({ title: 'Full Body', exercises: ['Squat or Leg Press — 4 x 8', 'Bench Press or Dumbbell Press — 4 x 8', 'Lat Pulldown — 3 x 10', 'Romanian Deadlift — 3 x 8', 'Planks — 3 x 45s'] });
+                    sessions.push({ title: 'Full Body', exercises: ['Squat or Leg Press — 3 x 6', 'Bench Press or Dumbbell Press — 3 x 8', 'Lat Pulldown — 2 x 10', 'Romanian Deadlift — 2 x 8', 'Planks — 2 x 30s'] });
                 }
             }
 
@@ -738,14 +969,118 @@
             ];
             y = drawSection(doc, 'Recovery Rules', recoveryLines, y, margin, width);
 
-            const filename = `${(payload.name || 'athlete').replace(/\s+/g, '_').toLowerCase()}_brotein_plan.pdf`;
-            doc.save(filename);
+                const filename = `${(payload.name || 'athlete').replace(/\s+/g, '_').toLowerCase()}_brotein_plan.pdf`;
+                const pdfBlob = doc.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+
+                try {
+                    const link = document.createElement('a');
+                    link.href = pdfUrl;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setPlanStatus('PDF downloaded.', 'success');
+                } catch (error) {
+                    showOpenPdfFallback(pdfUrl);
+                    setPlanStatus('Download blocked by your browser. Use the link below.', 'error');
+                }
+
+                setTimeout(() => URL.revokeObjectURL(pdfUrl), 2000);
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                setPlanStatus('Something went wrong. Please try again.', 'error');
+            } finally {
+                if (generateButton) generateButton.disabled = false;
+            }
         }
 
-        document.getElementById('planForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            generatePdf();
+        const CURRENT_USER_KEY = 'brotein_current_user';
+
+        function getCurrentUser() {
+            try {
+                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
+                return user && user.loggedIn ? user : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function updateAccountMenu() {
+            const user = getCurrentUser();
+            const nameEl = document.getElementById('accountName');
+            const loginBtn = document.querySelector('.login-btn');
+            const logoutBtn = document.querySelector('.logout-btn');
+
+            if (!nameEl || !loginBtn || !logoutBtn) return;
+
+            if (user) {
+                const displayName = user.name || 'User';
+                nameEl.textContent = displayName;
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+            } else {
+                nameEl.textContent = 'Guest';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        document.querySelector('.login-btn')?.addEventListener('click', function () {
+            window.location.href = 'login.html';
         });
+
+        document.querySelector('.logout-btn')?.addEventListener('click', function () {
+            localStorage.removeItem(CURRENT_USER_KEY);
+            updateAccountMenu();
+        });
+
+        document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
+            const accountWrap = this.closest('.account-wrap');
+            if (!accountWrap) return;
+            accountWrap.classList.toggle('is-open');
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function (event) {
+            const accountWrap = document.querySelector('.account-wrap');
+            if (accountWrap && !accountWrap.contains(event.target)) {
+                accountWrap.classList.remove('is-open');
+            }
+        });
+
+        const planForm = document.getElementById('planForm');
+        const generateButton = document.querySelector('.generate-button');
+
+        ['weight', 'height', 'days', 'goal'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', updateGenerateButtonState);
+                el.addEventListener('change', updateGenerateButtonState);
+            }
+        });
+
+        planForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+        });
+
+        generateButton.addEventListener('click', async function () {
+            if (!canGeneratePlan()) {
+                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
+                return;
+            }
+
+            try {
+                await generatePdf();
+            } catch (error) {
+                console.error('Plan generation failed:', error);
+                setPlanStatus('Something went wrong. Please try again.', 'error');
+            }
+        });
+
+        updateGenerateButtonState();
+        updateAccountMenu();
     </script>
 </body>
 </html>

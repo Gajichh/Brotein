@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Brotein | Calculators</title>
     <meta name="description" content="Brotein calculators for BMI and calorie intake, built for fitness progress and meal planning." />
+    <link rel="icon" type="image/x-icon" href="broteinico.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -35,6 +36,8 @@
                 linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
             color: var(--text);
             min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
         }
 
         body::before {
@@ -87,9 +90,100 @@
             min-width: 0;
         }
 
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-wrap {
+            position: relative;
+            padding-bottom: 14px;
+            margin-bottom: -14px;
+        }
+
+        .account-trigger {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .account-trigger:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .account-trigger svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .account-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            opacity: 0;
+            pointer-events: none;
+            width: 190px;
+            background: rgba(18,18,18,0.98);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition-delay: 0.08s;
+        }
+
+        .account-wrap:hover .account-menu,
+        .account-wrap:focus-within .account-menu,
+        .account-wrap.is-open .account-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .account-name {
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .account-menu .menu-btn {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            border-radius: 999px;
+            padding: 10px 12px;
+            font: inherit;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .account-menu .logout-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
         .brand-logo {
             display: block;
-            width: 130px;
+            width: 110px;
             height: auto;
             object-fit: contain;
             filter: brightness(1.05);
@@ -229,6 +323,7 @@
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
             color-scheme: dark;
+            font-size: 16px;
         }
 
         select {
@@ -297,12 +392,21 @@
             font-weight: 800;
             letter-spacing: -0.06em;
             line-height: 1;
+            margin-bottom: 12px;
         }
 
         .result-copy {
-            margin-top: 10px;
+            margin-top: 12px;
             color: var(--muted);
             line-height: 1.7;
+        }
+
+        .protein-target {
+            display: block;
+            margin-top: 14px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.03em;
         }
 
         .mini-grid {
@@ -345,7 +449,7 @@
             font-size: 0.7rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            margin-bottom: 14px;
+            margin: 0 0 12px;
         }
 
         .status-pill.healthy {
@@ -358,6 +462,100 @@
             color: #ff6a6a;
             border-color: #ff6a6a;
             background: rgba(255, 106, 106, 0.08);
+        }
+
+        .bmi-meter {
+            margin-top: 18px;
+            padding-top: 8px;
+        }
+
+        .bmi-scale {
+            position: relative;
+            height: 22px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: linear-gradient(
+                90deg,
+                rgba(255, 161, 92, 0.85) 0%,
+                rgba(255, 210, 110, 0.85) 18%,
+                rgba(120, 233, 168, 0.9) 38%,
+                rgba(120, 233, 168, 0.9) 52%,
+                rgba(255, 133, 133, 0.9) 72%,
+                rgba(255, 91, 91, 0.95) 100%
+            );
+            overflow: hidden;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+
+        .bmi-scale::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 38%;
+            width: 2px;
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+        }
+
+        .bmi-scale::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 72%;
+            width: 2px;
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+        }
+
+        .bmi-marker {
+            position: absolute;
+            top: -3px;
+            left: 0%;
+            width: 0;
+            height: 0;
+            transform: translateX(-50%);
+            transition: left 0.25s ease;
+        }
+
+        .bmi-marker::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background: var(--text);
+            border: 2px solid var(--bg);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.18);
+        }
+
+        .bmi-marker::after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 12px;
+            width: 2px;
+            height: 18px;
+            background: var(--text);
+            border-radius: 999px;
+        }
+
+        .bmi-scale-labels {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            margin-top: 8px;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .bmi-scale-labels span {
+            display: flex;
+            justify-content: center;
         }
 
         .footer-links {
@@ -391,8 +589,31 @@
         }
 
         @media (max-width: 720px) {
+            .nav {
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .nav-left {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .nav-cta {
+                margin-left: auto;
+            }
+
             .nav-links {
                 display: none;
+            }
+
+            .nav-cta {
+                padding: 10px 14px;
+                font-size: 0.68rem;
+            }
+
+            .brand-logo {
+                width: 104px;
             }
 
             .form-grid,
@@ -408,6 +629,25 @@
                 text-align: left;
             }
 
+            .account-trigger {
+                width: 34px;
+                height: 34px;
+            }
+
+            .account-menu {
+                width: 170px;
+            }
+
+            .brand-logo {
+                width: 92px;
+            }
+
+            .nav-cta {
+                padding: 9px 12px;
+                font-size: 0.62rem;
+                letter-spacing: 0.06em;
+            }
+
             .subtext {
                 margin: 0;
                 text-align: left;
@@ -421,14 +661,52 @@
                 width: 100%;
             }
         }
+
+        @media (max-width: 480px) {
+            .page-shell {
+                width: min(100%, calc(100% - 18px));
+            }
+
+            main {
+                padding-top: 32px;
+            }
+
+            .panel,
+            .result-box {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .hero {
+                margin-bottom: 20px;
+            }
+
+            .subtext {
+                font-size: 0.95rem;
+                line-height: 1.6;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="page-shell nav">
-            <a href="index.html" class="brand" aria-label="Brotein home">
-                <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
-            </a>
+            <div class="nav-left">
+                <div class="account-wrap">
+                    <button class="account-trigger" type="button" aria-label="Account menu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/></svg>
+                    </button>
+                    <div class="account-menu">
+                        <div class="account-name" id="accountName">Guest</div>
+                        <button class="menu-btn login-btn" type="button">Log in</button>
+                        <button class="menu-btn logout-btn" type="button">Log out</button>
+                    </div>
+                </div>
+
+                <a href="index.html" class="brand" aria-label="Brotein home">
+                    <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
+                </a>
+            </div>
 
             <nav class="nav-links" aria-label="Main navigation">
                 <a href="index.html">Home</a>
@@ -462,11 +740,11 @@
                         </div>
                         <div class="field">
                             <label for="bmiAge">Age</label>
-                            <input id="bmiAge" name="age" type="number" min="10" max="100" value="28" required />
+                            <input id="bmiAge" name="age" type="number" min="0" max="100" value="0" required />
                         </div>
                         <div class="field">
                             <label for="bmiWeight">Weight</label>
-                            <input id="bmiWeight" name="weight" type="number" min="30" step="0.1" value="75" required />
+                            <input id="bmiWeight" name="weight" type="number" min="0" step="0.1" value="0" required />
                         </div>
                         <div class="field">
                             <label for="bmiWeightUnit">Weight unit</label>
@@ -477,7 +755,7 @@
                         </div>
                         <div class="field full">
                             <label for="bmiHeight">Height (cm)</label>
-                            <input id="bmiHeight" name="height" type="number" min="100" max="250" step="0.1" value="178" required />
+                            <input id="bmiHeight" name="height" type="number" min="0" max="250" step="0.1" value="0" required />
                         </div>
                     </div>
 
@@ -491,6 +769,19 @@
                     <div id="bmiResult" class="big-result">24.9</div>
                     <div id="bmiStatus" class="status-pill">Healthy range</div>
                     <div id="bmiSummary" class="result-copy">You’re in a solid range for most gym-goers. Keep your training and nutrition consistent.</div>
+
+                    <div class="bmi-meter" aria-label="BMI gauge">
+                        <div class="bmi-scale" aria-hidden="true">
+                            <div id="bmiMarker" class="bmi-marker"></div>
+                        </div>
+                        <div class="bmi-scale-labels">
+                            <span>0</span>
+                            <span>18.5</span>
+                            <span>25</span>
+                            <span>30</span>
+                            <span>40+</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -507,11 +798,11 @@
                         </div>
                         <div class="field">
                             <label for="calAge">Age</label>
-                            <input id="calAge" type="number" min="10" max="100" value="28" required />
+                            <input id="calAge" type="number" min="0" max="100" value="0" required />
                         </div>
                         <div class="field">
                             <label for="calWeight">Weight</label>
-                            <input id="calWeight" type="number" min="30" step="0.1" value="75" required />
+                            <input id="calWeight" type="number" min="0" step="0.1" value="0" required />
                         </div>
                         <div class="field">
                             <label for="calWeightUnit">Weight unit</label>
@@ -522,7 +813,7 @@
                         </div>
                         <div class="field">
                             <label for="calHeight">Height (cm)</label>
-                            <input id="calHeight" type="number" min="100" max="250" step="0.1" value="178" required />
+                            <input id="calHeight" type="number" min="0" max="250" step="0.1" value="0" required />
                         </div>
                         <div class="field">
                             <label for="calWorkout">Workout frequency</label>
@@ -551,23 +842,24 @@
 
                 <div class="result-box">
                     <h3>Daily intake</h3>
-                    <div id="calorieTarget" class="big-result">2450 kcal</div>
+                    <div id="calorieTarget" class="big-result">0 kcal</div>
                     <div id="calorieHeadline" class="status-pill">Maintain</div>
-                    <div id="calorieSummary" class="result-copy">Your maintenance target is 2,450 kcal per day based on your current bodyweight and training frequency.</div>
+                    <div id="calorieSummary" class="result-copy">Your maintenance target will appear here once you enter your body stats.</div>
+                    <div id="proteinSummary" class="protein-target">Protein target: 0 g/day</div>
                 </div>
 
                 <div class="mini-grid">
                     <div class="mini-card">
                         <span class="label">Weight loss</span>
-                        <span id="lossValue" class="value">1,800 kcal</span>
+                        <span id="lossValue" class="value">0 kcal</span>
                     </div>
                     <div class="mini-card">
                         <span class="label">Maintain</span>
-                        <span id="maintainValue" class="value">2,450 kcal</span>
+                        <span id="maintainValue" class="value">0 kcal</span>
                     </div>
                     <div class="mini-card">
                         <span class="label">Weight gain</span>
-                        <span id="gainValue" class="value">2,800 kcal</span>
+                        <span id="gainValue" class="value">0 kcal</span>
                     </div>
                 </div>
             </div>
@@ -597,9 +889,20 @@
         }
 
         function calculateCalories(age, weight, height, activityMultiplier, goal, gender) {
+            if (!Number.isFinite(age) || !Number.isFinite(weight) || !Number.isFinite(height) || weight <= 0 || height <= 0) {
+                return {
+                    maintenance: 0,
+                    targetCalories: 0,
+                    lossCalories: 0,
+                    maintainCalories: 0,
+                    gainCalories: 0,
+                    goalLabel: 'Maintain'
+                };
+            }
+
             const sexAdjustment = gender === 'female' ? -161 : 5;
             const bmr = (10 * weight) + (6.25 * height) - (5 * age) + sexAdjustment;
-            const maintenance = bmr * activityMultiplier;
+            const maintenance = Math.max(0, bmr * activityMultiplier);
 
             const goalConfig = {
                 loss: { multiplier: 0.8, label: 'Weight loss' },
@@ -607,7 +910,7 @@
                 gain: { multiplier: 1.15, label: 'Weight gain' }
             };
 
-            const goalData = goalConfig[goal];
+            const goalData = goalConfig[goal] || goalConfig.maintain;
             const targetCalories = Math.round(maintenance * goalData.multiplier);
             const lossCalories = Math.round(maintenance * 0.8);
             const maintainCalories = Math.round(maintenance);
@@ -623,6 +926,20 @@
             };
         }
 
+        function calculateProteinTarget(weightKg, goal) {
+            if (!Number.isFinite(weightKg) || weightKg <= 0) {
+                return 0;
+            }
+
+            const goalMap = {
+                loss: 1.8,
+                maintain: 1.8,
+                gain: 2.2
+            };
+            const gramsPerKg = goalMap[goal] || 1.8;
+            return Math.round(weightKg * gramsPerKg);
+        }
+
         function formatCalories(value) {
             return `${new Intl.NumberFormat('en-US').format(value)} kcal`;
         }
@@ -632,9 +949,13 @@
             const weight = Number(document.getElementById('bmiWeight').value || 0);
             const weightUnit = document.getElementById('bmiWeightUnit').value || 'kg';
             const height = Number(document.getElementById('bmiHeight').value || 0);
+            const marker = document.getElementById('bmiMarker');
 
-            if (!weight || !height) {
-                document.getElementById('bmiResult').textContent = '—';
+            if (!weight || !height || weight <= 0 || height <= 0) {
+                document.getElementById('bmiResult').textContent = '0.0';
+                document.getElementById('bmiStatus').textContent = 'Enter values';
+                document.getElementById('bmiStatus').classList.remove('healthy', 'overweight');
+                if (marker) marker.style.left = '0%';
                 return;
             }
 
@@ -642,6 +963,8 @@
             const bmi = calculateBMI(weightKg, height);
             const info = bmiCategory(bmi);
             const statusEl = document.getElementById('bmiStatus');
+            const maxBmiForScale = 40;
+            const pct = Math.min(Math.max((bmi / maxBmiForScale) * 100, 0), 100);
 
             statusEl.textContent = info.label;
             statusEl.classList.remove('healthy', 'overweight');
@@ -651,6 +974,8 @@
             } else if (info.label === 'Overweight' || info.label === 'Obesity') {
                 statusEl.classList.add('overweight');
             }
+
+            if (marker) marker.style.left = `${pct}%`;
 
             document.getElementById('bmiResult').textContent = bmi.toFixed(1);
             document.getElementById('bmiSummary').textContent = info.summary;
@@ -665,20 +990,83 @@
             const goal = document.getElementById('calGoal').value || 'maintain';
             const gender = document.getElementById('calGender').value || 'male';
 
-            if (!weight || !height) {
-                document.getElementById('calorieTarget').textContent = '—';
+            if (!weight || !height || !age || weight <= 0 || height <= 0 || age <= 0) {
+                document.getElementById('calorieTarget').textContent = '0 kcal';
+                document.getElementById('calorieHeadline').textContent = 'Maintain';
+                document.getElementById('calorieSummary').textContent = 'Your maintenance target will appear here once you enter your body stats.';
+                document.getElementById('proteinSummary').textContent = 'Protein target: 0 g/day';
+                document.getElementById('lossValue').textContent = '0 kcal';
+                document.getElementById('maintainValue').textContent = '0 kcal';
+                document.getElementById('gainValue').textContent = '0 kcal';
                 return;
             }
 
             const weightKg = convertWeightToKg(weight, weightUnit);
             const results = calculateCalories(age, weightKg, height, activity, goal, gender);
+            const proteinTarget = calculateProteinTarget(weightKg, goal);
+
             document.getElementById('calorieTarget').textContent = formatCalories(results.targetCalories);
             document.getElementById('calorieHeadline').textContent = results.goalLabel;
             document.getElementById('calorieSummary').textContent = `Your ${results.goalLabel.toLowerCase()} target is ${formatCalories(results.targetCalories)} per day based on your gender, bodyweight, age, height, and training frequency.`;
+            document.getElementById('proteinSummary').textContent = `Protein target: ${new Intl.NumberFormat('en-US').format(proteinTarget)} g/day`;
             document.getElementById('lossValue').textContent = formatCalories(results.lossCalories);
             document.getElementById('maintainValue').textContent = formatCalories(results.maintainCalories);
             document.getElementById('gainValue').textContent = formatCalories(results.gainCalories);
         }
+
+        const CURRENT_USER_KEY = 'brotein_current_user';
+
+        function getCurrentUser() {
+            try {
+                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
+                return user && user.loggedIn ? user : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function updateAccountMenu() {
+            const user = getCurrentUser();
+            const nameEl = document.getElementById('accountName');
+            const loginBtn = document.querySelector('.login-btn');
+            const logoutBtn = document.querySelector('.logout-btn');
+
+            if (!nameEl || !loginBtn || !logoutBtn) return;
+
+            if (user) {
+                const displayName = user.name || 'User';
+                nameEl.textContent = displayName;
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+            } else {
+                nameEl.textContent = 'Guest';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        document.querySelector('.login-btn')?.addEventListener('click', function () {
+            window.location.href = 'login.html';
+        });
+
+        document.querySelector('.logout-btn')?.addEventListener('click', function () {
+            localStorage.removeItem(CURRENT_USER_KEY);
+            updateAccountMenu();
+        });
+
+        document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
+            const accountWrap = this.closest('.account-wrap');
+            if (!accountWrap) return;
+            accountWrap.classList.toggle('is-open');
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function (event) {
+            const accountWrap = document.querySelector('.account-wrap');
+            if (accountWrap && !accountWrap.contains(event.target)) {
+                accountWrap.classList.remove('is-open');
+            }
+        });
 
         document.getElementById('bmiForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -702,6 +1090,7 @@
 
         updateBMI();
         updateCalories();
+        updateAccountMenu();
     </script>
 </body>
 </html>
