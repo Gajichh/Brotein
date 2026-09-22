@@ -7,13 +7,13 @@
     <link rel="icon" type="image/x-icon" href="broteinico.ico">
     <style>
         :root {
-            --bg: #0d0d0d;
-            --panel: #151515;
+            --bg: #000000;
+            --panel: #0f0f0f;
             --line: rgba(255,255,255,0.1);
-            --text: #f3f3f1;
-            --muted: #b2b2ad;
-            --danger: #ff9b9b;
-            --success: #d9f99d;
+            --text: #fafafa;
+            --muted: #a3a3a3;
+            --danger: #ff6b6b;
+            --success: #c5f23f;
         }
 
         * { box-sizing: border-box; }
@@ -21,7 +21,7 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+            background: linear-gradient(180deg, #000000 0%, var(--bg) 26%, #000000 100%);
             color: var(--text);
             overflow-x: hidden;
             -webkit-text-size-adjust: 100%;
@@ -116,6 +116,26 @@
             color: var(--danger);
         }
 
+        .back-link {
+            display: inline-block;
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 999px;
+            color: var(--text);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .access-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
         .empty {
             padding: 18px 0 8px;
             color: var(--muted);
@@ -163,16 +183,19 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="theme.css" />
 </head>
 <body>
+    <div class="site-glow" aria-hidden="true"></div>
     <div class="page-shell">
         <div class="topbar">
             <h1>Admin</h1>
-            <span class="chip">Single package: FREE</span>
+            <span class="chip" style="display:none;">Single package: FREE</span>
+            <a href="index.html" class="back-link">Back to site</a>
         </div>
 
         <div class="panel">
-            <table aria-label="Users table">
+            <table id="usersTable" aria-label="Users table" style="display:none;">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -184,7 +207,11 @@
                 </thead>
                 <tbody id="adminTableBody"></tbody>
             </table>
-            <div id="emptyState" class="empty" style="display:none;">No accounts found.</div>
+            <div id="emptyState" class="empty">Checking admin access...</div>
+            <div id="accessLinks" class="access-links" style="display:none;">
+                <a href="index.html" class="back-link">Back to home</a>
+                <a href="login.html" class="back-link">Log in</a>
+            </div>
         </div>
     </div>
 
@@ -215,23 +242,36 @@
             emptyState.style.display = 'block';
         }
 
+        // Shown to anyone who isn't a signed-in admin: no user data, just a way out.
+        function denyAccess(message) {
+            document.getElementById('usersTable').style.display = 'none';
+            document.querySelector('.chip').style.display = 'none';
+            document.getElementById('accessLinks').style.display = 'flex';
+            showMessage(message);
+        }
+
         async function renderAdminTable() {
             if (!db) {
-                showMessage('Could not connect to the server.');
+                denyAccess('Could not connect to the server.');
                 return;
             }
 
             const { data: { session } } = await db.auth.getSession();
             if (!session) {
-                showMessage('Log in with an admin account to view users.');
+                denyAccess('Log in with an admin account to view this page.');
                 return;
             }
 
-            const { data: isAdmin } = await db.rpc('is_admin');
-            if (!isAdmin) {
-                showMessage('This account does not have admin access.');
+            // Checked on the server (is_admin reads the profiles table), so it can't be faked from the browser.
+            const { data: isAdmin, error: adminError } = await db.rpc('is_admin');
+            if (adminError || isAdmin !== true) {
+                denyAccess('This account does not have admin access.');
                 return;
             }
+
+            document.getElementById('usersTable').style.display = '';
+            document.querySelector('.chip').style.display = '';
+            document.getElementById('accessLinks').style.display = 'none';
 
             const { data: users, error } = await db
                 .from('profiles')

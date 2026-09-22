@@ -10,10 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0d0d;
-            --panel: #151515;
-            --text: #f3f3f1;
-            --muted: #b2b2ad;
+            --bg: #000000;
+            --panel: #0f0f0f;
+            --text: #fafafa;
+            --muted: #a3a3a3;
             --line: rgba(255,255,255,0.1);
             --chip: rgba(255,255,255,0.06);
         }
@@ -23,7 +23,7 @@
         body {
             margin: 0;
             font-family: "Inter", sans-serif;
-            background: linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+            background: linear-gradient(180deg, #000000 0%, var(--bg) 26%, #000000 100%);
             color: var(--text);
             overflow-x: hidden;
             -webkit-text-size-adjust: 100%;
@@ -45,7 +45,7 @@
             top: 0;
             z-index: 10;
             backdrop-filter: blur(16px);
-            background: rgba(13, 13, 13, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             border-bottom: 1px solid var(--line);
         }
 
@@ -110,11 +110,11 @@
             position: absolute;
             top: calc(100% + 10px);
             left: 50%;
-            transform: translateX(-50%) translateY(6px);
+            transform: translateX(calc(-50% + var(--menu-shift, 0px))) translateY(6px);
             opacity: 0;
             pointer-events: none;
             width: 190px;
-            background: rgba(18,18,18,0.98);
+            background: rgba(15,15,15,0.98);
             border: 1px solid var(--line);
             border-radius: 16px;
             padding: 12px;
@@ -128,7 +128,7 @@
         .account-wrap.is-open .account-menu {
             opacity: 1;
             pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(calc(-50% + var(--menu-shift, 0px))) translateY(0);
         }
 
         .account-name {
@@ -141,7 +141,7 @@
         }
 
         .account-name.premium-user {
-            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -165,10 +165,10 @@
         .account-menu .upgrade-btn {
             display: none;
             margin-top: 10px;
-            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
-            border-color: rgba(251,191,36,0.6);
-            color: #1b1208;
-            box-shadow: 0 10px 20px rgba(249,115,22,0.18);
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            border-color: rgba(197,242,63,0.48);
+            color: #0a0a0a;
+            box-shadow: 0 10px 20px rgba(197,242,63,0.09);
         }
 
         .account-menu .logout-btn {
@@ -177,6 +177,11 @@
         }
 
         .account-menu .profile-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .account-menu .admin-btn {
             display: none;
             margin-top: 10px;
         }
@@ -324,7 +329,7 @@
         }
 
         select option {
-            background: #171717;
+            background: #151515;
             color: var(--text);
         }
 
@@ -334,7 +339,8 @@
             box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
         }
 
-        .generate-button {
+        .generate-button,
+        .profile-form .calc-button {
             margin-top: 18px;
             display: inline-flex;
             align-items: center;
@@ -354,11 +360,13 @@
             transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-        .generate-button:hover:not(:disabled) {
+        .generate-button:hover:not(:disabled),
+        .profile-form .calc-button:hover {
             transform: translateY(-1px);
         }
 
-        .generate-button:disabled {
+        .generate-button:disabled,
+        .profile-form .calc-button:disabled {
             opacity: 0.75;
             cursor: wait;
         }
@@ -380,11 +388,11 @@
         }
 
         .plan-status.error {
-            color: #ff8e8e;
+            color: #ff6b6b;
         }
 
         .plan-status.success {
-            color: #9ce6b4;
+            color: #c5f23f;
         }
 
         .plan-card {
@@ -577,6 +585,34 @@
             letter-spacing: -0.05em;
         }
 
+        .profile-form {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .profile-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .profile-form .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .profile-form .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .profile-form label {
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
         .detail-list {
             display: grid;
             gap: 14px;
@@ -606,9 +642,9 @@
         }
 
         .package-tag.premium {
-            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
-            border-color: rgba(251,191,36,0.6);
-            color: #1b1208;
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            border-color: rgba(197,242,63,0.48);
+            color: #0a0a0a;
         }
 
         .plan-summary {
@@ -665,7 +701,7 @@
             border: 1px solid rgba(255,142,142,0.5);
             border-radius: 999px;
             background: transparent;
-            color: #ff8e8e;
+            color: #ff6b6b;
             padding: 15px 24px;
             font-size: 0.76rem;
             font-weight: 700;
@@ -696,8 +732,11 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="nav-menu.css" />
+    <link rel="stylesheet" href="theme.css" />
 </head>
 <body>
+    <div class="site-glow" aria-hidden="true"></div>
     <header>
         <div class="page-shell nav">
             <div class="nav-left">
@@ -708,6 +747,7 @@
                     <div class="account-menu">
                         <div class="account-name" id="accountName">Guest</div>
                         <button class="menu-btn profile-btn" type="button">Profile</button>
+                        <button class="menu-btn admin-btn" type="button">Admin panel</button>
                         <button class="menu-btn upgrade-btn" type="button">Upgrade</button>
                         <button class="menu-btn login-btn" type="button">Log in</button>
                         <button class="menu-btn logout-btn" type="button">Log out</button>
@@ -721,12 +761,31 @@
 
             <nav class="nav-links" aria-label="Main navigation">
                 <a href="index.html">Home</a>
-                <a href="calculators.html">Calculators</a>
-                <a href="plan.html">Plans</a>
+                <div class="tools-menu">
+                    <button type="button" class="tools-trigger" aria-haspopup="true" aria-expanded="false">
+                        All Tools
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="tools-dropdown">
+                        <a href="gym-finder.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg></span>
+                            <span class="tools-text"><strong>Gym Finder</strong><small>Gyms near you, open ones first</small></span>
+                        </a>
+                        <a href="calculators.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm1 3v4h8V5H8Zm0 7v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Zm-6 4v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Z"/></svg></span>
+                            <span class="tools-text"><strong>Calculators</strong><small>BMI and daily calories</small></span>
+                        </a>
+                        <a href="plan.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg></span>
+                            <span class="tools-text"><strong>Workout Plans</strong><small>Your personal training plan</small></span>
+                        </a>
+                    </div>
+                </div>
+                <a href="collaborations.html">Collaborations</a>
                 <a href="contact.html">Contact</a>
             </nav>
 
-            <a href="plan.html" class="nav-cta">Workout Plan</a>
+            <a href="plan.html" class="nav-cta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.5h6.5L9 22l10-12h-6.5L13.5 2Z"/></svg>Workout Plan</a>
         </div>
     </header>
 
@@ -751,6 +810,41 @@
                     <div><dt>Package</dt><dd><span id="profilePackage" class="package-tag"></span></dd></div>
                     <div><dt>Member since</dt><dd id="profileJoined"></dd></div>
                 </dl>
+
+                <form id="profileForm" class="profile-form" style="margin-top: 22px;">
+                    <h3 style="margin: 0 0 14px; font-size: 1.1rem; letter-spacing: -0.03em;">Personal information</h3>
+                    <div class="profile-form-grid">
+                        <div class="field">
+                            <label for="profileWeight">Weight</label>
+                            <input id="profileWeight" name="profileWeight" type="number" min="0" step="0.1" placeholder="0" />
+                        </div>
+                        <div class="field">
+                            <label for="profileWeightUnit">Weight unit</label>
+                            <select id="profileWeightUnit" name="profileWeightUnit">
+                                <option value="kg">Kgs</option>
+                                <option value="lbs">Lbs</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="profileHeight">Height (cm)</label>
+                            <input id="profileHeight" name="profileHeight" type="number" min="0" step="0.1" placeholder="0" />
+                        </div>
+                        <div class="field">
+                            <label for="profileAge">Age</label>
+                            <input id="profileAge" name="profileAge" type="number" min="0" max="120" placeholder="0" />
+                        </div>
+                        <div class="field full">
+                            <label for="profileGender">Gender</label>
+                            <select id="profileGender" name="profileGender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-row" style="margin-top: 18px;">
+                        <button type="submit" class="calc-button">Save profile</button>
+                    </div>
+                </form>
             </section>
 
             <section class="profile-panel" aria-labelledby="plan-heading">
@@ -772,7 +866,7 @@
                         <button type="button" id="downloadPlanButton" class="generate-button">Download PDF</button>
                         <button type="button" id="deletePlanButton" class="ghost-button">Delete plan</button>
                     </div>
-                    <a id="openPdfFallback" href="#" style="display:none; margin-top:12px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#dfe9ff; text-decoration:underline;" target="_blank" rel="noreferrer">Can't download? Open pdf</a>
+                    <a id="openPdfFallback" href="#" style="display:none; margin-top:12px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#c5f23f; text-decoration:underline;" target="_blank" rel="noreferrer">Can't download? Open pdf</a>
                 </div>
 
                 <div id="planStatus" class="plan-status" aria-live="polite" role="status"></div>
@@ -783,11 +877,16 @@
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
+    <script src="questionnaire.js"></script>
     <script src="plan-builder.js"></script>
     <script>
         const CURRENT_USER_KEY = 'brotein_current_user';
         const db = window.broteinSupabase;
         let savedPlan = null;
+
+        function normalizePackageName(value) {
+            return String(value || 'FREE').toUpperCase();
+        }
 
         function getCurrentUser() {
             try {
@@ -798,8 +897,136 @@
             }
         }
 
-        function updateAccountMenu() {
+        async function syncCurrentUserFromProfile() {
             const user = getCurrentUser();
+            if (!user || user.guest || !db) return user;
+
+            const { data: { session } } = await db.auth.getSession();
+            if (!session) return user;
+
+            const { data: profile } = await db
+                .from('profiles')
+                .select('name, email, package, is_admin, weight, weight_unit, height, age, gender')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            const nextUser = {
+                ...user,
+                name: profile?.name || user.name || 'User',
+                email: profile?.email || user.email || session.user.email,
+                package: normalizePackageName(profile?.package || user.package || 'FREE'),
+                isAdmin: Boolean(profile?.is_admin),
+                profile: {
+                    ...(user.profile || {}),
+                    weight: profile?.weight ?? user.profile?.weight ?? '',
+                    weightUnit: profile?.weight_unit ?? user.profile?.weightUnit ?? 'kg',
+                    height: profile?.height ?? user.profile?.height ?? '',
+                    age: profile?.age ?? user.profile?.age ?? '',
+                    gender: profile?.gender ?? user.profile?.gender ?? 'male'
+                },
+                guest: false,
+                loggedIn: true
+            };
+
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(nextUser));
+            return nextUser;
+        }
+
+        function getProfileFromUser() {
+            try {
+                const user = getCurrentUser();
+                return user && user.profile ? user.profile : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function saveProfileToUser(profile) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) return;
+
+            const updatedUser = {
+                ...currentUser,
+                profile: {
+                    ...(currentUser.profile || {}),
+                    ...profile
+                }
+            };
+
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+
+            const users = JSON.parse(localStorage.getItem('brotein_users') || '[]');
+            const index = users.findIndex((user) => (user.email || '').toLowerCase() === (currentUser.email || '').toLowerCase());
+            if (index >= 0) {
+                users[index].profile = updatedUser.profile;
+                localStorage.setItem('brotein_users', JSON.stringify(users));
+            }
+
+            return updatedUser.profile;
+        }
+
+        async function saveProfileToDatabase(profile) {
+            if (!db) return;
+
+            const { data: { session } } = await db.auth.getSession();
+            if (!session) return;
+
+            const profilePayload = {
+                weight: profile.weight === '' || profile.weight === null || typeof profile.weight === 'undefined' ? null : Number(profile.weight),
+                weight_unit: profile.weightUnit || 'kg',
+                height: profile.height === '' || profile.height === null || typeof profile.height === 'undefined' ? null : Number(profile.height),
+                age: profile.age === '' || profile.age === null || typeof profile.age === 'undefined' ? null : Number(profile.age),
+                gender: profile.gender || null
+            };
+
+            const { error } = await db.from('profiles').update(profilePayload).eq('id', session.user.id);
+            if (error) {
+                console.error('Could not save profile to database:', error.message);
+                throw error;
+            }
+        }
+
+        function fillProfileFormFromUser() {
+            const profile = getProfileFromUser();
+            document.getElementById('profileWeight').value = profile.weight ?? '';
+            document.getElementById('profileWeightUnit').value = profile.weightUnit || 'kg';
+            document.getElementById('profileHeight').value = profile.height ?? '';
+            document.getElementById('profileAge').value = profile.age ?? '';
+            document.getElementById('profileGender').value = profile.gender || 'male';
+        }
+
+        document.getElementById('profileForm')?.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                showProfileMessage('Log in to save your personal info.');
+                return;
+            }
+
+            const formData = {
+                weight: document.getElementById('profileWeight').value,
+                weightUnit: document.getElementById('profileWeightUnit').value,
+                height: document.getElementById('profileHeight').value,
+                age: document.getElementById('profileAge').value,
+                gender: document.getElementById('profileGender').value
+            };
+
+            const updatedProfile = saveProfileToUser(formData);
+
+            try {
+                if (updatedProfile) {
+                    await saveProfileToDatabase(updatedProfile);
+                }
+                setPlanStatus('Profile saved successfully.', 'success');
+                window.location.reload();
+            } catch (error) {
+                setPlanStatus('Profile saved locally, but the database update failed.', 'error');
+            }
+        });
+
+        async function updateAccountMenu() {
+            const user = await syncCurrentUserFromProfile();
             const nameEl = document.getElementById('accountName');
             const loginBtn = document.querySelector('.login-btn');
             const logoutBtn = document.querySelector('.logout-btn');
@@ -810,8 +1037,12 @@
             const profileBtn = document.querySelector('.profile-btn');
             if (profileBtn) profileBtn.style.display = user && !user.guest ? 'block' : 'none';
 
+            // Only a shortcut: admin.html checks admin rights with Supabase itself.
+            const adminBtn = document.querySelector('.admin-btn');
+            if (adminBtn) adminBtn.style.display = user && !user.guest && user.isAdmin ? 'block' : 'none';
+
             const isGuest = !!user && user.guest === true;
-            const packageName = (user && user.package) ? String(user.package).toUpperCase() : 'FREE';
+            const packageName = normalizePackageName(user?.package);
             const isPremium = packageName === 'PREMIUM';
             nameEl.classList.toggle('premium-user', isPremium);
 
@@ -850,6 +1081,10 @@
             window.location.href = 'login.html';
         });
 
+        document.querySelector('.admin-btn')?.addEventListener('click', function () {
+            window.location.href = 'admin.html';
+        });
+
         document.querySelector('.profile-btn')?.addEventListener('click', function () {
             window.location.href = 'profile.html';
         });
@@ -864,10 +1099,34 @@
             signOut.finally(() => window.location.reload());
         });
 
+        // Keep the menu centred under the icon, nudging it only when it would go off-screen.
+        function keepAccountMenuOnScreen() {
+            const wrap = document.querySelector('.account-wrap');
+            const menu = document.querySelector('.account-menu');
+            if (!wrap || !menu) return;
+            // Measured from the wrapper, not the menu, so the menu's slide-in animation doesn't skew it.
+            const wrapRect = wrap.getBoundingClientRect();
+            const left = wrapRect.left + wrapRect.width / 2 - menu.offsetWidth / 2;
+            const right = left + menu.offsetWidth;
+            const gap = 8;
+            let shift = 0;
+            if (left < gap) shift = gap - left;
+            else if (right > window.innerWidth - gap) shift = window.innerWidth - gap - right;
+            menu.style.setProperty('--menu-shift', `${shift}px`);
+        }
+
+        keepAccountMenuOnScreen();
+        window.addEventListener('resize', keepAccountMenuOnScreen);
+
+        const accountMenuWrap = document.querySelector('.account-wrap');
+
+        // Hovering or clicking the profile icon opens the menu; it stays open until you click somewhere else.
+        accountMenuWrap?.addEventListener('mouseenter', function () {
+            accountMenuWrap.classList.add('is-open');
+        });
+
         document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
-            const accountWrap = this.closest('.account-wrap');
-            if (!accountWrap) return;
-            accountWrap.classList.toggle('is-open');
+            accountMenuWrap?.classList.add('is-open');
             event.stopPropagation();
         });
 
@@ -955,11 +1214,29 @@
             }
 
             const [{ data: profile }, { data: plan, error: planError }] = await Promise.all([
-                db.from('profiles').select('name, email, package, created_at').eq('id', session.user.id).maybeSingle(),
+                db.from('profiles').select('name, email, package, created_at, weight, weight_unit, height, age, gender').eq('id', session.user.id).maybeSingle(),
                 db.from('workout_plans').select('*').eq('user_id', session.user.id).maybeSingle()
             ]);
 
-            const packageName = String(profile?.package || 'FREE').toUpperCase();
+            const loadedProfile = {
+                weight: profile?.weight ?? '',
+                weightUnit: profile?.weight_unit ?? 'kg',
+                height: profile?.height ?? '',
+                age: profile?.age ?? '',
+                gender: profile?.gender ?? 'male'
+            };
+
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                const packageName = normalizePackageName(profile?.package || currentUser.package || 'FREE');
+                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
+                    ...currentUser,
+                    package: packageName,
+                    profile: loadedProfile
+                }));
+            }
+
+            const packageName = normalizePackageName(profile?.package || 'FREE');
             document.getElementById('profileName').textContent = profile?.name || session.user.user_metadata?.name || 'User';
             document.getElementById('profileEmail').textContent = profile?.email || session.user.email;
             const packageEl = document.getElementById('profilePackage');
@@ -1029,7 +1306,12 @@
         });
 
         updateAccountMenu();
+        syncCurrentUserFromProfile().finally(() => {
+            updateAccountMenu();
+            fillProfileFormFromUser();
+        });
         loadProfile();
     </script>
+    <script src="nav-menu.js"></script>
 </body>
 </html>

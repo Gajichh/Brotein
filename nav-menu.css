@@ -1,0 +1,119 @@
+/* "All Tools" dropdown in the top navigation (shared by every page). */
+.tools-menu {
+    position: relative;
+    padding-bottom: 14px;
+    margin-bottom: -14px;
+}
+
+.tools-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+}
+
+.tools-trigger:hover,
+.tools-menu.is-open .tools-trigger {
+    color: var(--text, #fafafa);
+}
+
+.tools-trigger svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    transition: transform 0.2s ease;
+}
+
+.tools-menu.is-open .tools-trigger svg {
+    transform: rotate(180deg);
+}
+
+.tools-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    width: 280px;
+    padding: 8px;
+    display: grid;
+    gap: 2px;
+    background: rgba(18, 18, 18, 0.98);
+    border: 1px solid var(--line, rgba(255, 255, 255, 0.1));
+    border-radius: 18px;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 20;
+}
+
+.tools-menu.is-open .tools-dropdown {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.tools-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 12px;
+    color: var(--text, #fafafa);
+    text-transform: none;
+    letter-spacing: normal;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.tools-dropdown a:hover,
+.tools-dropdown a:focus-visible {
+    background: rgba(255, 255, 255, 0.06);
+    outline: none;
+}
+
+.tools-dropdown a[aria-current="page"] {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.tools-icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #d4f85e, #b9e82e);
+    color: #0a0a0a;
+}
+
+.tools-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.tools-text {
+    display: grid;
+    gap: 2px;
+}
+
+.tools-text strong {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.tools-text small {
+    font-size: 0.74rem;
+    color: var(--muted, #a3a3a3);
+}

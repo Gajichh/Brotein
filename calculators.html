@@ -11,17 +11,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0d0d;
-            --panel: #151515;
-            --panel-alt: #1b1b1b;
-            --text: #f3f3f1;
-            --muted: #b2b2ad;
+            --bg: #000000;
+            --panel: #0f0f0f;
+            --panel-alt: #151515;
+            --text: #fafafa;
+            --muted: #a3a3a3;
             --line: rgba(255, 255, 255, 0.1);
             --chip: rgba(255, 255, 255, 0.06);
-            --accent: #f3f3f1;
-            --success: #d7f4d0;
+            --accent: #fafafa;
+            --success: #c5f23f;
             --warning: #f6d7a3;
-            --danger: #f4b0a6;
+            --danger: #ff6b6b;
         }
 
         * { box-sizing: border-box; }
@@ -33,7 +33,7 @@
             font-family: "Inter", sans-serif;
             background:
                 radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 28%),
-                linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+                linear-gradient(180deg, #000000 0%, var(--bg) 26%, #000000 100%);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
@@ -67,7 +67,7 @@
             top: 0;
             z-index: 10;
             backdrop-filter: blur(16px);
-            background: rgba(13, 13, 13, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             border-bottom: 1px solid var(--line);
         }
 
@@ -131,11 +131,11 @@
             position: absolute;
             top: calc(100% + 10px);
             left: 50%;
-            transform: translateX(-50%) translateY(6px);
+            transform: translateX(calc(-50% + var(--menu-shift, 0px))) translateY(6px);
             opacity: 0;
             pointer-events: none;
             width: 190px;
-            background: rgba(18,18,18,0.98);
+            background: rgba(15,15,15,0.98);
             border: 1px solid var(--line);
             border-radius: 16px;
             padding: 12px;
@@ -149,7 +149,7 @@
         .account-wrap.is-open .account-menu {
             opacity: 1;
             pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(calc(-50% + var(--menu-shift, 0px))) translateY(0);
         }
 
         .account-name {
@@ -162,7 +162,7 @@
         }
 
         .account-name.premium-user {
-            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -186,10 +186,10 @@
         .account-menu .upgrade-btn {
             display: none;
             margin-top: 10px;
-            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
-            border-color: rgba(251,191,36,0.6);
-            color: #1b1208;
-            box-shadow: 0 10px 20px rgba(249,115,22,0.18);
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            border-color: rgba(197,242,63,0.48);
+            color: #0a0a0a;
+            box-shadow: 0 10px 20px rgba(197,242,63,0.09);
         }
 
         .account-menu .logout-btn {
@@ -198,6 +198,11 @@
         }
 
         .account-menu .profile-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .account-menu .admin-btn {
             display: none;
             margin-top: 10px;
         }
@@ -359,37 +364,13 @@
         }
 
         select option {
-            background: #171717;
+            background: #151515;
             color: var(--text);
         }
 
         input:focus, select:focus {
             border-color: rgba(255,255,255,0.28);
             box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
-        }
-
-        .button-row {
-            display: flex;
-            justify-content: flex-start;
-            margin-top: 20px;
-        }
-
-        .calc-button {
-            border: 1px solid rgba(255,255,255,0.18);
-            border-radius: 999px;
-            background: var(--text);
-            color: var(--bg);
-            padding: 14px 24px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .calc-button:hover {
-            transform: translateY(-1px);
         }
 
         .result-box {
@@ -474,14 +455,14 @@
         }
 
         .status-pill.healthy {
-            color: #8afaa0;
-            border-color: #8afaa0;
+            color: #c5f23f;
+            border-color: #c5f23f;
             background: rgba(138, 250, 160, 0.08);
         }
 
         .status-pill.overweight {
-            color: #ff6a6a;
-            border-color: #ff6a6a;
+            color: #ff6b6b;
+            border-color: #ff6b6b;
             background: rgba(255, 106, 106, 0.08);
         }
 
@@ -499,8 +480,8 @@
                 90deg,
                 rgba(255, 161, 92, 0.85) 0%,
                 rgba(255, 210, 110, 0.85) 18%,
-                rgba(120, 233, 168, 0.9) 38%,
-                rgba(120, 233, 168, 0.9) 52%,
+                rgba(197, 242, 63, 0.9) 38%,
+                rgba(197, 242, 63, 0.9) 52%,
                 rgba(255, 133, 133, 0.9) 72%,
                 rgba(255, 91, 91, 0.95) 100%
             );
@@ -674,13 +655,6 @@
                 text-align: left;
             }
 
-            .button-row {
-                justify-content: stretch;
-            }
-
-            .calc-button {
-                width: 100%;
-            }
         }
 
         @media (max-width: 480px) {
@@ -708,8 +682,11 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="nav-menu.css" />
+    <link rel="stylesheet" href="theme.css" />
 </head>
 <body>
+    <div class="site-glow" aria-hidden="true"></div>
     <header>
         <div class="page-shell nav">
             <div class="nav-left">
@@ -720,6 +697,7 @@
                     <div class="account-menu">
                         <div class="account-name" id="accountName">Guest</div>
                         <button class="menu-btn profile-btn" type="button">Profile</button>
+                        <button class="menu-btn admin-btn" type="button">Admin panel</button>
                         <button class="menu-btn upgrade-btn" type="button">Upgrade</button>
                         <button class="menu-btn login-btn" type="button">Log in</button>
                         <button class="menu-btn logout-btn" type="button">Log out</button>
@@ -733,12 +711,31 @@
 
             <nav class="nav-links" aria-label="Main navigation">
                 <a href="index.html">Home</a>
-                <a href="calculators.html">Calculators</a>
-                <a href="plan.html">Plans</a>
+                <div class="tools-menu">
+                    <button type="button" class="tools-trigger" aria-haspopup="true" aria-expanded="false">
+                        All Tools
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="tools-dropdown">
+                        <a href="gym-finder.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg></span>
+                            <span class="tools-text"><strong>Gym Finder</strong><small>Gyms near you, open ones first</small></span>
+                        </a>
+                        <a href="calculators.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm1 3v4h8V5H8Zm0 7v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Zm-6 4v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Z"/></svg></span>
+                            <span class="tools-text"><strong>Calculators</strong><small>BMI and daily calories</small></span>
+                        </a>
+                        <a href="plan.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg></span>
+                            <span class="tools-text"><strong>Workout Plans</strong><small>Your personal training plan</small></span>
+                        </a>
+                    </div>
+                </div>
+                <a href="collaborations.html">Collaborations</a>
                 <a href="contact.html">Contact</a>
             </nav>
 
-            <a href="plan.html" class="nav-cta">Workout Plan</a>
+            <a href="plan.html" class="nav-cta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.5h6.5L9 22l10-12h-6.5L13.5 2Z"/></svg>Workout Plan</a>
         </div>
     </header>
 
@@ -782,9 +779,6 @@
                         </div>
                     </div>
 
-                    <div class="button-row">
-                        <button type="submit" class="calc-button">Calculate BMI</button>
-                    </div>
                 </form>
 
                 <div class="result-box">
@@ -858,9 +852,6 @@
                         </div>
                     </div>
 
-                    <div class="button-row">
-                        <button type="submit" class="calc-button">Calculate calories</button>
-                    </div>
                 </form>
 
                 <div class="result-box">
@@ -896,6 +887,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
+    <script src="questionnaire.js"></script>
     <script>
         function convertWeightToKg(weight, unit) {
             return unit === 'lbs' ? weight / 2.20462 : weight;
@@ -969,6 +961,56 @@
             return `${new Intl.NumberFormat('en-US').format(value)} kcal`;
         }
 
+        function getSavedProfile() {
+            try {
+                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
+                return user && user.profile ? user.profile : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function applySavedProfileToCalculators() {
+            const profile = getSavedProfile();
+            const user = getCurrentUser();
+
+            if (!profile || Object.keys(profile).length === 0) {
+                if (!user && document.getElementById('bmiAge')) {
+                    document.getElementById('bmiAge').value = '0';
+                    document.getElementById('bmiWeight').value = '0';
+                    document.getElementById('bmiHeight').value = '0';
+                    document.getElementById('calAge').value = '0';
+                    document.getElementById('calWeight').value = '0';
+                    document.getElementById('calHeight').value = '0';
+                }
+                return;
+            }
+
+            if (profile.gender) {
+                document.getElementById('bmiGender').value = profile.gender;
+                document.getElementById('calGender').value = profile.gender;
+            }
+            if (typeof profile.age !== 'undefined') {
+                document.getElementById('bmiAge').value = profile.age;
+                document.getElementById('calAge').value = profile.age;
+            }
+            if (typeof profile.weight !== 'undefined') {
+                document.getElementById('bmiWeight').value = profile.weight;
+                document.getElementById('calWeight').value = profile.weight;
+            }
+            if (profile.weightUnit) {
+                document.getElementById('bmiWeightUnit').value = profile.weightUnit;
+                document.getElementById('calWeightUnit').value = profile.weightUnit;
+            }
+            if (typeof profile.height !== 'undefined') {
+                document.getElementById('bmiHeight').value = profile.height;
+                document.getElementById('calHeight').value = profile.height;
+            }
+
+            updateBMI();
+            updateCalories();
+        }
+
         function updateBMI() {
             const age = Number(document.getElementById('bmiAge').value || 0);
             const weight = Number(document.getElementById('bmiWeight').value || 0);
@@ -1040,6 +1082,11 @@
         }
 
         const CURRENT_USER_KEY = 'brotein_current_user';
+        const db = window.broteinSupabase;
+
+        function normalizePackageName(value) {
+            return String(value || 'FREE').toUpperCase();
+        }
 
         function getCurrentUser() {
             try {
@@ -1048,6 +1095,33 @@
             } catch (error) {
                 return null;
             }
+        }
+
+        async function syncCurrentUserFromProfile() {
+            const user = getCurrentUser();
+            if (!user || user.guest || !db) return user;
+
+            const { data: { session } } = await db.auth.getSession();
+            if (!session) return user;
+
+            const { data: profile } = await db
+                .from('profiles')
+                .select('name, email, package, is_admin')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            const nextUser = {
+                ...user,
+                name: profile?.name || user.name || 'User',
+                email: profile?.email || user.email || session.user.email,
+                package: normalizePackageName(profile?.package || user.package || 'FREE'),
+                isAdmin: Boolean(profile?.is_admin),
+                guest: false,
+                loggedIn: true
+            };
+
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(nextUser));
+            return nextUser;
         }
 
         function updateAccountMenu() {
@@ -1062,8 +1136,12 @@
             const profileBtn = document.querySelector('.profile-btn');
             if (profileBtn) profileBtn.style.display = user && !user.guest ? 'block' : 'none';
 
+            // Only a shortcut: admin.html checks admin rights with Supabase itself.
+            const adminBtn = document.querySelector('.admin-btn');
+            if (adminBtn) adminBtn.style.display = user && !user.guest && user.isAdmin ? 'block' : 'none';
+
             const isGuest = !!user && user.guest === true;
-            const packageName = (user && user.package) ? String(user.package).toUpperCase() : 'FREE';
+            const packageName = normalizePackageName(user?.package);
             const isPremium = packageName === 'PREMIUM';
             nameEl.classList.toggle('premium-user', isPremium);
 
@@ -1102,6 +1180,10 @@
             window.location.href = 'login.html';
         });
 
+        document.querySelector('.admin-btn')?.addEventListener('click', function () {
+            window.location.href = 'admin.html';
+        });
+
         document.querySelector('.profile-btn')?.addEventListener('click', function () {
             window.location.href = 'profile.html';
         });
@@ -1116,10 +1198,34 @@
             signOut.finally(() => window.location.reload());
         });
 
+        // Keep the menu centred under the icon, nudging it only when it would go off-screen.
+        function keepAccountMenuOnScreen() {
+            const wrap = document.querySelector('.account-wrap');
+            const menu = document.querySelector('.account-menu');
+            if (!wrap || !menu) return;
+            // Measured from the wrapper, not the menu, so the menu's slide-in animation doesn't skew it.
+            const wrapRect = wrap.getBoundingClientRect();
+            const left = wrapRect.left + wrapRect.width / 2 - menu.offsetWidth / 2;
+            const right = left + menu.offsetWidth;
+            const gap = 8;
+            let shift = 0;
+            if (left < gap) shift = gap - left;
+            else if (right > window.innerWidth - gap) shift = window.innerWidth - gap - right;
+            menu.style.setProperty('--menu-shift', `${shift}px`);
+        }
+
+        keepAccountMenuOnScreen();
+        window.addEventListener('resize', keepAccountMenuOnScreen);
+
+        const accountMenuWrap = document.querySelector('.account-wrap');
+
+        // Hovering or clicking the profile icon opens the menu; it stays open until you click somewhere else.
+        accountMenuWrap?.addEventListener('mouseenter', function () {
+            accountMenuWrap.classList.add('is-open');
+        });
+
         document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
-            const accountWrap = this.closest('.account-wrap');
-            if (!accountWrap) return;
-            accountWrap.classList.toggle('is-open');
+            accountMenuWrap?.classList.add('is-open');
             event.stopPropagation();
         });
 
@@ -1129,6 +1235,8 @@
                 accountWrap.classList.remove('is-open');
             }
         });
+
+        syncCurrentUserFromProfile().finally(() => updateAccountMenu());
 
         document.getElementById('bmiForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -1153,6 +1261,8 @@
         updateBMI();
         updateCalories();
         updateAccountMenu();
+        applySavedProfileToCalculators();
     </script>
+    <script src="nav-menu.js"></script>
 </body>
 </html>

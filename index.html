@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brotein | Gym Memes & Workout Plans</title>
-    <meta name="description" content="Brotein is a fitness meme and workout plan brand built around gym culture, training motivation, and no-excuses performance content.">
+    <meta name="description" content="Less thinking, more lifting. Lock in. Get it done.">
     <link rel="icon" type="image/x-icon" href="broteinico.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0d0d;
-            --panel: #151515;
-            --panel-alt: #1b1b1b;
-            --text: #f3f3f1;
-            --muted: #b2b2ad;
+            --bg: #000000;
+            --panel: #0f0f0f;
+            --panel-alt: #151515;
+            --text: #fafafa;
+            --muted: #a3a3a3;
             --line: rgba(255, 255, 255, 0.1);
             --chip: rgba(255, 255, 255, 0.06);
         }
@@ -31,7 +31,7 @@
             font-family: "Inter", sans-serif;
             background:
                 radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 28%),
-                linear-gradient(180deg, #070707 0%, var(--bg) 26%, #101010 100%);
+                linear-gradient(180deg, #000000 0%, var(--bg) 26%, #000000 100%);
             color: var(--text);
             position: relative;
             overflow-x: hidden;
@@ -68,7 +68,7 @@
             top: 0;
             z-index: 10;
             backdrop-filter: blur(16px);
-            background: rgba(13, 13, 13, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             border-bottom: 1px solid var(--line);
         }
 
@@ -131,11 +131,11 @@
             position: absolute;
             top: calc(100% + 10px);
             left: 50%;
-            transform: translateX(-50%) translateY(6px);
+            transform: translateX(calc(-50% + var(--menu-shift, 0px))) translateY(6px);
             opacity: 0;
             pointer-events: none;
             width: 190px;
-            background: rgba(18,18,18,0.98);
+            background: rgba(15,15,15,0.98);
             border: 1px solid var(--line);
             border-radius: 16px;
             padding: 12px;
@@ -149,7 +149,7 @@
         .account-wrap.is-open .account-menu {
             opacity: 1;
             pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(calc(-50% + var(--menu-shift, 0px))) translateY(0);
         }
 
         .account-name {
@@ -162,7 +162,7 @@
         }
 
         .account-name.premium-user {
-            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -186,10 +186,10 @@
         .account-menu .upgrade-btn {
             display: none;
             margin-top: 10px;
-            background: linear-gradient(135deg, #facc15, #f59e0b, #f97316);
-            border-color: rgba(251,191,36,0.6);
-            color: #1b1208;
-            box-shadow: 0 10px 20px rgba(249,115,22,0.18);
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            border-color: rgba(197,242,63,0.48);
+            color: #0a0a0a;
+            box-shadow: 0 10px 20px rgba(197,242,63,0.09);
         }
 
         .account-menu .logout-btn {
@@ -198,6 +198,11 @@
         }
 
         .account-menu .profile-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .account-menu .admin-btn {
             display: none;
             margin-top: 10px;
         }
@@ -728,7 +733,346 @@
                 align-items: flex-start;
             }
         }
+
+        .hero-heading {
+            margin: 0;
+            font-size: clamp(2.6rem, 7vw, 6.4rem);
+            line-height: 0.92;
+            letter-spacing: -0.06em;
+            font-weight: 900;
+            padding-bottom: 0.1em;
+            background: linear-gradient(180deg, #ffffff 0%, #d6d6d3 45%, #ffffff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* The "Your online gymbro" plate sits between the heading and the paragraph. */
+        .hero-eyebrow {
+            margin: 18px 0 4px;
+        }
+
+        .hero-note {
+            margin: 22px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .hero-note a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .button.gold {
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            border-color: rgba(197,242,63,0.48);
+            color: #0a0a0a;
+            box-shadow: 0 10px 24px rgba(197,242,63,0.11);
+        }
+
+        .button.dark {
+            background: #000000;
+            color: #fafafa;
+            border-color: #000000;
+            white-space: nowrap;
+        }
+
+        a.feature-card {
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        a.feature-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.22);
+        }
+
+        .feature-card .gold-label {
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            border-color: rgba(197,242,63,0.48);
+            color: #0a0a0a;
+        }
+
+        .card-link {
+            margin-top: 18px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .step-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            padding: 22px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .step-card h3 {
+            margin: 0 0 8px;
+            font-size: 1.25rem;
+            letter-spacing: -0.03em;
+        }
+
+        .step-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .premium-block {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 30px 34px;
+            border-radius: 32px;
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            color: #0a0a0a;
+            box-shadow: 0 18px 40px rgba(197,242,63,0.09);
+        }
+
+        .premium-block h2 {
+            margin: 8px 0 0;
+            font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+        }
+
+        .premium-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .follow .social-row {
+            justify-content: flex-start;
+            margin-top: 0;
+        }
+
+        @media (max-width: 480px) {
+            .hero-heading {
+                letter-spacing: -0.04em;
+                line-height: 1;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .premium-block {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 24px 20px;
+            }
+        }
+        /* ---- Hero card: black card with grainy glow rising from the bottom ---- */
+        .hero {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            width: calc(100vw - 40px);
+            margin: 12px 0 0 calc(50% - 50vw + 20px);
+            min-height: calc(100vh - 110px);
+            padding: 80px 20px 140px;
+            border-radius: 28px;
+            background: #000000;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 3;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .hero-glow {
+            position: absolute;
+            inset: -5%;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 22% 10% at 40% 96%, rgba(215,228,255,0.55), transparent 70%),
+                radial-gradient(ellipse 18% 9% at 70% 98%, rgba(215,228,255,0.5), transparent 70%),
+                radial-gradient(ellipse 58% 13% at 24% 87%, rgba(232,96,60,0.9), transparent 70%),
+                radial-gradient(ellipse 58% 13% at 78% 85%, rgba(232,96,60,0.85), transparent 70%),
+                radial-gradient(ellipse 34% 50% at 5% 72%, rgba(255,158,150,0.7), transparent 70%),
+                radial-gradient(ellipse 34% 50% at 95% 70%, rgba(255,158,150,0.65), transparent 70%),
+                radial-gradient(ellipse 60% 30% at 28% 106%, rgba(58,108,138,0.7), transparent 72%),
+                radial-gradient(ellipse 95% 42% at 50% 112%, rgba(30,58,98,0.95), transparent 75%),
+                #000000;
+            filter: blur(10px) saturate(1.1);
+            animation: heroDrift 16s ease-in-out infinite alternate;
+        }
+
+        /* Black dome in the middle, so the glow curves up the sides. */
+        .hero-glow::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 47% 64% at 50% 36%, #000000 82%, rgba(0,0,0,0.7) 92%, transparent 100%);
+        }
+
+        .hero-grain {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            opacity: 0.32;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .hero-stars {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .hero-stars span {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background:
+                linear-gradient(90deg, transparent 47%, rgba(255,255,255,0.95) 50%, transparent 53%),
+                linear-gradient(0deg, transparent 47%, rgba(255,255,255,0.95) 50%, transparent 53%);
+            -webkit-mask: radial-gradient(circle, #000 15%, transparent 68%);
+            mask: radial-gradient(circle, #000 15%, transparent 68%);
+            animation: heroTwinkle 3.2s ease-in-out infinite;
+        }
+
+        .hero-stars span:nth-child(1) { left: 37%; top: 80%; }
+        .hero-stars span:nth-child(2) { left: 81%; top: 83%; width: 34px; height: 34px; animation-delay: 0.8s; }
+        .hero-stars span:nth-child(3) { left: 42%; top: 93%; width: 18px; height: 18px; animation-delay: 1.6s; }
+        .hero-stars span:nth-child(4) { left: 66%; top: 95%; width: 30px; height: 30px; animation-delay: 0.4s; }
+        .hero-stars span:nth-child(5) { left: 49%; top: 86%; width: 14px; height: 14px; animation-delay: 2.1s; }
+        .hero-stars span:nth-child(6) { left: 18%; top: 96%; width: 16px; height: 16px; animation-delay: 1.2s; }
+
+        @keyframes heroDrift {
+            from { transform: translate3d(-1.5%, 0, 0) scale(1); }
+            to { transform: translate3d(1.5%, -2%, 0) scale(1.04); }
+        }
+
+        @keyframes heroTwinkle {
+            0%, 100% { opacity: 0.35; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-glow,
+            .hero-stars span {
+                animation: none;
+            }
+        }
+
+        .hero-heading {
+            font-size: clamp(2.4rem, 5.4vw, 4.6rem);
+            font-weight: 600;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            padding-bottom: 0;
+            background: none;
+            -webkit-background-clip: border-box;
+            background-clip: border-box;
+            color: #ffffff;
+        }
+
+        .hero-eyebrow {
+            margin: 24px 0 6px;
+            padding: 8px 18px;
+            background: #151515;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: none;
+            color: #fafafa;
+            font-size: 0.9rem;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+
+        .hero-eyebrow::before {
+            display: none;
+        }
+
+        .hero .subtext {
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #a3a3a3;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            margin-top: 36px;
+        }
+
+        /* Pill buttons in normal case, like the header button. */
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 15px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            box-shadow: none;
+        }
+
+        .button.gold {
+            background: var(--accent, #c5f23f);
+            border-color: var(--accent, #c5f23f);
+            color: #0a0a0a;
+        }
+
+        .button.gold:hover {
+            filter: brightness(1.08);
+        }
+
+        .button.secondary {
+            background: #151515;
+            border-color: rgba(255,255,255,0.1);
+            color: #ffffff;
+        }
+
+        .hero-note {
+            color: #a3a3a3;
+        }
+
+        @media (max-width: 820px) {
+            .hero {
+                width: calc(100vw - 20px);
+                margin-left: calc(50% - 50vw + 10px);
+                min-height: auto;
+                padding: 56px 16px 110px;
+                border-radius: 22px;
+            }
+
+            .hero-glow::after {
+                background: radial-gradient(ellipse 60% 62% at 50% 34%, #000000 80%, rgba(0,0,0,0.7) 92%, transparent 100%);
+            }
+
+            .button {
+                width: 100%;
+            }
+        }
     </style>
+    <link rel="stylesheet" href="nav-menu.css" />
+    <link rel="stylesheet" href="theme.css" />
 </head>
 <body>
     <header>
@@ -741,6 +1085,7 @@
                     <div class="account-menu">
                         <div class="account-name" id="accountName">Guest</div>
                         <button class="menu-btn profile-btn" type="button">Profile</button>
+                        <button class="menu-btn admin-btn" type="button">Admin panel</button>
                         <button class="menu-btn upgrade-btn" type="button">Upgrade</button>
                         <button class="menu-btn login-btn" type="button">Log in</button>
                         <button class="menu-btn logout-btn" type="button">Log out</button>
@@ -754,113 +1099,139 @@
 
             <nav class="nav-links" aria-label="Main navigation">
                 <a href="index.html">Home</a>
-                <a href="calculators.html">Calculators</a>
-                <a href="plan.html">Plans</a>
+                <div class="tools-menu">
+                    <button type="button" class="tools-trigger" aria-haspopup="true" aria-expanded="false">
+                        All Tools
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="tools-dropdown">
+                        <a href="gym-finder.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg></span>
+                            <span class="tools-text"><strong>Gym Finder</strong><small>Gyms near you, open ones first</small></span>
+                        </a>
+                        <a href="calculators.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm1 3v4h8V5H8Zm0 7v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Zm-6 4v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Z"/></svg></span>
+                            <span class="tools-text"><strong>Calculators</strong><small>BMI and daily calories</small></span>
+                        </a>
+                        <a href="plan.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg></span>
+                            <span class="tools-text"><strong>Workout Plans</strong><small>Your personal training plan</small></span>
+                        </a>
+                    </div>
+                </div>
+                <a href="collaborations.html">Collaborations</a>
                 <a href="contact.html">Contact</a>
             </nav>
 
-            <a href="plan.html" class="nav-cta">Workout Plan</a>
+            <a href="plan.html" class="nav-cta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.5h6.5L9 22l10-12h-6.5L13.5 2Z"/></svg>Workout Plan</a>
         </div>
     </header>
 
     <main id="top" class="page-shell">
         <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-glow" aria-hidden="true"></div>
+            <div class="hero-grain" aria-hidden="true"></div>
+            <div class="hero-stars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
             <div class="hero-inner">
-                <div class="eyebrow">Fitness memes • workout plans</div>
-                <div class="hero-title-wrap">
-                    <h1 id="hero-title" aria-label="2,000,000 plus views across all platforms">
-                        <span class="hero-number" data-target="2000000" data-suffix="+">0+</span>
-                        <span class="hero-subtitle">views across all platforms</span>
-                    </h1>
-                </div>
-                <p class="subtext">Brotein: your gymbro for memes, workouts, and no-excuse gains.</p>
-
-                <div class="social-row" aria-label="Social media links">
-                    <a href="#" class="social-button youtube" aria-label="YouTube">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.1 3.1 0 0 0-2.2-2.2C19.5 3.4 12 3.4 12 3.4s-7.5 0-9.3.6A3.1 3.1 0 0 0 .5 6.2 32.7 32.7 0 0 0 0 12a32.7 32.7 0 0 0 .5 5.8 3.1 3.1 0 0 0 2.2 2.2c1.8.6 9.3.6 9.3.6s7.5 0 9.3-.6a3.1 3.1 0 0 0 2.2-2.2A32.7 32.7 0 0 0 24 12a32.7 32.7 0 0 0-.5-5.8ZM9.8 15.5V8.5l6.2 3.5-6.2 3.5Z"/></svg>
-                    </a>
-                    <a href="#" class="social-button tiktok" aria-label="TikTok">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 3.1c.4 1.4 1.3 2.5 2.6 3.3v2.6a6.7 6.7 0 0 1-2.6-.7v6.9A5.5 5.5 0 1 1 11 9.2v2.7a3 3 0 1 0 2.2 2.9V3.1h3.2Zm.6 9.4a3.1 3.1 0 1 1-3.1-3.1v2.6a.5.5 0 0 0 .5.5h2.6Z"/></svg>
-                    </a>
-                    <a href="#" class="social-button instagram" aria-label="Instagram">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9Zm9.3 1.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
-                    </a>
-                </div>
+                <h1 id="hero-title" class="hero-heading">Less thinking.<br>More lifting.</h1>
+                <div class="eyebrow hero-eyebrow">Your online gymbro</div>
+                <p class="subtext">Free fitness calculators, a workout plan built around your body, and a profile that remembers your stats.</p>
 
                 <div class="hero-actions">
-                    <a href="calculators.html" class="button primary">Calculators</a>
-                    <a href="contact.html" class="button secondary">Join the grind</a>
+                    <a href="plan.html" class="button gold"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.5h6.5L9 22l10-12h-6.5L13.5 2Z"/></svg>Get your workout plan</a>
+                    <a href="gym-finder.html" class="button secondary"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>Find a gym nearby</a>
                 </div>
 
-                <div class="stats-row" id="stats">
-                    <div class="stat-card">
-                        <strong>2.3M+</strong>
-                        <span>Monthly views</span>
-                    </div>
-                    <div class="stat-card">
-                        <strong>220k</strong>
-                        <span>Monthly likes</span>
-                    </div>
-                    <div class="stat-card">
-                        <strong>134</strong>
-                        <span>Plan downloads</span>
-                    </div>
-                </div>
+                <p class="hero-note" id="heroNote">New here? <a href="login.html">Create a free account</a> and your stats are saved for next time.</p>
             </div>
         </section>
 
-        <section id="about">
+        <section id="features" aria-labelledby="features-title">
             <div class="section-head">
-                <h2>Gym culture, but smarter.</h2>
-                <p>From hilarious fitness memes to structured workout plans, Brotein keeps the energy high and the progress real.</p>
+                <h2 id="features-title">Everything you need to start.</h2>
+                <p>No complicated apps, no endless scrolling. Pick a tool and get going.</p>
             </div>
 
-            <div class="card-grid" id="platforms">
-                <article class="feature-card">
+            <div class="card-grid">
+                <a class="feature-card" href="calculators.html">
                     <div>
-                        <span class="label">Meme content</span>
-                        <h3>Gym humor that lands</h3>
-                        <p>Relatable training jokes, “this is me at 6am” energy, and the kind of gym chaos that gets shared by everyone who trains.</p>
+                        <span class="label">Free</span>
+                        <h3>BMI &amp; calorie calculators</h3>
+                        <p>See your BMI and how many calories you need to lose, keep or gain weight. Results update as you type.</p>
                     </div>
-                    <div class="pill-row">
-                        <span class="pill">Viral</span>
-                        <span class="pill">Relatable</span>
-                    </div>
-                </article>
+                    <span class="card-link">Open calculators →</span>
+                </a>
 
-                <article class="feature-card">
+                <a class="feature-card" href="plan.html">
                     <div>
-                        <span class="label">Workout plans</span>
-                        <h3>Strength, fat loss, progress</h3>
-                        <p>Practical routines for muscle gain, fat loss, and consistency — built to work whether you’re a beginner or the guy who never skips leg day.</p>
+                        <span class="label gold-label">Premium</span>
+                        <h3>Your personal workout plan</h3>
+                        <p>Pick your goal and training days and get a full weekly plan with exercises, sets and reps, ready as a PDF.</p>
                     </div>
-                    <div class="pill-row">
-                        <span class="pill">Hypertrophy</span>
-                        <span class="pill">Cut</span>
-                    </div>
-                </article>
+                    <span class="card-link">Build my plan →</span>
+                </a>
 
-                <article class="feature-card">
+                <a class="feature-card" href="profile.html">
                     <div>
-                        <span class="label">Mindset</span>
-                        <h3>No excuses, just reps</h3>
-                        <p>Discipline-driven training advice, recovery reminders, and motivation that keeps people showing up when the gym feels hard.</p>
+                        <span class="label">Free account</span>
+                        <h3>A profile that remembers you</h3>
+                        <p>Save your stats once and they fill in the calculators and plan form for you. Your workout plan is kept there too.</p>
                     </div>
-                    <div class="pill-row">
-                        <span class="pill">Discipline</span>
-                        <span class="pill">Consistency</span>
-                    </div>
-                </article>
+                    <span class="card-link">Go to profile →</span>
+                </a>
             </div>
         </section>
 
-        <section>
-            <div class="quote-block" id="contact">
-                <blockquote>“Gym memes, hard work, and workout plans that actually get people moving.”</blockquote>
-                <div class="quote-meta">
-                    <span class="meta-label">Brotein</span>
-                    <strong>Open for collabs</strong>
+        <section id="how" aria-labelledby="how-title">
+            <div class="section-head">
+                <h2 id="how-title">How it works.</h2>
+                <p>Three steps from zero to a plan you can take to the gym.</p>
+            </div>
+
+            <div class="card-grid">
+                <div class="step-card">
+                    <span class="step-number">1</span>
+                    <h3>Create an account</h3>
+                    <p>Sign up for free with your email. It takes less than a minute.</p>
                 </div>
+                <div class="step-card">
+                    <span class="step-number">2</span>
+                    <h3>Tell us your stats</h3>
+                    <p>Weight, height, age and gender. We use them to fill in everything for you.</p>
+                </div>
+                <div class="step-card">
+                    <span class="step-number">3</span>
+                    <h3>Get your plan</h3>
+                    <p>Choose your goal and days per week, and download your personal plan.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="premium">
+            <div class="premium-block">
+                <div>
+                    <span class="premium-label">Brotein Premium</span>
+                    <h2>Unlock your personal workout plan for only 0.99$.</h2>
+                </div>
+                <a href="upgrade.html" class="button dark" id="premiumButton">Go Premium</a>
+            </div>
+        </section>
+
+        <section class="follow" aria-labelledby="follow-title">
+            <div class="section-head">
+                <h2 id="follow-title">Come for the plans, stay for the memes.</h2>
+                <p>Follow Brotein for daily gym humor and training motivation.</p>
+            </div>
+            <div class="social-row" aria-label="Social media links">
+                <a href="https://www.youtube.com/@brotein-eu" target="_blank" rel="noopener noreferrer" class="social-button youtube" aria-label="YouTube">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.1 3.1 0 0 0-2.2-2.2C19.5 3.4 12 3.4 12 3.4s-7.5 0-9.3.6A3.1 3.1 0 0 0 .5 6.2 32.7 32.7 0 0 0 0 12a32.7 32.7 0 0 0 .5 5.8 3.1 3.1 0 0 0 2.2 2.2c1.8.6 9.3.6 9.3.6s7.5 0 9.3-.6a3.1 3.1 0 0 0 2.2-2.2A32.7 32.7 0 0 0 24 12a32.7 32.7 0 0 0-.5-5.8ZM9.8 15.5V8.5l6.2 3.5-6.2 3.5Z"/></svg>
+                </a>
+                <a href="https://www.tiktok.com/@brotein.gg" target="_blank" rel="noopener noreferrer" class="social-button tiktok" aria-label="TikTok">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 3.1c.4 1.4 1.3 2.5 2.6 3.3v2.6a6.7 6.7 0 0 1-2.6-.7v6.9A5.5 5.5 0 1 1 11 9.2v2.7a3 3 0 1 0 2.2 2.9V3.1h3.2Zm.6 9.4a3.1 3.1 0 1 1-3.1-3.1v2.6a.5.5 0 0 0 .5.5h2.6Z"/></svg>
+                </a>
+                <a href="https://www.instagram.com/brotein.eu/" target="_blank" rel="noopener noreferrer" class="social-button instagram" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9Zm9.3 1.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
+                </a>
             </div>
         </section>
     </main>
@@ -874,8 +1245,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
+    <script src="questionnaire.js"></script>
     <script>
         const CURRENT_USER_KEY = 'brotein_current_user';
+        const db = window.broteinSupabase;
+
+        function normalizePackageName(value) {
+            return String(value || 'FREE').toUpperCase();
+        }
 
         function getCurrentUser() {
             try {
@@ -884,6 +1261,33 @@
             } catch (error) {
                 return null;
             }
+        }
+
+        async function syncCurrentUserFromProfile() {
+            const user = getCurrentUser();
+            if (!user || user.guest || !db) return user;
+
+            const { data: { session } } = await db.auth.getSession();
+            if (!session) return user;
+
+            const { data: profile } = await db
+                .from('profiles')
+                .select('name, email, package, is_admin')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            const nextUser = {
+                ...user,
+                name: profile?.name || user.name || 'User',
+                email: profile?.email || user.email || session.user.email,
+                package: normalizePackageName(profile?.package || user.package || 'FREE'),
+                isAdmin: Boolean(profile?.is_admin),
+                guest: false,
+                loggedIn: true
+            };
+
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(nextUser));
+            return nextUser;
         }
 
         function updateAccountMenu() {
@@ -898,8 +1302,12 @@
             const profileBtn = document.querySelector('.profile-btn');
             if (profileBtn) profileBtn.style.display = user && !user.guest ? 'block' : 'none';
 
+            // Only a shortcut: admin.html checks admin rights with Supabase itself.
+            const adminBtn = document.querySelector('.admin-btn');
+            if (adminBtn) adminBtn.style.display = user && !user.guest && user.isAdmin ? 'block' : 'none';
+
             const isGuest = !!user && user.guest === true;
-            const packageName = (user && user.package) ? String(user.package).toUpperCase() : 'FREE';
+            const packageName = normalizePackageName(user?.package);
             const isPremium = packageName === 'PREMIUM';
             nameEl.classList.toggle('premium-user', isPremium);
 
@@ -938,6 +1346,10 @@
             window.location.href = 'login.html';
         });
 
+        document.querySelector('.admin-btn')?.addEventListener('click', function () {
+            window.location.href = 'admin.html';
+        });
+
         document.querySelector('.profile-btn')?.addEventListener('click', function () {
             window.location.href = 'profile.html';
         });
@@ -952,13 +1364,34 @@
             signOut.finally(() => window.location.reload());
         });
 
+        // Keep the menu centred under the icon, nudging it only when it would go off-screen.
+        function keepAccountMenuOnScreen() {
+            const wrap = document.querySelector('.account-wrap');
+            const menu = document.querySelector('.account-menu');
+            if (!wrap || !menu) return;
+            // Measured from the wrapper, not the menu, so the menu's slide-in animation doesn't skew it.
+            const wrapRect = wrap.getBoundingClientRect();
+            const left = wrapRect.left + wrapRect.width / 2 - menu.offsetWidth / 2;
+            const right = left + menu.offsetWidth;
+            const gap = 8;
+            let shift = 0;
+            if (left < gap) shift = gap - left;
+            else if (right > window.innerWidth - gap) shift = window.innerWidth - gap - right;
+            menu.style.setProperty('--menu-shift', `${shift}px`);
+        }
+
+        keepAccountMenuOnScreen();
+        window.addEventListener('resize', keepAccountMenuOnScreen);
+
+        const accountMenuWrap = document.querySelector('.account-wrap');
+
+        // Hovering or clicking the profile icon opens the menu; it stays open until you click somewhere else.
+        accountMenuWrap?.addEventListener('mouseenter', function () {
+            accountMenuWrap.classList.add('is-open');
+        });
+
         document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
-            const accountWrap = this.closest('.account-wrap');
-            if (!accountWrap) return;
-            const isOpen = accountWrap.classList.toggle('is-open');
-            if (isOpen) {
-                accountWrap.querySelector('.account-menu')?.focus();
-            }
+            accountMenuWrap?.classList.add('is-open');
             event.stopPropagation();
         });
 
@@ -969,37 +1402,26 @@
             }
         });
 
-        const counter = document.querySelector('.hero-number');
-        if (counter) {
-            const target = Number(counter.dataset.target || 0);
-            const suffix = counter.dataset.suffix || '';
-            const start = 0;
-            const duration = 1200;
-            const startTime = performance.now();
+        syncCurrentUserFromProfile().finally(() => updateAccountMenu());
 
-            function easeOutCubic(t) {
-                return 1 - Math.pow(1 - t, 3);
+        // Greet logged-in users instead of asking them to sign up, and hide Premium promo for Premium users.
+        function personalizeHome() {
+            const user = getCurrentUser();
+            const note = document.getElementById('heroNote');
+            const premium = document.getElementById('premium');
+            if (user && !user.guest) {
+                note.textContent = `Welcome back, ${user.name || 'bro'}. Let's get to work.`;
             }
-
-            function animateCounter(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = easeOutCubic(progress);
-                const currentValue = Math.round(start + (target - start) * eased);
-
-                counter.textContent = `${currentValue.toLocaleString()}${suffix}`;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateCounter);
-                } else {
-                    counter.textContent = `${target.toLocaleString()}${suffix}`;
-                }
+            if (premium) {
+                premium.style.display = String(user?.package || 'FREE').toUpperCase() === 'PREMIUM' ? 'none' : '';
             }
-
-            requestAnimationFrame(animateCounter);
         }
+
+        personalizeHome();
+        syncCurrentUserFromProfile().finally(personalizeHome);
 
         updateAccountMenu();
     </script>
+    <script src="nav-menu.js"></script>
 </body>
 </html>
