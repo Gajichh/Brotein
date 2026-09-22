@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Brotein | Gym Finder</title>
-    <meta name="description" content="Find gyms near you with Brotein's free Gym Finder." />
+    <title>Brotein | Pricing</title>
+    <meta name="description" content="Brotein pricing: start free, upgrade to Premium for your personal workout plan." />
     <link rel="icon" type="image/x-icon" href="broteinico.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <style>
         :root {
             --bg: #000000;
@@ -545,394 +544,158 @@
             }
         }
 
-        .gym-controls {
-            margin: 0 auto;
-            max-width: 760px;
-            padding: 22px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-            border: 1px solid var(--line);
-            border-radius: 28px;
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            align-items: stretch;
+            margin-top: 8px;
         }
 
-        .gym-locate {
-            width: 100%;
+        .price-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 28px 24px 24px;
+            border-radius: 28px;
+            background: rgba(15,15,15,0.85);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
+        }
+
+        .price-card.is-featured {
+            border-color: rgba(197,242,63,0.55);
+            box-shadow: 0 0 0 1px rgba(197,242,63,0.25), 0 20px 50px rgba(197,242,63,0.08);
+        }
+
+        .price-badge {
+            position: absolute;
+            top: -13px;
+            left: 24px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: #c5f23f;
+            color: #0a0a0a;
+            font-size: 0.74rem;
+            font-weight: 700;
+        }
+
+        .price-card h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .price-card .price-tagline {
+            margin: 6px 0 22px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .price {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+
+        .price strong {
+            font-size: 2.8rem;
+            font-weight: 600;
+            letter-spacing: -0.04em;
+        }
+
+        .price span {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .price-features {
+            list-style: none;
+            margin: 0 0 26px;
+            padding: 0;
+            display: grid;
+            align-content: start;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .price-features li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-size: 0.95rem;
+            line-height: 1.45;
+        }
+
+        .price-features svg {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            margin-top: 1px;
+            fill: #c5f23f;
+        }
+
+        .price-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            border: 1px solid rgba(197,242,63,0.48);
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
             border-radius: 999px;
-            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            border: 1px solid rgba(255,255,255,0.12);
+            background: #151515;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: filter 0.2s ease, transform 0.2s ease;
+        }
+
+        .price-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .price-button.is-primary {
+            background: #c5f23f;
+            border-color: #c5f23f;
             color: #0a0a0a;
-            padding: 15px 22px;
-            font: inherit;
-            font-size: 0.78rem;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 10px 24px rgba(197,242,63,0.11);
         }
 
-        .gym-locate svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
+        .price-button.is-current {
+            pointer-events: none;
+            opacity: 0.7;
         }
 
-        .gym-or {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 16px 0;
-            color: var(--muted);
-            font-size: 0.7rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
+        .price-card.is-soon {
+            border-style: dashed;
+            background: rgba(15,15,15,0.6);
         }
 
-        .gym-or::before,
-        .gym-or::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: var(--line);
-        }
-
-        .gym-search {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 10px;
-            margin: 0;
-        }
-
-        .gym-search button,
-        .gym-radius select {
-            font: inherit;
-        }
-
-        .gym-search button {
-            border: 1px solid rgba(255,255,255,0.18);
-            border-radius: 14px;
-            background: var(--text);
-            color: var(--bg);
-            padding: 0 20px;
-            font-size: 0.74rem;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-
-        .gym-radius {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 14px;
-        }
-
-        .gym-radius select {
-            width: auto;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.04);
-            color: var(--text);
-            padding: 10px 12px;
-            color-scheme: dark;
-        }
-
-        .gym-locate:disabled,
-        .gym-search button:disabled {
-            opacity: 0.6;
-            cursor: wait;
-        }
-
-        .gym-status {
-            min-height: 20px;
-            margin-top: 14px;
-            font-size: 0.74rem;
-            letter-spacing: 0.04em;
+        .price-card.is-soon .price strong {
+            font-size: 1.6rem;
             color: var(--muted);
         }
 
-        .gym-status.error {
-            color: #ff6b6b;
-        }
-
-        .gym-status.success {
-            color: #c5f23f;
-        }
-
-        .gym-privacy {
-            margin: 10px 0 0;
-            font-size: 0.72rem;
-            color: var(--muted);
-        }
-
-        .gym-results {
-            display: grid;
-            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-            gap: 20px;
-            margin-top: 28px;
-        }
-
-        .gym-results[hidden] {
-            display: none;
-        }
-
-        .gym-list-wrap {
-            max-height: 560px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .gym-count {
-            margin: 0 0 12px;
-            font-size: 0.72rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .gym-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: grid;
-            gap: 12px;
-        }
-
-        .gym-item,
-        .gym-empty {
-            padding: 16px 18px;
-            border: 1px solid var(--line);
-            border-radius: 20px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-        }
-
-        .gym-empty {
-            color: var(--muted);
-        }
-
-        .gym-item-head {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .gym-name {
-            border: 0;
-            background: none;
-            padding: 0;
-            color: var(--text);
-            font: inherit;
-            font-size: 1.05rem;
-            font-weight: 700;
-            text-align: left;
-            cursor: pointer;
-        }
-
-        .gym-name:hover {
-            text-decoration: underline;
-        }
-
-        .gym-side {
-            flex-shrink: 0;
-            display: grid;
-            justify-items: end;
-            gap: 3px;
-            text-align: right;
-        }
-
-        .gym-state {
-            font-size: 0.66rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .gym-state.is-open {
-            color: #c5f23f;
-        }
-
-        .gym-state.is-closed {
-            color: #ff6b6b;
-        }
-
-        .gym-today {
-            font-size: 0.74rem;
-            color: var(--muted);
-            max-width: 170px;
-        }
-
-        .gym-distance {
-            flex-shrink: 0;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #c5f23f;
-        }
-
-        .gym-meta {
-            margin: 6px 0 0;
+        .pricing-note {
+            margin: 26px auto 0;
+            max-width: 620px;
+            text-align: center;
             color: var(--muted);
             font-size: 0.86rem;
-            line-height: 1.5;
-            overflow-wrap: anywhere;
+            line-height: 1.6;
         }
 
-        .gym-links {
-            display: flex;
-            gap: 14px;
-            margin-top: 10px;
-        }
-
-        .gym-links a {
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        .gym-extras {
-            margin-top: 12px;
-            border-top: 1px solid var(--line);
-            padding-top: 10px;
-        }
-
-        .gym-extras summary {
-            cursor: pointer;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--text);
-            list-style: none;
-        }
-
-        .gym-extras summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .gym-extras summary::after {
-            content: " +";
-            color: #c5f23f;
-        }
-
-        .gym-extras[open] summary::after {
-            content: " \2212";
-        }
-
-        .gym-extras-body {
-            margin-top: 10px;
-        }
-
-        .gym-extras-title {
-            margin: 10px 0 6px;
-            font-size: 0.66rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .gym-chips {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .gym-chips li {
-            padding: 6px 10px;
-            border-radius: 999px;
-            border: 1px solid var(--line);
-            background: var(--chip);
-            font-size: 0.76rem;
-        }
-
-        .gym-chips.is-yes li {
-            border-color: rgba(250,204,21,0.45);
-            color: #c5f23f;
-        }
-
-        .gym-chips.is-yes li::before {
-            content: "\2713  ";
-        }
-
-        .gym-chips.is-no li {
-            color: var(--muted);
-            text-decoration: line-through;
-        }
-
-        .gym-extras-empty,
-        .gym-extras-note {
-            margin: 10px 0 0;
-            font-size: 0.76rem;
-            line-height: 1.5;
-            color: var(--muted);
-        }
-
-        .gym-extras-note a {
-            color: var(--text);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        #gymMap {
-            height: 560px;
-            border-radius: 24px;
-            border: 1px solid var(--line);
-            background: #111;
-            z-index: 0;
-        }
-
-        /* Dark map to match the site. */
-        #gymMap .leaflet-tile {
-            filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9);
-        }
-
-        #gymMap .leaflet-popup-content {
-            font-family: Inter, sans-serif;
-            display: grid;
-            gap: 4px;
-        }
-
-        #gymMap .leaflet-popup-content a {
-            color: #b45309;
-            font-weight: 700;
-        }
-
-        @media (max-width: 820px) {
-            .gym-results {
+        @media (max-width: 980px) {
+            .pricing-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .gym-map-wrap {
-                order: -1;
-            }
-
-            #gymMap {
-                height: 340px;
-            }
-
-            .gym-list-wrap {
-                max-height: none;
-                overflow: visible;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .gym-search {
-                grid-template-columns: 1fr;
-            }
-
-            .gym-search button {
-                padding: 14px 20px;
+                max-width: 480px;
+                margin-left: auto;
+                margin-right: auto;
+                gap: 26px;
             }
         }
     </style>
@@ -995,47 +758,53 @@
 
     <main class="page-shell">
         <section class="hero">
-            <div class="eyebrow">Gym Finder</div>
-            <h1>Find a gym near you.</h1>
-            <p class="subtext">Use your location or search any city to see gyms around you, with distance, opening hours and directions.</p>
+            <div class="eyebrow">Pricing</div>
+            <h1>Simple pricing. Serious gains.</h1>
+            <p class="subtext">Start free with the calculators and Gym Finder. Upgrade when you want a workout plan built around you.</p>
         </section>
 
-        <section class="gym-controls" aria-label="Search for gyms">
-            <button type="button" id="gymLocateButton" class="gym-locate">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-                Use my location
-            </button>
+        <section class="pricing-grid" aria-label="Packages">
+            <article class="price-card" id="planFree">
+                <h2>Free</h2>
+                <p class="price-tagline">Everything you need to get started.</p>
+                <div class="price"><strong>0$</strong><span>forever</span></div>
+                <ul class="price-features">
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>BMI &amp; calorie calculators</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Gym Finder with today's opening hours</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Free account that saves your stats</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Your stats filled in across every tool</span></li>
+                </ul>
+                <a href="login.html" class="price-button" data-plan-button="FREE">Create free account</a>
+            </article>
 
-            <div class="gym-or">or</div>
+            <article class="price-card is-featured" id="planPremium">
+                <span class="price-badge">Most popular</span>
+                <h2>Premium</h2>
+                <p class="price-tagline">Your own training plan, built around your body.</p>
+                <div class="price"><strong>0.99$</strong></div>
+                <ul class="price-features">
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Everything in Free</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Personal workout plan generator</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Plan saved to your profile</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Download your plan as a PDF</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Premium badge on your account</span></li>
+                </ul>
+                <a href="upgrade.html" class="price-button is-primary" data-plan-button="PREMIUM"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.5h6.5L9 22l10-12h-6.5L13.5 2Z"/></svg>Get Premium</a>
+            </article>
 
-            <form id="gymSearchForm" class="gym-search" role="search">
-                <input id="gymSearchInput" type="text" aria-label="City or address" placeholder="City or address, e.g. Belgrade" autocomplete="address-level2" />
-                <button type="submit">Search</button>
-            </form>
-
-            <div class="gym-radius">
-                <label for="gymRadius">Search radius</label>
-                <select id="gymRadius">
-                    <option value="2">2 km</option>
-                    <option value="5" selected>5 km</option>
-                    <option value="10">10 km</option>
-                    <option value="20">20 km</option>
-                </select>
-            </div>
-
-            <div id="gymStatus" class="gym-status" aria-live="polite" role="status"></div>
-            <p class="gym-privacy">Your location is only used to search and is never saved.</p>
+            <article class="price-card is-soon">
+                <h2>More packages</h2>
+                <p class="price-tagline">New packages with more tools are on the way.</p>
+                <div class="price"><strong>Coming soon</strong></div>
+                <ul class="price-features">
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>More tools and training content</span></li>
+                        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4-10.6 10.6Z"/></svg><span>Something you'd want included? Tell us</span></li>
+                </ul>
+                <a href="contact.html" class="price-button">Tell us what you want</a>
+            </article>
         </section>
 
-        <section id="gymResults" class="gym-results" hidden>
-            <div class="gym-list-wrap">
-                <p id="gymCount" class="gym-count"></p>
-                <ul id="gymList" class="gym-list"></ul>
-            </div>
-            <div class="gym-map-wrap">
-                <div id="gymMap" aria-label="Map of gyms"></div>
-            </div>
-        </section>
+        <p class="pricing-note">Prices are in US dollars. The calculators and Gym Finder stay free for everyone.</p>
 
         <div class="footer">Brotein • Fitness memes & workout plans</div>
     </main>
@@ -1044,167 +813,32 @@
     <script src="supabase-client.js"></script>
     <script src="questionnaire.js"></script>
     <script>
-        const CURRENT_USER_KEY = 'brotein_current_user';
-        const db = window.broteinSupabase;
-
-        function normalizePackageName(value) {
-            return String(value || 'FREE').toUpperCase();
-        }
-
-        function getCurrentUser() {
+        // Show which package the signed-in user already has.
+        (function () {
+            let user = null;
             try {
-                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
-                return user && user.loggedIn ? user : null;
+                user = JSON.parse(localStorage.getItem('brotein_current_user') || 'null');
             } catch (error) {
-                return null;
+                user = null;
             }
-        }
+            if (!user || !user.loggedIn || user.guest) return;
 
-        async function syncCurrentUserFromProfile() {
-            const user = getCurrentUser();
-            if (!user || user.guest || !db) return user;
+            const current = String(user.package || 'FREE').toUpperCase();
+            const freeButton = document.querySelector('[data-plan-button="FREE"]');
+            const premiumButton = document.querySelector('[data-plan-button="PREMIUM"]');
 
-            const { data: { session } } = await db.auth.getSession();
-            if (!session) return user;
-
-            const { data: profile } = await db
-                .from('profiles')
-                .select('name, email, package, is_admin')
-                .eq('id', session.user.id)
-                .maybeSingle();
-
-            const nextUser = {
-                ...user,
-                name: profile?.name || user.name || 'User',
-                email: profile?.email || user.email || session.user.email,
-                package: normalizePackageName(profile?.package || user.package || 'FREE'),
-                isAdmin: Boolean(profile?.is_admin),
-                guest: false,
-                loggedIn: true
-            };
-
-            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(nextUser));
-            return nextUser;
-        }
-
-        function updateAccountMenu() {
-            const user = getCurrentUser();
-            const nameEl = document.getElementById('accountName');
-            const loginBtn = document.querySelector('.login-btn');
-            const logoutBtn = document.querySelector('.logout-btn');
-            const upgradeBtn = document.querySelector('.upgrade-btn');
-
-            if (!nameEl || !loginBtn || !logoutBtn) return;
-
-            const profileBtn = document.querySelector('.profile-btn');
-            if (profileBtn) profileBtn.style.display = user && !user.guest ? 'block' : 'none';
-
-            // Only a shortcut: admin.html checks admin rights with Supabase itself.
-            const adminBtn = document.querySelector('.admin-btn');
-            if (adminBtn) adminBtn.style.display = user && !user.guest && user.isAdmin ? 'block' : 'none';
-
-            const isGuest = !!user && user.guest === true;
-            const packageName = normalizePackageName(user?.package);
-            const isPremium = packageName === 'PREMIUM';
-            nameEl.classList.toggle('premium-user', isPremium);
-
-            if (isGuest) {
-                nameEl.textContent = 'Guest';
-                loginBtn.textContent = 'LOG IN';
-                loginBtn.style.display = 'block';
-                logoutBtn.style.display = 'none';
-                if (upgradeBtn) {
-                    upgradeBtn.style.display = 'none';
-                }
-                return;
-            }
-
-            if (user) {
-                const displayName = user.name || 'User';
-                nameEl.textContent = displayName;
-                loginBtn.textContent = 'Log in';
-                loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'block';
-                if (upgradeBtn) {
-                    upgradeBtn.style.display = isPremium ? 'none' : 'block';
-                }
+            if (current === 'PREMIUM') {
+                premiumButton.textContent = "You're on Premium";
+                premiumButton.classList.add('is-current');
+                freeButton.textContent = 'Included in Premium';
+                freeButton.classList.add('is-current');
             } else {
-                nameEl.textContent = 'Guest';
-                loginBtn.textContent = 'LOG IN';
-                loginBtn.style.display = 'block';
-                logoutBtn.style.display = 'none';
-                if (upgradeBtn) {
-                    upgradeBtn.style.display = 'none';
-                }
+                freeButton.textContent = "You're on Free";
+                freeButton.classList.add('is-current');
             }
-        }
-
-        document.querySelector('.login-btn')?.addEventListener('click', function () {
-            window.location.href = 'login.html';
-        });
-
-        document.querySelector('.admin-btn')?.addEventListener('click', function () {
-            window.location.href = 'admin.html';
-        });
-
-        document.querySelector('.profile-btn')?.addEventListener('click', function () {
-            window.location.href = 'profile.html';
-        });
-
-        document.querySelector('.upgrade-btn')?.addEventListener('click', function () {
-            window.location.href = 'upgrade.html';
-        });
-
-        document.querySelector('.logout-btn')?.addEventListener('click', function () {
-            localStorage.removeItem(CURRENT_USER_KEY);
-            const signOut = window.broteinSupabase ? window.broteinSupabase.auth.signOut() : Promise.resolve();
-            signOut.finally(() => window.location.reload());
-        });
-
-        // Keep the menu centred under the icon, nudging it only when it would go off-screen.
-        function keepAccountMenuOnScreen() {
-            const wrap = document.querySelector('.account-wrap');
-            const menu = document.querySelector('.account-menu');
-            if (!wrap || !menu) return;
-            // Measured from the wrapper, not the menu, so the menu's slide-in animation doesn't skew it.
-            const wrapRect = wrap.getBoundingClientRect();
-            const left = wrapRect.left + wrapRect.width / 2 - menu.offsetWidth / 2;
-            const right = left + menu.offsetWidth;
-            const gap = 8;
-            let shift = 0;
-            if (left < gap) shift = gap - left;
-            else if (right > window.innerWidth - gap) shift = window.innerWidth - gap - right;
-            menu.style.setProperty('--menu-shift', `${shift}px`);
-        }
-
-        keepAccountMenuOnScreen();
-        window.addEventListener('resize', keepAccountMenuOnScreen);
-
-        const accountMenuWrap = document.querySelector('.account-wrap');
-
-        // Hovering or clicking the profile icon opens the menu; it stays open until you click somewhere else.
-        accountMenuWrap?.addEventListener('mouseenter', function () {
-            accountMenuWrap.classList.add('is-open');
-        });
-
-        document.querySelector('.account-trigger')?.addEventListener('click', function (event) {
-            accountMenuWrap?.classList.add('is-open');
-            event.stopPropagation();
-        });
-
-        document.addEventListener('click', function (event) {
-            const accountWrap = document.querySelector('.account-wrap');
-            if (accountWrap && !accountWrap.contains(event.target)) {
-                accountWrap.classList.remove('is-open');
-            }
-        });
-
-        syncCurrentUserFromProfile().finally(() => updateAccountMenu());
+        })();
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/opening_hours@3.15.0/build/opening_hours.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tz-lookup@6.1.25/tz.min.js"></script>
-    <script src="gym-finder.js"></script>
     <script src="nav-menu.js"></script>
+    <script src="account-menu.js"></script>
 </body>
 </html>
