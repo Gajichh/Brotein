@@ -288,6 +288,7 @@
             // Fill in whatever form is on this page right away.
             if (typeof window.applySavedProfileToCalculators === 'function') window.applySavedProfileToCalculators();
             if (typeof window.applySavedProfileToPlan === 'function') window.applySavedProfileToPlan();
+            if (typeof window.applySavedProfileToFoodPlan === 'function') window.applySavedProfileToFoodPlan();
             if (typeof window.fillProfileFormFromUser === 'function') window.fillProfileFormFromUser();
         });
 

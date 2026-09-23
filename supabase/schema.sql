@@ -142,5 +142,66 @@ create policy "Users delete own plan"
     on public.workout_plans for delete
     using (auth.uid() = user_id);
 
+-- Saved food plans: one per user (unique user_id). This mirrors the workout
+-- plan storage and keeps each food plan tied to the user’s personal stats.
+create table if not exists public.food_plans (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null unique references auth.users (id) on delete cascade,
+    name text not null default '',
+    gender text not null check (gender in ('male', 'female')),
+    weight_kg numeric not null check (weight_kg > 0),
+    height_cm numeric not null check (height_cm > 0),
+    age integer not null check (age >= 0),
+    days integer not null check (days between 1 and 7),
+    goal text not null check (goal in ('loss', 'maintain', 'gain', 'muscle')),
+    maintenance_calories integer not null check (maintenance_calories >= 0),
+    daily_target_calories integer not null check (daily_target_calories >= 0),
+    weekly_target_calories integer not null check (weekly_target_calories >= 0),
+    protein_target_g integer not null check (protein_target_g >= 0),
+    created_at timestamptz not null default now()
+);
+
+alter table public.food_plans enable row level security;
+
+drop policy if exists "Users read own food plan" on public.food_plans;
+create policy "Users read own food plan"
+    on public.food_plans for select
+    using (auth.uid() = user_id);
+
+drop policy if exists "Premium users create own food plan" on public.food_plans;
+create policy "Premium users create own food plan"
+    on public.food_plans for insert
+    with check (
+        auth.uid() = user_id
+        and exists (
+            select 1 from public.profiles
+            where id = auth.uid() and package = 'PREMIUM'
+        )
+    );
+
+drop policy if exists "Users delete own food plan" on public.food_plans;
+create policy "Users delete own food plan"
+    on public.food_plans for delete
+    using (auth.uid() = user_id);
+
+-- Personal info users fill in on profile.html; used to prefill the calculators and plan form.
+alter table public.profiles add column if not exists weight numeric check (weight >= 0);
+alter table public.profiles add column if not exists weight_unit text not null default 'kg' check (weight_unit in ('kg', 'lbs'));
+alter table public.profiles add column if not exists height numeric check (height >= 0);
+alter table public.profiles add column if not exists age integer check (age >= 0 and age <= 120);
+alter table public.profiles add column if not exists gender text check (gender in ('male', 'female'));
+
+-- Users may update only these personal columns on their own row, never
+-- package or is_admin (those change only through the functions above or by
+-- hand in the dashboard).
+revoke update on public.profiles from anon, authenticated;
+grant update (weight, weight_unit, height, age, gender) on public.profiles to authenticated;
+
+drop policy if exists "Users update own personal info" on public.profiles;
+create policy "Users update own personal info"
+    on public.profiles for update
+    using (auth.uid() = id)
+    with check (auth.uid() = id);
+
 -- To make yourself an admin, register on the site first, then run:
 --   update public.profiles set is_admin = true where email = 'you@example.com';

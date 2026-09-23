@@ -669,6 +669,117 @@
             margin: 0 0 12px;
         }
 
+        /* Collapsible day rows, used by both plans. */
+        .day-rows {
+            display: grid;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .day-row {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.02);
+            overflow: hidden;
+        }
+
+        .day-row[open] {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.16);
+        }
+
+        .day-row summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .day-row summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .day-row summary::after {
+            content: "";
+            margin-left: auto;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #c5f23f;
+            border-bottom: 2px solid #c5f23f;
+            transform: rotate(45deg) translate(-2px, -2px);
+            transition: transform 0.2s ease;
+        }
+
+        .day-row[open] summary::after {
+            transform: rotate(-135deg) translate(-2px, -2px);
+        }
+
+        .day-tag {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--chip);
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .day-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .day-meta {
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .day-list {
+            list-style: none;
+            margin: 0;
+            padding: 0 16px 16px 16px;
+            columns: 2;
+            column-gap: 26px;
+            color: var(--muted);
+        }
+
+        .day-list li {
+            break-inside: avoid;
+            padding: 5px 0 5px 14px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 0.92rem;
+        }
+
+        .day-list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #c5f23f;
+        }
+
+        .day-list strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        @media (max-width: 720px) {
+            .day-list {
+                columns: 1;
+            }
+
+            .day-meta {
+                display: none;
+            }
+        }
+
         .session-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -779,6 +890,10 @@
                             <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg></span>
                             <span class="tools-text"><strong>Workout Plans</strong><small>Your personal training plan</small></span>
                         </a>
+                        <a href="food-plan.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="16" cy="8" r="5.6"/><path d="M14.1 11.6 7.9 17.8l1.5 1.5 6.2-6.2z"/><circle cx="10.4" cy="20.1" r="2.2"/><circle cx="6.9" cy="16.6" r="2.2"/></svg></span>
+                            <span class="tools-text"><strong>Food Plans</strong><small>Calories and weekly nutrition</small></span>
+                        </a>
                     </div>
                 </div>
                 <a href="collaborations.html">Collaborations</a>
@@ -860,7 +975,7 @@
                     <p id="planFocus" class="plan-text"></p>
                     <p id="planWeekly" class="plan-text"></p>
                     <p id="planNutrition" class="plan-text"></p>
-                    <div id="planSessions" class="session-grid"></div>
+                    <div id="planSessions" class="day-rows"></div>
 
                     <div class="plan-actions">
                         <button type="button" id="downloadPlanButton" class="generate-button">Download PDF</button>
@@ -871,6 +986,27 @@
 
                 <div id="planStatus" class="plan-status" aria-live="polite" role="status"></div>
             </section>
+
+            <section class="profile-panel" aria-labelledby="food-plan-heading" style="grid-column: 1 / -1;">
+                <h2 id="food-plan-heading">Your food plan</h2>
+
+                <div id="foodEmpty" class="empty-plan" style="display:none;">
+                    <p id="foodEmptyText"></p>
+                    <a id="foodEmptyLink" href="food-plan.html" class="generate-button"></a>
+                </div>
+
+                <div id="foodDetails" style="display:none;">
+                    <div id="foodSummary" class="plan-summary"></div>
+                    <div id="foodDays" class="day-rows"></div>
+
+                    <div class="plan-actions">
+                        <button type="button" id="downloadFoodButton" class="generate-button">Download PDF</button>
+                        <button type="button" id="deleteFoodButton" class="ghost-button">Delete food plan</button>
+                    </div>
+                </div>
+
+                <div id="foodStatus" class="plan-status" aria-live="polite" role="status"></div>
+            </section>
         </div>
     </main>
 
@@ -879,10 +1015,12 @@
     <script src="supabase-client.js"></script>
     <script src="questionnaire.js"></script>
     <script src="plan-builder.js"></script>
+    <script src="food-plan-builder.js"></script>
     <script>
         const CURRENT_USER_KEY = 'brotein_current_user';
         const db = window.broteinSupabase;
         let savedPlan = null;
+        let savedFoodPlan = null;
 
         function normalizePackageName(value) {
             return String(value || 'FREE').toUpperCase();
@@ -1193,13 +1331,111 @@
             document.getElementById('planNutrition').textContent = goalPlan.nutrition;
 
             document.getElementById('planSessions').innerHTML = getPlanSessions(plan).map((session, index) => `
-                <div class="plan-card">
-                    <span class="day">Day ${index + 1}</span>
-                    <h3>${escapeHtml(session.title)}</h3>
-                    <ul>${session.exercises.map((exercise) => `<li>${escapeHtml(exercise)}</li>`).join('')}</ul>
-                </div>
+                <details class="day-row">
+                    <summary>
+                        <span class="day-tag">Day ${index + 1}</span>
+                        <span class="day-title">${escapeHtml(session.title)}</span>
+                        <span class="day-meta">${session.exercises.length} exercises</span>
+                    </summary>
+                    <ul class="day-list">${session.exercises.map((exercise) => `<li>${escapeHtml(exercise)}</li>`).join('')}</ul>
+                </details>
             `).join('');
         }
+
+        function setFoodStatus(message, type = '') {
+            const statusEl = document.getElementById('foodStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'plan-status';
+            if (type) statusEl.classList.add(type);
+        }
+
+        function renderFoodPlan(profile) {
+            const empty = document.getElementById('foodEmpty');
+            const details = document.getElementById('foodDetails');
+
+            if (!savedFoodPlan) {
+                details.style.display = 'none';
+                empty.style.display = 'block';
+                const isPremium = String(profile?.package || 'FREE').toUpperCase() === 'PREMIUM';
+                document.getElementById('foodEmptyText').textContent = isPremium
+                    ? 'You don\'t have a saved food plan yet. Generate one and it will be kept here.'
+                    : 'Food plans are a Premium feature. Upgrade to get your weekly nutrition plan.';
+                const link = document.getElementById('foodEmptyLink');
+                link.textContent = isPremium ? 'Generate a food plan' : 'Upgrade';
+                link.href = isPremium ? 'food-plan.html' : 'upgrade.html';
+                return;
+            }
+
+            const plan = rowToFoodPlan(savedFoodPlan);
+            const summary = getFoodPlanSummary(plan);
+
+            empty.style.display = 'none';
+            details.style.display = 'block';
+
+            document.getElementById('foodSummary').innerHTML = [
+                getGoalPlan(plan.goal, plan.days, plan.gender).label,
+                `${formatCalories(plan.daily_target_calories)} per day`,
+                `${formatCalories(plan.maintenance_calories)} maintenance`,
+                `${plan.protein_target_g}g protein`,
+                `${plan.days} training days`,
+                `Created ${new Date(savedFoodPlan.created_at).toLocaleDateString()}`
+            ].map((item) => `<span>${escapeHtml(item)}</span>`).join('');
+
+            document.getElementById('foodDays').innerHTML = summary.days.map((day) => `
+                <details class="day-row">
+                    <summary>
+                        <span class="day-tag">${escapeHtml(day.day)}</span>
+                        <span class="day-title">${escapeHtml(formatCalories(day.calories))}</span>
+                        <span class="day-meta">${escapeHtml(`P ${day.protein}g • C ${day.carbs}g • F ${day.fats}g`)}</span>
+                    </summary>
+                    <ul class="day-list">
+                        ${day.meals.map((meal) => {
+                            const detail = typeof meal.detail === 'string' ? { main: meal.detail, alt: '' } : (meal.detail || { main: '', alt: '' });
+                            const alt = detail.alt ? ` (or ${detail.alt})` : '';
+                            return `<li><strong>${escapeHtml(`${meal.name} — ${meal.calories} kcal, ${meal.protein}g protein`)}</strong><br>${escapeHtml(`${detail.main}${alt}`)}</li>`;
+                        }).join('')}
+                    </ul>
+                </details>
+            `).join('');
+        }
+
+        document.getElementById('downloadFoodButton').addEventListener('click', function () {
+            if (!savedFoodPlan) return;
+            try {
+                const doc = createFoodPlanPdf(rowToFoodPlan(savedFoodPlan));
+                const url = URL.createObjectURL(doc.output('blob'));
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = getFoodPlanFilename(rowToFoodPlan(savedFoodPlan));
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 2000);
+                setFoodStatus('PDF downloaded.', 'success');
+            } catch (error) {
+                console.error('Food plan PDF failed:', error);
+                setFoodStatus('Something went wrong. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('deleteFoodButton').addEventListener('click', async function () {
+            if (!savedFoodPlan) return;
+            if (!confirm('Delete your food plan? You can generate a new one afterwards.')) return;
+
+            this.disabled = true;
+            const { error } = await db.from('food_plans').delete().eq('id', savedFoodPlan.id);
+            this.disabled = false;
+
+            if (error) {
+                setFoodStatus('Could not delete your food plan: ' + error.message, 'error');
+                return;
+            }
+
+            savedFoodPlan = null;
+            const { data: profile } = await db.from('profiles').select('package').eq('id', (await db.auth.getSession()).data.session.user.id).maybeSingle();
+            renderFoodPlan(profile);
+            setFoodStatus('Food plan deleted. You can now generate a new one.', 'success');
+        });
 
         async function loadProfile() {
             if (!db) {
@@ -1213,9 +1449,10 @@
                 return;
             }
 
-            const [{ data: profile }, { data: plan, error: planError }] = await Promise.all([
+            const [{ data: profile }, { data: plan, error: planError }, { data: foodPlan, error: foodError }] = await Promise.all([
                 db.from('profiles').select('name, email, package, created_at, weight, weight_unit, height, age, gender').eq('id', session.user.id).maybeSingle(),
-                db.from('workout_plans').select('*').eq('user_id', session.user.id).maybeSingle()
+                db.from('workout_plans').select('*').eq('user_id', session.user.id).maybeSingle(),
+                db.from('food_plans').select('*').eq('user_id', session.user.id).maybeSingle()
             ]);
 
             const loadedProfile = {
@@ -1252,6 +1489,11 @@
             if (planError) {
                 setPlanStatus('Could not load your plan: ' + planError.message, 'error');
             }
+            if (foodError) {
+                setFoodStatus('Could not load your food plan: ' + foodError.message, 'error');
+            }
+            savedFoodPlan = foodPlan || null;
+            renderFoodPlan(profile);
             savedPlan = plan || null;
             renderPlan(profile);
         }
