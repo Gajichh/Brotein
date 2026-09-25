@@ -8,6 +8,10 @@
     const MIN_REQUEST_GAP_MS = 1100;
     let lastRequestAt = 0;
 
+    const db = window.broteinSupabase;
+    const LAST_QUERY_KEY = 'brotein_last_gym_query';
+    const UNIT_KEY = 'brotein_gym_unit';
+
     const statusEl = document.getElementById('gymStatus');
     const listEl = document.getElementById('gymList');
     const countEl = document.getElementById('gymCount');
@@ -15,10 +19,23 @@
     const searchForm = document.getElementById('gymSearchForm');
     const searchInput = document.getElementById('gymSearchInput');
     const locateButton = document.getElementById('gymLocateButton');
+    const suggestionsEl = document.getElementById('gymSuggestions');
+    const filtersEl = document.getElementById('gymFilters');
+    const sortToggleEl = document.getElementById('gymSortToggle');
+    const unitToggleEl = document.getElementById('gymUnitToggle');
+    const mapSkeletonEl = document.getElementById('gymMapSkeleton');
+    const favoritesSection = document.getElementById('gymFavorites');
+    const favoritesListEl = document.getElementById('gymFavoritesList');
 
     let map = null;
     let resultsLayer = null;
     let lastSearch = null;
+    let lastGyms = [];
+    let sortMode = 'open';
+    let unit = localStorage.getItem(UNIT_KEY) || 'km';
+    const activeFilters = new Set();
+    let currentUserId = null;
+    let favoriteIds = new Set();
 
     function setStatus(message, type = '') {
         statusEl.textContent = message;
@@ -50,6 +67,10 @@
     }
 
     function formatDistance(km) {
+        if (unit === 'mi') {
+            const miles = km * 0.621371;
+            return miles < 0.1 ? `${Math.round(miles * 5280)} ft` : `${miles.toFixed(1)} mi`;
+        }
         return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
     }
 
@@ -93,7 +114,7 @@
         });
     }
 
-    async function fetchGyms(lat, lon, radiusKm) {
+    async function fetchGyms(lat, lon, radiusKm, onProgress) {
         const box = boxAround(lat, lon, radiusKm);
         let results = await gymsInBox(box);
 
@@ -107,8 +128,9 @@
                 { west: box.west, east: midLon, north: midLat, south: box.south },
                 { west: midLon, east: box.east, north: midLat, south: box.south }
             ];
-            for (const quarter of quarters) {
-                results = results.concat(await gymsInBox(quarter));
+            for (let i = 0; i < quarters.length; i++) {
+                if (onProgress) onProgress(i + 1, quarters.length);
+                results = results.concat(await gymsInBox(quarters[i]));
             }
         }
 
@@ -352,7 +374,177 @@
         return menu;
     }
 
+    function starSvg() {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17.6 6.4 20.6l1.4-6.3-4.8-4.3 6.4-.6L12 3.5Z"/></svg>';
+    }
+
+    const FILTER_LABELS = {
+        open24: 'Open 24/7',
+        sauna: 'Sauna',
+        pool: 'Swimming pool',
+        women: 'Women only',
+        wheelchair: 'Wheelchair accessible',
+        showers: 'Showers'
+    };
+
+    function gymMatchesFilters(gym) {
+        if (!activeFilters.size) return true;
+        return [...activeFilters].every((key) => gym.features.has.includes(FILTER_LABELS[key]));
+    }
+
+    function sortGyms(gyms) {
+        const statusOrder = { open: 0, unknown: 1, closed: 2 };
+        return gyms.slice().sort((a, b) => {
+            if (sortMode === 'distance') return a.distance - b.distance;
+            return (statusOrder[a.today.status] - statusOrder[b.today.status]) || (a.distance - b.distance);
+        });
+    }
+
+    // Re-filters and re-sorts the last fetched results without hitting the network again.
+    function applyFiltersAndSort() {
+        const filtered = sortGyms(lastGyms.filter(gymMatchesFilters));
+        renderResults(filtered, lastSearch);
+        return filtered;
+    }
+
+    function highlightListItem(id) {
+        listEl.querySelectorAll('.gym-item').forEach((el) => el.classList.remove('is-highlighted'));
+        const el = listEl.querySelector(`[data-gym-id="${id}"]`);
+        if (el) el.classList.add('is-highlighted');
+    }
+
+    function appendRetryButton(afterEl) {
+        const radiusValues = ['2', '5', '10', '20'];
+        const idx = radiusValues.indexOf(radiusEl.value);
+        if (idx === -1 || idx >= radiusValues.length - 1) return;
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.className = 'gym-retry-btn';
+        retry.textContent = `Search within ${radiusValues[idx + 1]} km`;
+        retry.addEventListener('click', () => {
+            radiusEl.value = radiusValues[idx + 1];
+            if (lastSearch) searchAround(lastSearch);
+        });
+        afterEl.appendChild(document.createElement('br'));
+        afterEl.appendChild(retry);
+    }
+
+    function renderSkeleton() {
+        listEl.innerHTML = '';
+        for (let i = 0; i < 4; i++) {
+            const skeleton = document.createElement('li');
+            skeleton.className = 'gym-skeleton';
+            listEl.appendChild(skeleton);
+        }
+        countEl.textContent = '';
+        if (mapSkeletonEl) mapSkeletonEl.hidden = false;
+    }
+
+    // ---- Favorite gyms (signed-in accounts only) ----
+    async function initFavorites() {
+        if (!db) return;
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) return;
+        currentUserId = session.user.id;
+
+        const { data, error } = await db.from('favorite_gyms').select('*').eq('user_id', currentUserId);
+        if (error) {
+            console.error('Could not load favorite gyms:', error.message);
+            return;
+        }
+        favoriteIds = new Set((data || []).map((row) => row.gym_osm_id));
+        renderFavoritesSection(data || []);
+    }
+
+    function renderFavoritesSection(rows) {
+        if (!favoritesSection || !favoritesListEl) return;
+        if (!rows.length) {
+            favoritesSection.hidden = true;
+            return;
+        }
+        favoritesSection.hidden = false;
+        favoritesListEl.innerHTML = '';
+
+        rows.forEach((row) => {
+            const item = document.createElement('li');
+            item.className = 'gym-item';
+
+            const head = document.createElement('div');
+            head.className = 'gym-item-head';
+
+            const name = document.createElement('button');
+            name.type = 'button';
+            name.className = 'gym-name';
+            name.textContent = row.name;
+            name.addEventListener('click', function () {
+                initMap();
+                document.getElementById('gymResults').hidden = false;
+                map.invalidateSize();
+                map.setView([Number(row.lat), Number(row.lon)], 16);
+                document.getElementById('gymMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'gym-favorite-btn is-favorite';
+            remove.innerHTML = starSvg();
+            remove.title = 'Remove from favorites';
+            remove.addEventListener('click', async function () {
+                await toggleFavorite({ id: row.gym_osm_id, name: row.name, lat: Number(row.lat), lon: Number(row.lon), address: row.address }, true);
+            });
+
+            head.append(name, remove);
+            item.appendChild(head);
+
+            if (row.address) {
+                const addr = document.createElement('p');
+                addr.className = 'gym-meta';
+                addr.textContent = row.address;
+                item.appendChild(addr);
+            }
+
+            favoritesListEl.appendChild(item);
+        });
+    }
+
+    async function refreshFavoritesList() {
+        if (!currentUserId) return;
+        const { data, error } = await db.from('favorite_gyms').select('*').eq('user_id', currentUserId);
+        if (error) {
+            console.error('Could not refresh favorite gyms:', error.message);
+            return;
+        }
+        renderFavoritesSection(data || []);
+    }
+
+    async function toggleFavorite(gym, isCurrentlyFavorite) {
+        if (!currentUserId) {
+            setStatus('Log in to save favorite gyms.', 'error');
+            return;
+        }
+
+        if (isCurrentlyFavorite) {
+            favoriteIds.delete(gym.id);
+            const { error } = await db.from('favorite_gyms').delete().eq('user_id', currentUserId).eq('gym_osm_id', gym.id);
+            if (error) console.error('Could not remove favorite gym:', error.message);
+        } else {
+            favoriteIds.add(gym.id);
+            const { error } = await db.from('favorite_gyms').upsert({
+                user_id: currentUserId,
+                gym_osm_id: gym.id,
+                name: gym.name,
+                lat: gym.lat,
+                lon: gym.lon,
+                address: gym.address || null
+            }, { onConflict: 'user_id,gym_osm_id' });
+            if (error) console.error('Could not save favorite gym:', error.message);
+        }
+
+        await refreshFavoritesList();
+    }
+
     function renderResults(gyms, origin) {
+        if (mapSkeletonEl) mapSkeletonEl.hidden = true;
         listEl.innerHTML = '';
         resultsLayer.clearLayers();
 
@@ -360,13 +552,22 @@
             radius: 8, color: '#fafafa', weight: 3, fillColor: '#000000', fillOpacity: 1
         }).bindPopup(origin.isUser ? 'You are here' : origin.label).addTo(resultsLayer);
 
-        countEl.textContent = gyms.length ? `${gyms.length} gym${gyms.length === 1 ? '' : 's'} found` : '';
+        if (activeFilters.size && lastGyms.length) {
+            countEl.textContent = `${gyms.length} of ${lastGyms.length} gym${lastGyms.length === 1 ? '' : 's'} match your filters`;
+        } else {
+            countEl.textContent = gyms.length ? `${gyms.length} gym${gyms.length === 1 ? '' : 's'} found` : '';
+        }
 
         if (!gyms.length) {
             map.setView([origin.lat, origin.lon], 13);
             const empty = document.createElement('li');
             empty.className = 'gym-empty';
-            empty.textContent = 'No gyms found in this area. Try a bigger radius.';
+            if (lastGyms.length && activeFilters.size) {
+                empty.textContent = 'No gyms match your filters. Try clearing some.';
+            } else {
+                empty.textContent = 'No gyms found in this area. Try a bigger radius.';
+                appendRetryButton(empty);
+            }
             listEl.appendChild(empty);
             return;
         }
@@ -382,13 +583,18 @@
                 fillColor: isClosed ? '#8a8a85' : '#c5f23f',
                 fillOpacity: isClosed ? 0.7 : 0.95
             }).bindPopup(popupContent(gym)).addTo(resultsLayer);
+            marker.on('click', () => highlightListItem(gym.id));
             bounds.push([gym.lat, gym.lon]);
 
             const item = document.createElement('li');
             item.className = 'gym-item';
+            item.dataset.gymId = gym.id;
 
             const head = document.createElement('div');
             head.className = 'gym-item-head';
+
+            const nameRow = document.createElement('div');
+            nameRow.className = 'gym-name-row';
             const name = document.createElement('button');
             name.type = 'button';
             name.className = 'gym-name';
@@ -398,6 +604,22 @@
                 marker.openPopup();
                 document.getElementById('gymMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
+
+            const isFav = favoriteIds.has(gym.id);
+            const favBtn = document.createElement('button');
+            favBtn.type = 'button';
+            favBtn.className = 'gym-favorite-btn' + (isFav ? ' is-favorite' : '');
+            favBtn.innerHTML = starSvg();
+            favBtn.title = isFav ? 'Remove from favorites' : 'Save to favorites';
+            favBtn.addEventListener('click', async function () {
+                const currentlyFav = favoriteIds.has(gym.id);
+                await toggleFavorite(gym, currentlyFav);
+                favBtn.classList.toggle('is-favorite', !currentlyFav);
+                favBtn.title = !currentlyFav ? 'Remove from favorites' : 'Save to favorites';
+            });
+
+            nameRow.append(name, favBtn);
+
             const side = document.createElement('div');
             side.className = 'gym-side';
             const distance = document.createElement('span');
@@ -414,8 +636,9 @@
             today.className = 'gym-today';
             today.textContent = gym.today.text;
             side.appendChild(today);
-            head.append(name, side);
+            head.append(nameRow, side);
             item.appendChild(head);
+
 
             [gym.address, gym.hours && `Hours: ${gym.hours}`, gym.phone && `Phone: ${gym.phone}`]
                 .filter(Boolean)
@@ -455,18 +678,21 @@
     async function searchAround(origin) {
         initMap();
         lastSearch = origin;
+        hideSuggestions();
         const radiusKm = Number(radiusEl.value);
         setBusy(true);
         setStatus(`Looking for gyms within ${radiusKm} km...`);
         document.getElementById('gymResults').hidden = false;
         map.invalidateSize();
+        renderSkeleton();
 
         try {
-            const results = await fetchGyms(origin.lat, origin.lon, radiusKm);
+            const results = await fetchGyms(origin.lat, origin.lon, radiusKm, (step, total) => {
+                setStatus(`Busy area — searching part ${step} of ${total}...`);
+            });
             const timeZone = origin.isUser ? Intl.DateTimeFormat().resolvedOptions().timeZone : timeZoneAt(origin.lat, origin.lon);
             const now = localNow(timeZone);
             const seen = new Set();
-            const statusOrder = { open: 0, unknown: 1, closed: 2 };
             const gyms = results
                 .map((result) => toGym(result, origin.lat, origin.lon, now))
                 .filter((gym) => {
@@ -477,16 +703,18 @@
                     seen.add(gym.id);
                     seen.add(key);
                     return true;
-                })
-                // Open now first, then gyms without listed hours, then closed; nearest first within each.
-                .sort((a, b) => (statusOrder[a.today.status] - statusOrder[b.today.status]) || (a.distance - b.distance));
+                });
 
-            renderResults(gyms, origin);
+            lastGyms = gyms;
+            applyFiltersAndSort();
             const openCount = gyms.filter((gym) => gym.today.status === 'open').length;
             const place = origin.isUser ? 'near you' : `near ${origin.label}`;
             setStatus(`Showing gyms ${place}. ${openCount} open now (local time ${formatClock(now)}), shown first.`, 'success');
         } catch (error) {
             console.error('Gym search failed:', error);
+            if (mapSkeletonEl) mapSkeletonEl.hidden = true;
+            listEl.innerHTML = '';
+            countEl.textContent = '';
             setStatus('The gym search service is busy right now. Please try again in a moment.', 'error');
         } finally {
             setBusy(false);
@@ -498,6 +726,11 @@
             setStatus('Your browser can\'t share your location. Search for a city instead.', 'error');
             return;
         }
+        if (!window.isSecureContext) {
+            setStatus('Location only works over HTTPS (or localhost). Open this page via a secure URL, or search for a city instead.', 'error');
+            return;
+        }
+        hideSuggestions();
         setBusy(true);
         setStatus('Getting your location...');
         navigator.geolocation.getCurrentPosition(
@@ -507,7 +740,7 @@
             (error) => {
                 setBusy(false);
                 setStatus(error.code === error.PERMISSION_DENIED
-                    ? 'Location access was blocked. Search for a city or address instead.'
+                    ? 'Location access was blocked. Allow location for this site in your browser settings, or search for a city instead.'
                     : 'Couldn\'t get your location. Search for a city or address instead.', 'error');
             },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
@@ -516,6 +749,7 @@
 
     searchForm.addEventListener('submit', async function (event) {
         event.preventDefault();
+        hideSuggestions();
         const place = searchInput.value.trim();
         if (!place) {
             setStatus('Type a city or address to search.', 'error');
@@ -530,6 +764,7 @@
                 setStatus(`Couldn't find "${place}". Try a different spelling or a nearby city.`, 'error');
                 return;
             }
+            localStorage.setItem(LAST_QUERY_KEY, place);
             searchAround(origin);
         } catch (error) {
             console.error('Place search failed:', error);
@@ -541,4 +776,94 @@
     radiusEl.addEventListener('change', function () {
         if (lastSearch) searchAround(lastSearch);
     });
+
+    // ---- Autocomplete suggestions ----
+    let suggestDebounce = null;
+
+    function hideSuggestions() {
+        suggestionsEl.hidden = true;
+        suggestionsEl.innerHTML = '';
+    }
+
+    function renderSuggestions(results) {
+        if (!results.length) {
+            hideSuggestions();
+            return;
+        }
+        suggestionsEl.innerHTML = '';
+        results.forEach((result) => {
+            const label = result.display_name.split(',').slice(0, 2).join(',');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = result.display_name;
+            btn.addEventListener('click', () => {
+                searchInput.value = label;
+                localStorage.setItem(LAST_QUERY_KEY, label);
+                hideSuggestions();
+                searchAround({ lat: Number(result.lat), lon: Number(result.lon), label, isUser: false });
+            });
+            suggestionsEl.appendChild(btn);
+        });
+        suggestionsEl.hidden = false;
+    }
+
+    async function fetchSuggestions(query) {
+        try {
+            const results = await nominatimSearch({ q: query, limit: '5', addressdetails: '1' });
+            // The query can change while we were waiting on the throttled request.
+            if (searchInput.value.trim() === query) renderSuggestions(results);
+        } catch (error) {
+            console.error('Suggestion search failed:', error);
+        }
+    }
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(suggestDebounce);
+        const query = searchInput.value.trim();
+        if (query.length < 3) {
+            hideSuggestions();
+            return;
+        }
+        suggestDebounce = setTimeout(() => fetchSuggestions(query), 450);
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.gym-search-wrap')) hideSuggestions();
+    });
+
+    // ---- Sort / unit / filter toolbar ----
+    sortToggleEl.addEventListener('click', function (event) {
+        const btn = event.target.closest('button[data-sort]');
+        if (!btn) return;
+        sortMode = btn.dataset.sort;
+        sortToggleEl.querySelectorAll('button').forEach((b) => b.classList.toggle('is-active', b === btn));
+        if (lastGyms.length) applyFiltersAndSort();
+    });
+
+    unitToggleEl.addEventListener('click', function (event) {
+        const btn = event.target.closest('button[data-unit]');
+        if (!btn) return;
+        unit = btn.dataset.unit;
+        localStorage.setItem(UNIT_KEY, unit);
+        unitToggleEl.querySelectorAll('button').forEach((b) => b.classList.toggle('is-active', b === btn));
+        if (lastGyms.length) applyFiltersAndSort();
+    });
+
+    filtersEl.addEventListener('click', function (event) {
+        const btn = event.target.closest('button[data-filter]');
+        if (!btn) return;
+        const key = btn.dataset.filter;
+        if (activeFilters.has(key)) activeFilters.delete(key); else activeFilters.add(key);
+        btn.classList.toggle('is-active', activeFilters.has(key));
+        if (lastGyms.length) applyFiltersAndSort();
+    });
+
+    if (unit === 'mi') {
+        unitToggleEl.querySelectorAll('button').forEach((b) => b.classList.toggle('is-active', b.dataset.unit === 'mi'));
+    }
+
+    const savedQuery = localStorage.getItem(LAST_QUERY_KEY);
+    if (savedQuery) searchInput.value = savedQuery;
+
+    initFavorites();
 })();

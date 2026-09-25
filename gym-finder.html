@@ -599,6 +599,49 @@
             background: var(--line);
         }
 
+        .gym-search-wrap {
+            position: relative;
+        }
+
+        .gym-suggestions {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            z-index: 5;
+            background: rgba(15,15,15,0.98);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.3);
+        }
+
+        .gym-suggestions[hidden] {
+            display: none;
+        }
+
+        .gym-suggestions button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: 0;
+            border-top: 1px solid var(--line);
+            background: none;
+            color: var(--text);
+            padding: 10px 14px;
+            font: inherit;
+            font-size: 0.86rem;
+            cursor: pointer;
+        }
+
+        .gym-suggestions button:first-child {
+            border-top: 0;
+        }
+
+        .gym-suggestions button:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
         .gym-search {
             display: grid;
             grid-template-columns: 1fr auto;
@@ -651,6 +694,182 @@
         .gym-search button:disabled {
             opacity: 0.6;
             cursor: wait;
+        }
+
+        .gym-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .gym-toolbar-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .gym-unit-toggle,
+        .gym-sort-toggle {
+            display: inline-flex;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .gym-unit-toggle button,
+        .gym-sort-toggle button {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            padding: 8px 13px;
+            font: inherit;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .gym-unit-toggle button.is-active {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .gym-sort-toggle button.is-active {
+            background: #c5f23f;
+            color: #0a0a0a;
+        }
+
+        .gym-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .gym-filter-chip {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--chip);
+            color: var(--muted);
+            padding: 7px 12px;
+            font: inherit;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .gym-filter-chip.is-active {
+            border-color: rgba(197,242,63,0.5);
+            background: rgba(197,242,63,0.14);
+            color: #c5f23f;
+        }
+
+        .gym-retry-btn {
+            display: inline-block;
+            margin-top: 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--text);
+            padding: 10px 16px;
+            font: inherit;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .gym-favorite-btn {
+            border: 0;
+            background: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 2px;
+            flex-shrink: 0;
+            display: inline-flex;
+        }
+
+        .gym-favorite-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .gym-favorite-btn.is-favorite {
+            color: #c5f23f;
+        }
+
+        .gym-favorite-btn.is-favorite svg {
+            fill: currentColor;
+        }
+
+        .gym-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .gym-item.is-highlighted {
+            border-color: rgba(197,242,63,0.6);
+            background: linear-gradient(180deg, rgba(197,242,63,0.1), rgba(197,242,63,0.02));
+        }
+
+        .gym-favorites-section {
+            margin-top: 28px;
+        }
+
+        .gym-favorites-section h2 {
+            margin: 0 0 12px;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .gym-favorites-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        @keyframes gym-shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        .gym-skeleton {
+            height: 96px;
+            border-radius: 20px;
+            border: 1px solid var(--line);
+            background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 100%);
+            background-size: 400px 100%;
+            animation: gym-shimmer 1.4s infinite;
+        }
+
+        .gym-map-wrap {
+            position: relative;
+        }
+
+        .gym-map-skeleton {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(10,10,10,0.6);
+            border-radius: 24px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            z-index: 4;
         }
 
         .gym-status {
@@ -737,6 +956,7 @@
             font-weight: 700;
             text-align: left;
             cursor: pointer;
+            overflow-wrap: anywhere;
         }
 
         .gym-name:hover {
@@ -939,6 +1159,52 @@
             .gym-search button {
                 padding: 14px 20px;
             }
+
+            .gym-controls {
+                padding: 18px 14px;
+                border-radius: 22px;
+            }
+
+            .gym-toolbar {
+                gap: 8px;
+            }
+
+            .gym-toolbar-label {
+                width: 100%;
+            }
+
+            .gym-unit-toggle button,
+            .gym-sort-toggle button {
+                padding: 7px 10px;
+                font-size: 0.64rem;
+            }
+
+            .gym-filters {
+                gap: 6px;
+            }
+
+            .gym-filter-chip {
+                padding: 6px 10px;
+                font-size: 0.68rem;
+            }
+
+            .gym-item-head {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .gym-side {
+                text-align: left;
+                justify-items: start;
+            }
+
+            .gym-today {
+                max-width: none;
+            }
+
+            .gym-name {
+                font-size: 0.96rem;
+            }
         }
     </style>
     <link rel="stylesheet" href="nav-menu.css" />
@@ -992,6 +1258,10 @@
                             <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="16" cy="8" r="5.6"/><path d="M14.1 11.6 7.9 17.8l1.5 1.5 6.2-6.2z"/><circle cx="10.4" cy="20.1" r="2.2"/><circle cx="6.9" cy="16.6" r="2.2"/></svg></span>
                             <span class="tools-text"><strong>Food Plans</strong><small>Calories and weekly nutrition</small></span>
                         </a>
+                        <a href="calendar.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm12 6H5v12h14V8ZM7 11h3v3H7v-3Z"/></svg></span>
+                            <span class="tools-text"><strong>Calendar</strong><small>This week's plan at a glance</small></span>
+                        </a>
                     </div>
                 </div>
                 <a href="collaborations.html">Collaborations</a>
@@ -1017,10 +1287,13 @@
 
             <div class="gym-or">or</div>
 
-            <form id="gymSearchForm" class="gym-search" role="search">
-                <input id="gymSearchInput" type="text" aria-label="City or address" placeholder="City or address, e.g. Belgrade" autocomplete="address-level2" />
-                <button type="submit">Search</button>
-            </form>
+            <div class="gym-search-wrap">
+                <form id="gymSearchForm" class="gym-search" role="search" autocomplete="off">
+                    <input id="gymSearchInput" type="text" aria-label="City or address" placeholder="City or address, e.g. Belgrade" autocomplete="off" />
+                    <button type="submit">Search</button>
+                </form>
+                <div id="gymSuggestions" class="gym-suggestions" hidden></div>
+            </div>
 
             <div class="gym-radius">
                 <label for="gymRadius">Search radius</label>
@@ -1032,8 +1305,35 @@
                 </select>
             </div>
 
+            <div class="gym-toolbar">
+                <span class="gym-toolbar-label">Sort</span>
+                <div class="gym-sort-toggle" id="gymSortToggle">
+                    <button type="button" data-sort="open" class="is-active">Open first</button>
+                    <button type="button" data-sort="distance">Nearest</button>
+                </div>
+                <span class="gym-toolbar-label">Units</span>
+                <div class="gym-unit-toggle" id="gymUnitToggle">
+                    <button type="button" data-unit="km" class="is-active">km</button>
+                    <button type="button" data-unit="mi">mi</button>
+                </div>
+            </div>
+
+            <div class="gym-filters" id="gymFilters">
+                <button type="button" class="gym-filter-chip" data-filter="open24">Open 24/7</button>
+                <button type="button" class="gym-filter-chip" data-filter="sauna">Sauna</button>
+                <button type="button" class="gym-filter-chip" data-filter="pool">Swimming pool</button>
+                <button type="button" class="gym-filter-chip" data-filter="women">Women only</button>
+                <button type="button" class="gym-filter-chip" data-filter="wheelchair">Wheelchair accessible</button>
+                <button type="button" class="gym-filter-chip" data-filter="showers">Showers</button>
+            </div>
+
             <div id="gymStatus" class="gym-status" aria-live="polite" role="status"></div>
             <p class="gym-privacy">Your location is only used to search and is never saved.</p>
+        </section>
+
+        <section id="gymFavorites" class="gym-favorites-section" hidden>
+            <h2>Your favorite gyms</h2>
+            <ul id="gymFavoritesList" class="gym-favorites-list"></ul>
         </section>
 
         <section id="gymResults" class="gym-results" hidden>
@@ -1043,6 +1343,7 @@
             </div>
             <div class="gym-map-wrap">
                 <div id="gymMap" aria-label="Map of gyms"></div>
+                <div id="gymMapSkeleton" class="gym-map-skeleton" hidden>Loading map…</div>
             </div>
         </section>
 

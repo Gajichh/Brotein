@@ -203,5 +203,58 @@ create policy "Users update own personal info"
     using (auth.uid() = id)
     with check (auth.uid() = id);
 
+-- Whether the user opted in to daily gym reminder notifications (calendar.html).
+alter table public.profiles add column if not exists notifications_enabled boolean not null default false;
+grant update (notifications_enabled) on public.profiles to authenticated;
+
+-- Optional overrides for which weekdays are training days (calendar.html "swap day"),
+-- and per-meal reminder times. Both are arrays/objects handled entirely client-side.
+alter table public.profiles add column if not exists training_day_overrides jsonb;
+alter table public.profiles add column if not exists meal_reminder_times jsonb;
+grant update (training_day_overrides, meal_reminder_times) on public.profiles to authenticated;
+
+-- Daily check-ins for the calendar: workout completion, which meals were eaten, and
+-- an optional bodyweight check-in. One row per user per day.
+create table if not exists public.calendar_logs (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references auth.users (id) on delete cascade,
+    log_date date not null,
+    workout_done boolean not null default false,
+    meals_done text[] not null default '{}',
+    weight_kg numeric check (weight_kg >= 0),
+    updated_at timestamptz not null default now(),
+    unique (user_id, log_date)
+);
+
+alter table public.calendar_logs enable row level security;
+
+drop policy if exists "Users manage own calendar logs" on public.calendar_logs;
+create policy "Users manage own calendar logs"
+    on public.calendar_logs for all
+    using (auth.uid() = user_id)
+    with check (auth.uid() = user_id);
+
+-- Saved gyms from gym-finder.html. A user can favorite any number of gyms; gym_osm_id is
+-- the "osm_type/osm_id" pair gym-finder.js already uses as each gym's id.
+create table if not exists public.favorite_gyms (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references auth.users (id) on delete cascade,
+    gym_osm_id text not null,
+    name text not null,
+    lat numeric not null,
+    lon numeric not null,
+    address text,
+    created_at timestamptz not null default now(),
+    unique (user_id, gym_osm_id)
+);
+
+alter table public.favorite_gyms enable row level security;
+
+drop policy if exists "Users manage own favorite gyms" on public.favorite_gyms;
+create policy "Users manage own favorite gyms"
+    on public.favorite_gyms for all
+    using (auth.uid() = user_id)
+    with check (auth.uid() = user_id);
+
 -- To make yourself an admin, register on the site first, then run:
 --   update public.profiles set is_admin = true where email = 'you@example.com';

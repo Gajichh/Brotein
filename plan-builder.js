@@ -214,6 +214,45 @@ function getPlanSessions(plan) {
     return sessions;
 }
 
+// Spreads N training days across a 7-day week in blocks of at most 3 in a row,
+// with a single rest day between blocks (e.g. 5 days -> train train train REST train train REST;
+// 4 days -> train train REST train train REST REST). 2 or fewer days don't need a mid-week
+// gap since they're already spaced out by the trailing rest days. `overrides`, if given as an
+// array of 7 booleans, is used as-is (lets a user swap which weekdays they train).
+function getWeeklyTrainingLayout(totalDays, overrides) {
+    if (Array.isArray(overrides) && overrides.length === 7) return overrides;
+
+    const days = Math.max(0, Math.min(7, Number(totalDays) || 0));
+    if (days >= 7) return Array(7).fill(true);
+
+    const block1 = days <= 3 ? days : Math.ceil(days / 2);
+    const block2 = days <= 3 ? 0 : Math.floor(days / 2);
+
+    const layout = [];
+    for (let i = 0; i < block1; i++) layout.push(true);
+    if (block2 > 0) layout.push(false);
+    for (let i = 0; i < block2; i++) layout.push(true);
+    while (layout.length < 7) layout.push(false);
+
+    return layout;
+}
+
+// Returns 7 entries ({ type: 'training', dayNumber, session } or { type: 'rest' }) laying
+// out getPlanSessions() over the week using getWeeklyTrainingLayout().
+function getWeeklySchedule(plan, overrides) {
+    const sessions = getPlanSessions(plan);
+    const layout = getWeeklyTrainingLayout(Number(plan.days), overrides);
+    let dayNumber = 0;
+
+    return layout.map((isTraining) => {
+        if (isTraining && dayNumber < sessions.length) {
+            dayNumber += 1;
+            return { type: 'training', dayNumber, session: sessions[dayNumber - 1] };
+        }
+        return { type: 'rest' };
+    });
+}
+
 function getPlanBmi(plan) {
     return plan.weight / ((plan.height / 100) * (plan.height / 100));
 }
@@ -302,9 +341,14 @@ function createPlanPdf(plan, date = new Date()) {
     y = drawSection(doc, 'Plan Focus', [goalPlan.focus, goalPlan.weekly, goalPlan.nutrition], y, margin, width);
 
     const daySection = [];
-    getPlanSessions(plan).forEach((session, index) => {
-        daySection.push(`Day ${index + 1} — ${session.title}`);
-        session.exercises.forEach((exercise) => daySection.push(`- ${exercise}`));
+    getWeeklySchedule(plan).forEach((entry) => {
+        if (entry.type === 'rest') {
+            daySection.push('Rest Day');
+            daySection.push('');
+            return;
+        }
+        daySection.push(`Day ${entry.dayNumber} — ${entry.session.title}`);
+        entry.session.exercises.forEach((exercise) => daySection.push(`- ${exercise}`));
         daySection.push('');
     });
     y = drawSection(doc, 'Weekly Schedule', daySection, y, margin, width);

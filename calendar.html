@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brotein | Calendar</title>
+    <meta name="description" content="Your training week at a glance, with today's workout pulled straight from your plan." />
+    <link rel="icon" type="image/x-icon" href="broteinico.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --panel: #0f0f0f;
+            --text: #fafafa;
+            --muted: #a3a3a3;
+            --line: rgba(255,255,255,0.1);
+            --chip: rgba(255,255,255,0.06);
+            --gold: #d4f85e;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 28%),
+                linear-gradient(180deg, #000000 0%, var(--bg) 26%, #000000 100%);
+            color: var(--text);
+            position: relative;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(120deg, rgba(255,255,255,0.08), transparent 24%, transparent 75%, rgba(255,255,255,0.04));
+            mix-blend-mode: screen;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
+
+        .site-glow {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 0%, rgba(212,248,94,0.08), transparent 30%);
+            z-index: 0;
+        }
+
+        .page-shell {
+            width: min(1180px, calc(100% - 24px));
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            min-width: 0;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-wrap {
+            position: relative;
+            padding-bottom: 14px;
+            margin-bottom: -14px;
+        }
+
+        .account-trigger {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .account-trigger:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .account-trigger svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .account-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            opacity: 0;
+            pointer-events: none;
+            width: 190px;
+            background: rgba(15,15,15,0.98);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: translateY(6px);
+            z-index: 20;
+        }
+
+        .account-wrap:hover .account-menu,
+        .account-wrap:focus-within .account-menu,
+        .account-wrap.is-open .account-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .account-name {
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .account-menu .menu-btn {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            border-radius: 999px;
+            padding: 10px 12px;
+            font: inherit;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .account-menu .upgrade-btn,
+        .account-menu .logout-btn,
+        .account-menu .profile-btn,
+        .account-menu .admin-btn {
+            display: none;
+        }
+
+        .brand-logo {
+            display: block;
+            width: 110px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .nav-cta {
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        main {
+            padding: 56px 0 80px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 42px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2.4rem, 5.4vw, 4.6rem);
+            letter-spacing: -0.06em;
+            line-height: 0.95;
+        }
+
+        .subtitle {
+            max-width: 650px;
+            margin: 18px auto 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.75;
+        }
+
+        /* ---- Week strip ---- */
+        .week-panel {
+            background: rgba(20,20,20,0.9);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            padding: 26px 22px 30px;
+            box-shadow: 0 18px 50px rgba(0,0,0,0.2);
+        }
+
+        .week-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+        }
+
+        .week-panel-head-text {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .week-panel-head h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .week-range {
+            color: var(--muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+        }
+
+        .notify-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            color: var(--text);
+            padding: 10px 16px;
+            font: inherit;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        .notify-btn svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+        }
+
+        .notify-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .notify-btn.is-enabled {
+            border-color: rgba(212,248,94,0.48);
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            color: #0a0a0a;
+            box-shadow: 0 10px 24px rgba(197,242,63,0.11);
+        }
+
+        .notify-btn.is-enabled:hover {
+            background: linear-gradient(135deg, #d4f85e, #b9e82e);
+            color: #0a0a0a;
+            filter: brightness(1.05);
+        }
+
+        .notify-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .notify-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ---- Week navigation ---- */
+        .week-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .week-nav-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .week-nav-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .week-nav-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .week-nav-today {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 7px 12px;
+            cursor: pointer;
+        }
+
+        .week-nav-today:hover {
+            color: var(--text);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .edit-schedule-btn {
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 9px 14px;
+            cursor: pointer;
+        }
+
+        .edit-schedule-btn.is-active {
+            border-color: rgba(212,248,94,0.5);
+            color: var(--gold);
+            background: rgba(212,248,94,0.08);
+        }
+
+        /* ---- Weekly summary strip ---- */
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .summary-chip {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.02);
+            padding: 12px 14px;
+        }
+
+        .summary-chip span {
+            display: block;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .summary-chip strong {
+            font-size: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .summary-chip.streak strong {
+            color: var(--gold);
+        }
+
+        @media (max-width: 640px) {
+            .summary-strip {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* ---- Day type accents ---- */
+        .day-card.type-push { border-left: 3px solid #8fb8ff; }
+        .day-card.type-pull { border-left: 3px solid #e0a6ff; }
+        .day-card.type-legs { border-left: 3px solid #ffb86b; }
+        .day-card.type-conditioning { border-left: 3px solid #6bffc0; }
+        .day-card.type-fullbody { border-left: 3px solid var(--gold); }
+        .day-card.type-rest { border-left: 3px solid rgba(255,255,255,0.12); }
+
+        .day-card {
+            cursor: pointer;
+        }
+
+        .day-card.is-edit-mode {
+            cursor: pointer;
+            outline: 2px dashed transparent;
+        }
+
+        .day-card.is-edit-mode:hover {
+            outline-color: rgba(212,248,94,0.4);
+        }
+
+        .day-card.is-swap-selected {
+            outline: 2px dashed var(--gold);
+        }
+
+        .done-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(212,248,94,0.16);
+            color: var(--gold);
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .done-badge svg {
+            width: 10px;
+            height: 10px;
+            fill: var(--gold);
+        }
+
+        /* ---- Day detail modal ---- */
+        .day-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+        }
+
+        .day-modal-backdrop.is-open {
+            display: flex;
+        }
+
+        .day-modal {
+            width: min(480px, 100%);
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            background: #101010;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 22px 20px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+        }
+
+        .day-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .day-modal-head h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            letter-spacing: -0.03em;
+        }
+
+        .day-modal-close {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .day-modal-section {
+            margin-bottom: 22px;
+        }
+
+        .day-modal-section h4 {
+            margin: 0 0 12px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .modal-exercise-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .modal-exercise-list li {
+            font-size: 0.86rem;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .modal-done-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .modal-done-toggle button {
+            border: 1px solid rgba(212,248,94,0.5);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--gold);
+            padding: 8px 14px;
+            font: inherit;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .modal-done-toggle button.is-done {
+            background: var(--gold);
+            color: #0a0a0a;
+        }
+
+        .modal-weight-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .modal-weight-field input {
+            width: 100px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            padding: 8px 10px;
+            font: inherit;
+        }
+
+        .modal-login-hint {
+            color: var(--muted);
+            font-size: 0.82rem;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .day-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.02);
+            padding: 18px 16px;
+            min-height: 230px;
+            transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.22);
+        }
+
+        .day-card.is-today {
+            border-color: rgba(212,248,94,0.55);
+            background: linear-gradient(180deg, rgba(212,248,94,0.08), rgba(212,248,94,0.02));
+            box-shadow: 0 0 0 1px rgba(212,248,94,0.18), 0 18px 40px rgba(212,248,94,0.08);
+        }
+
+        .day-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .day-name {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .is-today .day-name {
+            color: var(--gold);
+        }
+
+        .day-number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+
+        .today-badge {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            align-self: flex-start;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--gold);
+            color: #0a0a0a;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .today-badge svg {
+            width: 11px;
+            height: 11px;
+            fill: #0a0a0a;
+        }
+
+        .is-today .today-badge {
+            display: inline-flex;
+        }
+
+        .day-section {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .day-section-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .day-section-label svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
+        }
+
+        .day-section-label.workout svg { fill: #8fb8ff; }
+
+        .day-section-body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            color: #e5e5e5;
+        }
+
+        .day-section-body.muted {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .day-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: var(--chip);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.68rem;
+            color: var(--muted);
+        }
+
+        .day-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.07);
+            margin: 5px 0;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 26px;
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .legend svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .legend .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212,248,94,0.18);
+        }
+
+        .empty-plans {
+            margin-top: 26px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .empty-card {
+            border: 1px dashed rgba(255,255,255,0.16);
+            border-radius: 18px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .empty-card svg {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .empty-card.workout svg { fill: #8fb8ff; }
+
+        .empty-card-text strong {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .empty-card-text span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.78rem;
+            line-height: 1.4;
+        }
+
+        .empty-card-text a {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        .empty-card-text a:hover {
+            text-decoration: underline;
+        }
+
+        .login-note {
+            margin-top: 26px;
+            text-align: center;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 20px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .login-note a {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        @media (max-width: 980px) {
+            .week-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 820px) {
+            .nav { gap: 12px; flex-wrap: wrap; }
+            .nav-left { flex: 1; min-width: 0; }
+            .nav-links { display: none; }
+            .nav-cta { padding: 10px 14px; font-size: 0.68rem; }
+            .brand-logo { width: 90px; }
+            .week-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .empty-plans {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main { padding: 36px 0 60px; }
+            .week-panel { padding: 20px 14px 24px; border-radius: 22px; }
+            .week-grid {
+                grid-template-columns: 1fr;
+            }
+            .day-card {
+                min-height: 0;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            .day-card-top {
+                width: 84px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .today-badge { align-self: flex-start; }
+            .day-section {
+                flex: 1;
+                min-width: 160px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="nav-menu.css" />
+    <link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+    <div class="site-glow" aria-hidden="true"></div>
+    <header>
+        <div class="page-shell nav">
+            <div class="nav-left">
+                <div class="account-wrap">
+                    <button class="account-trigger" type="button" aria-label="Account menu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/></svg>
+                    </button>
+                    <div class="account-menu">
+                        <div class="account-name" id="accountName">Guest</div>
+                        <button class="menu-btn profile-btn" type="button">Profile</button>
+                        <button class="menu-btn admin-btn" type="button">Admin panel</button>
+                        <button class="menu-btn upgrade-btn" type="button">Upgrade</button>
+                        <button class="menu-btn login-btn" type="button">Log in</button>
+                        <button class="menu-btn logout-btn" type="button">Log out</button>
+                    </div>
+                </div>
+
+                <a href="index.html" class="brand" aria-label="Brotein home">
+                    <img src="broteinlogo.png" alt="Brotein logo" class="brand-logo" />
+                </a>
+            </div>
+
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <div class="tools-menu">
+                    <button type="button" class="tools-trigger" aria-haspopup="true" aria-expanded="false">
+                        All Tools
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="tools-dropdown">
+                        <a href="gym-finder.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg></span>
+                            <span class="tools-text"><strong>Gym Finder</strong><small>Gyms near you, open ones first</small></span>
+                        </a>
+                        <a href="calculators.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm1 3v4h8V5H8Zm0 7v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Zm-6 4v2h2v-2H8Zm3 0v2h2v-2h-2Zm3 0v2h2v-2h-2Z"/></svg></span>
+                            <span class="tools-text"><strong>Calculators</strong><small>BMI and daily calories</small></span>
+                        </a>
+                        <a href="plan.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg></span>
+                            <span class="tools-text"><strong>Workout Plans</strong><small>Your personal training plan</small></span>
+                        </a>
+                        <a href="food-plan.html">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="16" cy="8" r="5.6"/><path d="M14.1 11.6 7.9 17.8l1.5 1.5 6.2-6.2z"/><circle cx="10.4" cy="20.1" r="2.2"/><circle cx="6.9" cy="16.6" r="2.2"/></svg></span>
+                            <span class="tools-text"><strong>Food Plans</strong><small>Calories and weekly nutrition</small></span>
+                        </a>
+                        <a href="calendar.html" aria-current="page">
+                            <span class="tools-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm12 6H5v12h14V8ZM7 11h3v3H7v-3Z"/></svg></span>
+                            <span class="tools-text"><strong>Calendar</strong><small>This week's plan at a glance</small></span>
+                        </a>
+                    </div>
+                </div>
+                <a href="collaborations.html">Collaborations</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <a href="pricing.html" class="nav-cta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 9A1.5 1.5 0 1 0 7.5 6a1.5 1.5 0 0 0 0 3Z"/></svg>Pricing</a>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero">
+            <div class="eyebrow">Calendar</div>
+            <h1>Your week at a glance</h1>
+            <p class="subtitle">See today highlighted, and a quick peek at what your workout plan has lined up for every day this week.</p>
+        </section>
+
+        <section class="week-panel" aria-labelledby="calendar-heading">
+            <div class="week-panel-head">
+                <div class="week-panel-head-text">
+                    <h2 id="calendar-heading">This week</h2>
+                    <span class="week-range" id="weekRange"></span>
+                    <div class="week-nav">
+                        <button type="button" class="week-nav-btn" id="prevWeekBtn" aria-label="Previous week">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button type="button" class="week-nav-today" id="todayWeekBtn">This week</button>
+                        <button type="button" class="week-nav-btn" id="nextWeekBtn" aria-label="Next week">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" class="edit-schedule-btn" id="editScheduleBtn">Swap a day</button>
+                    <button type="button" class="notify-btn" id="notifyBtn">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 0 0-2 2v.34C7.09 4.98 5 7.6 5 10.7V15l-1.6 2.13A1 1 0 0 0 4.2 19h15.6a1 1 0 0 0 .8-1.87L19 15v-4.3c0-3.1-2.09-5.72-5-6.36V4a2 2 0 0 0-2-2Zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Z"/></svg>
+                        <span id="notifyBtnText">Enable reminders</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="summary-strip" id="summaryStrip" style="display: none;">
+                <div class="summary-chip streak">
+                    <span>Streak</span>
+                    <strong id="summaryStreak">0 days</strong>
+                </div>
+                <div class="summary-chip">
+                    <span>Workouts done</span>
+                    <strong id="summaryDone">0 / 0</strong>
+                </div>
+                <div class="summary-chip">
+                    <span>Exercises this week</span>
+                    <strong id="summaryExercises">0</strong>
+                </div>
+            </div>
+
+            <div class="week-grid" id="weekGrid"></div>
+
+            <div class="legend">
+                <span><span class="dot"></span> Today</span>
+                <span><svg viewBox="0 0 24 24" aria-hidden="true" fill="#8fb8ff"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg> Workout plan</span>
+                <span>Tap a day for details</span>
+            </div>
+
+            <div class="empty-plans" id="emptyPlans" style="display: none;">
+                <div class="empty-card workout" id="emptyWorkoutCard" style="display: none;">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg>
+                    <div class="empty-card-text">
+                        <strong>No workout plan yet</strong>
+                        <span>Generate one and it'll show up here on your training days.</span>
+                        <a href="plan.html">Generate a plan &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="login-note" id="loginNote" style="display: none;">
+                Log in to see your workout plan mapped onto the calendar. <a href="login.html">Log in</a>
+            </div>
+        </section>
+    </main>
+
+    <div class="day-modal-backdrop" id="dayModalBackdrop">
+        <div class="day-modal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle">
+            <div class="day-modal-head">
+                <h3 id="dayModalTitle">Day</h3>
+                <button type="button" class="day-modal-close" id="dayModalClose" aria-label="Close">&times;</button>
+            </div>
+            <div id="dayModalBody"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script src="questionnaire.js"></script>
+    <script src="plan-builder.js"></script>
+    <script>
+        const CURRENT_USER_KEY = 'brotein_current_user';
+        const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const DAY_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const NOTIFY_ENABLED_KEY = 'brotein_notifications_enabled';
+        const NOTIFY_LAST_SENT_KEY = 'brotein_notif_last_sent';
+
+        let currentWorkoutPlan = null;
+        let currentUserId = null;
+        let trainingOverrides = null;
+        let calendarLogsByDate = {};
+        let weekOffset = 0;
+        let editMode = false;
+        let swapSelection = null;
+        let lastRenderContext = { weekDates: [], workoutByDay: {} };
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[char]));
+        }
+
+        function getCurrentUser() {
+            try {
+                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
+                return user && user.loggedIn ? user : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Monday = 0 ... Sunday = 6, matching DAY_NAMES.
+        function todayIndex(date) {
+            return (date.getDay() + 6) % 7;
+        }
+
+        function formatDateKey(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getWeekDates(baseDate, offsetWeeks = 0) {
+            const monday = new Date(baseDate);
+            monday.setDate(baseDate.getDate() - todayIndex(baseDate) + offsetWeeks * 7);
+            return DAY_NAMES.map((_, index) => {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + index);
+                return date;
+            });
+        }
+
+        // Spreads training days across the week starting Monday, with rest days worked
+        // into the middle (via getWeeklyTrainingLayout) unless the user swapped a day.
+        function getWorkoutByDayIndex(plan) {
+            const schedule = getWeeklySchedule(plan, trainingOverrides);
+            const map = {};
+            schedule.forEach((entry, index) => {
+                if (entry.type === 'training') map[index] = entry.session;
+            });
+            return map;
+        }
+
+        function workoutTypeClass(title) {
+            switch (title) {
+                case 'Push': return 'type-push';
+                case 'Pull': return 'type-pull';
+                case 'Legs': return 'type-legs';
+                case 'Conditioning': return 'type-conditioning';
+                default: return 'type-fullbody';
+            }
+        }
+
+        function workoutIcon() {
+            return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43Z"/></svg>';
+        }
+
+        function todayIcon() {
+            return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
+        }
+
+        function friendlyWorkoutName(title) {
+            return title === 'Legs' ? 'Leg' : title;
+        }
+
+        // ---- Streak + weekly summary ----
+        // Counts consecutive fully-completed weeks (every scheduled training day marked done).
+        // The current week only counts once its last training day has passed.
+        function computeStreak() {
+            if (!currentWorkoutPlan) return 0;
+            const layout = getWeeklyTrainingLayout(Number(currentWorkoutPlan.days), trainingOverrides);
+            const lastTrainingOffset = layout.lastIndexOf(true);
+            if (lastTrainingOffset === -1) return 0;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - todayIndex(today));
+
+            const lastTrainingDate = new Date(weekStart);
+            lastTrainingDate.setDate(weekStart.getDate() + lastTrainingOffset);
+            if (lastTrainingDate > today) weekStart.setDate(weekStart.getDate() - 7);
+
+            let streak = 0;
+            for (let w = 0; w < 104; w++) {
+                let complete = true;
+                for (let i = 0; i < 7 && complete; i++) {
+                    if (!layout[i]) continue;
+                    const d = new Date(weekStart);
+                    d.setDate(weekStart.getDate() + i);
+                    if (!calendarLogsByDate[formatDateKey(d)]?.workout_done) complete = false;
+                }
+                if (!complete) break;
+                streak++;
+                weekStart.setDate(weekStart.getDate() - 7);
+            }
+            return streak;
+        }
+
+        function renderSummary(weekDates, workoutByDay) {
+            const strip = document.getElementById('summaryStrip');
+            if (!currentWorkoutPlan) {
+                strip.style.display = 'none';
+                return;
+            }
+            strip.style.display = 'grid';
+
+            const trainingEntries = Object.entries(workoutByDay);
+            const totalExercises = trainingEntries.reduce((sum, [, session]) => sum + session.exercises.length, 0);
+
+            let doneCount = 0;
+            trainingEntries.forEach(([index]) => {
+                const dateKey = formatDateKey(weekDates[Number(index)]);
+                if (calendarLogsByDate[dateKey]?.workout_done) doneCount++;
+            });
+
+            const streak = computeStreak();
+            document.getElementById('summaryStreak').textContent = `${streak} week${streak === 1 ? '' : 's'}`;
+            const allDone = trainingEntries.length > 0 && doneCount === trainingEntries.length;
+            document.getElementById('summaryDone').textContent = `${doneCount} / ${trainingEntries.length}${allDone ? ' ✅' : ''}`;
+            document.getElementById('summaryExercises').textContent = String(totalExercises);
+        }
+
+        function renderWeekFromState() {
+            renderWeek({ workoutPlan: currentWorkoutPlan });
+        }
+
+        function renderWeek({ workoutPlan }) {
+            const today = new Date();
+            const weekDates = getWeekDates(today, weekOffset);
+            const currentIndex = todayIndex(today);
+            const grid = document.getElementById('weekGrid');
+
+            const workoutByDay = workoutPlan ? getWorkoutByDayIndex(workoutPlan) : {};
+            lastRenderContext = { weekDates, workoutByDay };
+
+            document.getElementById('weekRange').textContent =
+                `${weekDates[0].toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${weekDates[6].toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+
+            grid.innerHTML = weekDates.map((date, index) => {
+                const isToday = weekOffset === 0 && index === currentIndex;
+                const workout = workoutByDay[index];
+                const dateKey = formatDateKey(date);
+                const log = calendarLogsByDate[dateKey];
+                const typeClass = workout ? workoutTypeClass(workout.title) : 'type-rest';
+
+                const doneBadge = (workout && log?.workout_done)
+                    ? `<span class="done-badge">${todayIcon()} Done</span>`
+                    : '';
+
+                const workoutBody = workout
+                    ? `<div class="day-section-body">${escapeHtml(workout.title)}<div class="day-chip">${workout.exercises.length} exercises</div></div>`
+                    : workoutPlan
+                        ? `<div class="day-section-body muted">Rest day</div>`
+                        : `<div class="day-section-body muted">No plan yet</div>`;
+
+                const classes = ['day-card', typeClass];
+                if (isToday) classes.push('is-today');
+                if (editMode) classes.push('is-edit-mode');
+                if (editMode && swapSelection === index) classes.push('is-swap-selected');
+
+                return `
+                    <div class="${classes.join(' ')}" data-index="${index}">
+                        <div class="day-card-top">
+                            <div>
+                                <div class="day-name">${DAY_SHORT[index]}</div>
+                                <div class="day-number">${date.getDate()}</div>
+                            </div>
+                            ${isToday ? `<div class="today-badge">${todayIcon()} Today</div>` : doneBadge}
+                        </div>
+                        <div class="day-section">
+                            <div class="day-section-label workout">${workoutIcon()} Workout</div>
+                            ${workoutBody}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            grid.querySelectorAll('.day-card').forEach((card) => {
+                card.addEventListener('click', () => {
+                    const index = Number(card.getAttribute('data-index'));
+                    if (editMode) handleSwapClick(index);
+                    else openDayModal(index);
+                });
+            });
+
+            document.getElementById('emptyWorkoutCard').style.display = workoutPlan ? 'none' : 'flex';
+            document.getElementById('emptyPlans').style.display = workoutPlan ? 'none' : 'grid';
+
+            renderSummary(weekDates, workoutByDay);
+        }
+
+        // ---- Swap-a-day (edit schedule) ----
+        document.getElementById('editScheduleBtn').addEventListener('click', () => {
+            if (!currentUserId) { alert('Log in to customize your training days.'); return; }
+            if (!currentWorkoutPlan) { alert('Generate a workout plan first.'); return; }
+
+            editMode = !editMode;
+            swapSelection = null;
+            const btn = document.getElementById('editScheduleBtn');
+            btn.classList.toggle('is-active', editMode);
+            btn.textContent = editMode ? 'Cancel swap' : 'Swap a day';
+            renderWeekFromState();
+        });
+
+        function handleSwapClick(index) {
+            if (swapSelection === null) {
+                swapSelection = index;
+                renderWeekFromState();
+                return;
+            }
+            if (swapSelection === index) {
+                swapSelection = null;
+                renderWeekFromState();
+                return;
+            }
+
+            const layout = getWeeklyTrainingLayout(Number(currentWorkoutPlan.days), trainingOverrides).slice();
+            if (layout[swapSelection] === layout[index]) {
+                alert('Pick one training day and one rest day to swap.');
+                swapSelection = null;
+                renderWeekFromState();
+                return;
+            }
+
+            const temp = layout[swapSelection];
+            layout[swapSelection] = layout[index];
+            layout[index] = temp;
+
+            trainingOverrides = layout;
+            swapSelection = null;
+            editMode = false;
+            const btn = document.getElementById('editScheduleBtn');
+            btn.classList.remove('is-active');
+            btn.textContent = 'Swap a day';
+
+            saveTrainingOverrides(layout);
+            renderWeekFromState();
+        }
+
+        async function saveTrainingOverrides(layout) {
+            if (!currentUserId || !window.broteinSupabase) return;
+            const { error } = await window.broteinSupabase
+                .from('profiles')
+                .update({ training_day_overrides: layout })
+                .eq('id', currentUserId);
+            if (error) console.error('Could not save schedule swap:', error.message);
+        }
+
+        // ---- Day detail modal ----
+        function openDayModal(index) {
+            const { weekDates, workoutByDay } = lastRenderContext;
+            const date = weekDates[index];
+            const dateKey = formatDateKey(date);
+            const dayName = DAY_NAMES[index];
+            const workout = workoutByDay[index];
+            const log = calendarLogsByDate[dateKey] || { workout_done: false, weight_kg: null };
+
+            document.getElementById('dayModalTitle').textContent =
+                `${dayName}, ${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+
+            let html = '';
+
+            if (!currentUserId) {
+                html += `<p class="modal-login-hint">Log in to mark workouts done and track your weight. <a href="login.html" style="color: var(--gold); font-weight: 700;">Log in</a></p>`;
+            }
+
+            if (workout) {
+                html += `
+                    <div class="day-modal-section">
+                        <h4>${escapeHtml(workout.title)} day</h4>
+                        <ul class="modal-exercise-list">${workout.exercises.map((exercise) => `<li>${escapeHtml(exercise)}</li>`).join('')}</ul>
+                    </div>
+                `;
+                if (currentUserId) {
+                    const isFuture = date > new Date(new Date().setHours(0, 0, 0, 0));
+                    html += `
+                        <div class="modal-done-toggle">
+                            <span>Workout completed</span>
+                            <button type="button" id="modalDoneBtn" class="${log.workout_done ? 'is-done' : ''}" ${isFuture ? 'disabled title="Can\'t mark a future workout done yet"' : ''}>${isFuture ? 'Not yet' : (log.workout_done ? 'Done ✓' : 'Mark done')}</button>
+                        </div>
+                    `;
+                }
+            } else if (currentWorkoutPlan) {
+                html += `<div class="day-modal-section"><h4>Rest day</h4><p style="color:var(--muted); font-size:0.86rem; margin:0;">No training scheduled. Recovery is part of the plan.</p></div>`;
+            }
+
+            if (currentUserId) {
+                html += `
+                    <div class="day-modal-section">
+                        <h4>Bodyweight check-in</h4>
+                        <div class="modal-weight-field">
+                            <input type="number" min="0" step="0.1" id="modalWeightInput" value="${log.weight_kg ?? ''}" placeholder="kg" />
+                            <span style="color:var(--muted); font-size:0.8rem;">kg</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const body = document.getElementById('dayModalBody');
+            body.innerHTML = html;
+            document.getElementById('dayModalBackdrop').classList.add('is-open');
+
+            if (!currentUserId) return;
+
+            const doneBtn = document.getElementById('modalDoneBtn');
+            if (doneBtn && !doneBtn.disabled) {
+                doneBtn.addEventListener('click', async () => {
+                    await upsertCalendarLog(dateKey, { workout_done: !log.workout_done });
+                    openDayModal(index);
+                    renderWeekFromState();
+                });
+            }
+
+            const weightInput = document.getElementById('modalWeightInput');
+            if (weightInput) {
+                weightInput.addEventListener('change', async () => {
+                    const value = weightInput.value === '' ? null : Number(weightInput.value);
+                    await upsertCalendarLog(dateKey, { weight_kg: value });
+                });
+            }
+        }
+
+        function closeDayModal() {
+            document.getElementById('dayModalBackdrop').classList.remove('is-open');
+        }
+
+        document.getElementById('dayModalClose').addEventListener('click', closeDayModal);
+        document.getElementById('dayModalBackdrop').addEventListener('click', (event) => {
+            if (event.target.id === 'dayModalBackdrop') closeDayModal();
+        });
+
+        // ---- Week navigation ----
+        document.getElementById('prevWeekBtn').addEventListener('click', () => { weekOffset -= 1; renderWeekFromState(); });
+        document.getElementById('nextWeekBtn').addEventListener('click', () => { weekOffset += 1; renderWeekFromState(); });
+        document.getElementById('todayWeekBtn').addEventListener('click', () => { weekOffset = 0; renderWeekFromState(); });
+
+        // ---- Calendar logs (workout done / weight) ----
+        async function fetchCalendarLogs(userId) {
+            const db = window.broteinSupabase;
+            const since = new Date();
+            since.setDate(since.getDate() - 120);
+            const until = new Date();
+            until.setDate(until.getDate() + 30);
+
+            const { data, error } = await db
+                .from('calendar_logs')
+                .select('*')
+                .eq('user_id', userId)
+                .gte('log_date', formatDateKey(since))
+                .lte('log_date', formatDateKey(until));
+
+            if (error) {
+                console.error('Could not load calendar logs:', error.message);
+                return {};
+            }
+
+            const map = {};
+            (data || []).forEach((row) => {
+                map[row.log_date] = { workout_done: row.workout_done, weight_kg: row.weight_kg };
+            });
+            return map;
+        }
+
+        async function upsertCalendarLog(dateKey, patch) {
+            if (!currentUserId) return;
+            const existing = calendarLogsByDate[dateKey] || { workout_done: false, weight_kg: null };
+            const merged = { ...existing, ...patch };
+            calendarLogsByDate[dateKey] = merged;
+
+            const { error } = await window.broteinSupabase.from('calendar_logs').upsert({
+                user_id: currentUserId,
+                log_date: dateKey,
+                workout_done: merged.workout_done,
+                weight_kg: merged.weight_kg
+            }, { onConflict: 'user_id,log_date' });
+
+            if (error) console.error('Could not save calendar log:', error.message);
+        }
+
+        // ---- Missed-workout nudge ----
+        function maybeSendMissedWorkoutNudge() {
+            if (localStorage.getItem(NOTIFY_ENABLED_KEY) !== 'true') return;
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            if (!currentWorkoutPlan) return;
+
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const layout = getWeeklyTrainingLayout(Number(currentWorkoutPlan.days), trainingOverrides);
+            if (!layout[todayIndex(yesterday)]) return;
+
+            const yesterdayKey = formatDateKey(yesterday);
+            if (calendarLogsByDate[yesterdayKey]?.workout_done) return;
+
+            const nudgeKey = `brotein_missed_nudge_${yesterdayKey}`;
+            if (localStorage.getItem(nudgeKey) === 'true') return;
+
+            const schedule = getWeeklySchedule(currentWorkoutPlan, trainingOverrides);
+            const entry = schedule[todayIndex(yesterday)];
+            const title = entry?.session?.title ? friendlyWorkoutName(entry.session.title) : 'workout';
+
+            try {
+                new Notification('Missed yesterday\u2019s workout', {
+                    body: `You skipped ${title} day yesterday — jump back in today!`,
+                    icon: 'broteinico.ico'
+                });
+            } catch (error) {
+                console.error('Missed workout notification failed:', error.message);
+            }
+            localStorage.setItem(nudgeKey, 'true');
+        }
+
+        async function loadPlans() {
+            const db = window.broteinSupabase;
+            const session = db ? (await db.auth.getSession()).data.session : null;
+
+            if (!session) {
+                document.getElementById('loginNote').style.display = 'block';
+                updateNotifyButton();
+                renderWeekFromState();
+                return;
+            }
+
+            currentUserId = session.user.id;
+
+            const [workoutRes, profileRes, logsMap] = await Promise.all([
+                db.from('workout_plans').select('*').eq('user_id', session.user.id).maybeSingle(),
+                db.from('profiles').select('notifications_enabled, training_day_overrides').eq('id', session.user.id).maybeSingle(),
+                fetchCalendarLogs(session.user.id)
+            ]);
+
+            currentWorkoutPlan = workoutRes.data ? rowToPlan(workoutRes.data) : null;
+            trainingOverrides = Array.isArray(profileRes.data?.training_day_overrides) ? profileRes.data.training_day_overrides : null;
+            calendarLogsByDate = logsMap;
+
+            localStorage.setItem(NOTIFY_ENABLED_KEY, profileRes.data?.notifications_enabled ? 'true' : 'false');
+            updateNotifyButton();
+
+            renderWeekFromState();
+            maybeSendDailyReminder();
+            maybeSendMissedWorkoutNudge();
+        }
+
+        function todayDateKey() {
+            return formatDateKey(new Date());
+        }
+
+        function buildReminderMessage(workoutPlan) {
+            if (!workoutPlan) {
+                return { title: 'Time to lock in 💪', body: "You don't have a workout plan yet. Create a plan now and lock in!" };
+            }
+
+            const session = getWorkoutByDayIndex(workoutPlan)[todayIndex(new Date())];
+            if (!session) {
+                return { title: 'Rest day', body: 'No training scheduled today — recovery is part of the plan. See you tomorrow!' };
+            }
+
+            return { title: `It's ${friendlyWorkoutName(session.title)} day!`, body: `Today's session: ${session.title} — ${session.exercises.length} exercises. Let's get it.` };
+        }
+
+        function sendNotification(workoutPlan) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            const { title, body } = buildReminderMessage(workoutPlan);
+            try {
+                new Notification(title, { body, icon: 'broteinico.ico' });
+            } catch (error) {
+                console.error('Notification failed:', error.message);
+            }
+        }
+
+        function maybeSendDailyReminder() {
+            if (localStorage.getItem(NOTIFY_ENABLED_KEY) !== 'true') return;
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            if (localStorage.getItem(NOTIFY_LAST_SENT_KEY) === todayDateKey()) return;
+
+            sendNotification(currentWorkoutPlan);
+            localStorage.setItem(NOTIFY_LAST_SENT_KEY, todayDateKey());
+        }
+
+        function updateNotifyButton() {
+            const btn = document.getElementById('notifyBtn');
+            const label = document.getElementById('notifyBtnText');
+
+            if (!currentUserId) {
+                btn.classList.remove('is-enabled');
+                btn.disabled = true;
+                label.textContent = 'Log in to enable reminders';
+                return;
+            }
+
+            const enabled = localStorage.getItem(NOTIFY_ENABLED_KEY) === 'true' && 'Notification' in window && Notification.permission === 'granted';
+
+            btn.classList.toggle('is-enabled', enabled);
+            label.textContent = enabled ? 'Disable reminders' : 'Enable reminders';
+
+            if ('Notification' in window && Notification.permission === 'denied') {
+                btn.disabled = true;
+                label.textContent = 'Notifications blocked';
+            } else {
+                btn.disabled = false;
+            }
+        }
+
+        // Saves the preference on the signed-in account so it follows the user across devices.
+        async function saveNotificationsPreference(enabled) {
+            if (!currentUserId || !window.broteinSupabase) return;
+            const { error } = await window.broteinSupabase
+                .from('profiles')
+                .update({ notifications_enabled: enabled })
+                .eq('id', currentUserId);
+            if (error) console.error('Could not save notification preference:', error.message);
+        }
+
+        async function toggleNotifications() {
+            if (!currentUserId) return;
+
+            if (!('Notification' in window)) {
+                alert("Your browser doesn't support notifications.");
+                return;
+            }
+
+            if (localStorage.getItem(NOTIFY_ENABLED_KEY) === 'true') {
+                localStorage.setItem(NOTIFY_ENABLED_KEY, 'false');
+                updateNotifyButton();
+                await saveNotificationsPreference(false);
+                return;
+            }
+
+            const permission = Notification.permission === 'granted'
+                ? 'granted'
+                : await Notification.requestPermission().catch((error) => {
+                    console.error('Notification permission request failed:', error.message);
+                    return 'default';
+                });
+
+            if (permission !== 'granted') {
+                updateNotifyButton();
+                alert('Notifications are blocked for this site. Allow notifications in your browser settings, then try again.');
+                return;
+            }
+
+            localStorage.setItem(NOTIFY_ENABLED_KEY, 'true');
+            updateNotifyButton();
+            await saveNotificationsPreference(true);
+            maybeSendDailyReminder();
+        }
+
+        document.getElementById('notifyBtn').addEventListener('click', toggleNotifications);
+        updateNotifyButton();
+
+        // Catches the day rolling over while the tab stays open.
+        setInterval(() => {
+            maybeSendDailyReminder();
+        }, 30000);
+
+        loadPlans();
+    </script>
+    <script src="account-menu.js"></script>
+    <script src="nav-menu.js"></script>
+</body>
+</html>
