@@ -562,6 +562,415 @@
                 min-width: 0;
             }
         }
+        /* ---- Questionnaire ---- */
+        .quiz-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .quiz-step {
+            font-size: 0.74rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .quiz-bar {
+            height: 3px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
+            margin: 12px 0 18px;
+        }
+
+        .quiz-bar span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: #c5f23f;
+            transition: width 0.25s ease;
+        }
+
+        /* The questionnaire sits in a narrow card instead of the full-width panel. */
+        .quiz-panel {
+            max-width: 620px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 22px 22px 24px;
+        }
+
+        .quiz-panel h2 {
+            font-size: 1.6rem;
+        }
+
+        #quizBody {
+            text-align: center;
+        }
+
+        .quiz-title {
+            margin: 0 0 6px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .quiz-hint {
+            margin: 0 auto 16px;
+            max-width: 520px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            max-width: 420px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font: inherit;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .quiz-option.is-selected {
+            border-color: #c5f23f;
+            background: rgba(197,242,63,0.1);
+        }
+
+        .quiz-option-icon {
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .quiz-option.is-selected .quiz-option-icon {
+            background: rgba(197,242,63,0.16);
+        }
+
+        .quiz-option-text {
+            display: grid;
+            gap: 2px;
+        }
+
+        .quiz-option-label {
+            font-weight: 600;
+        }
+
+        .quiz-option-note {
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+
+        .quiz-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quiz-btn {
+            border-radius: 999px;
+            padding: 13px 26px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+        }
+
+        .quiz-btn.primary {
+            background: #c5f23f;
+            border-color: #c5f23f;
+            color: #0a0a0a;
+        }
+
+        .quiz-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ---- Plan sections: heading on the left, text beside it ---- */
+        .plan-block {
+            display: grid;
+            grid-template-columns: 150px minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
+            padding: 16px 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .plan-block h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .plan-block p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.94rem;
+        }
+
+        .plan-block ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.94rem;
+            line-height: 1.5;
+        }
+
+        .plan-block li {
+            position: relative;
+            padding-left: 14px;
+        }
+
+        .plan-block li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #c5f23f;
+        }
+
+        @media (max-width: 720px) {
+            .plan-block {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        /* ---- "You already have a plan" popup ---- */
+        .plan-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .plan-modal[hidden] {
+            display: none;
+        }
+
+        .plan-modal-card {
+            width: min(100%, 420px);
+            padding: 24px 22px 20px;
+            border-radius: 22px;
+            background: #151515;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .plan-modal-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.3rem;
+            letter-spacing: -0.02em;
+        }
+
+        .plan-modal-card p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .plan-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .plan-modal-actions .quiz-btn {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quiz-btn.danger {
+            border-color: rgba(229,77,46,0.5);
+            background: transparent;
+            color: #e54d2e;
+        }
+
+        /* ---- Plan preview ---- */
+        .plan-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 6px 0 18px;
+        }
+
+        .plan-summary span {
+            padding: 7px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--chip);
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .plan-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: stretch;
+            margin-top: 22px;
+        }
+
+        .plan-actions .generate-button,
+        .plan-actions .quiz-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 0 26px;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .day-rows {
+            display: grid;
+            gap: 8px;
+        }
+
+        .day-row {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.02);
+            overflow: hidden;
+        }
+
+        .day-row[open] {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.16);
+        }
+
+        .day-row summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .day-row summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .day-row summary::after {
+            content: "";
+            margin-left: auto;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #c5f23f;
+            border-bottom: 2px solid #c5f23f;
+            transform: rotate(45deg) translate(-2px, -2px);
+        }
+
+        .day-row[open] summary::after {
+            transform: rotate(-135deg) translate(-2px, -2px);
+        }
+
+        .day-tag {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--chip);
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .day-title {
+            font-weight: 600;
+        }
+
+        .day-meta {
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .day-list {
+            list-style: none;
+            margin: 0;
+            padding: 0 16px 16px;
+            color: var(--muted);
+        }
+
+        .day-list li {
+            break-inside: avoid;
+            padding: 5px 0 5px 14px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 0.92rem;
+        }
+
+        .day-list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #c5f23f;
+        }
+
+        .day-list em {
+            color: #c5f23f;
+            font-style: normal;
+        }
+
+        @media (max-width: 720px) {
+            .day-meta { display: none; }
+            .quiz-btn { flex: 1; }
+        }
     </style>
     <link rel="stylesheet" href="nav-menu.css" />
     <link rel="stylesheet" href="theme.css" />
@@ -635,81 +1044,46 @@
             <p class="subtitle">Tell us what you can train, what your goal is, and we’ll build a plan based on your body and your schedule.</p>
         </section>
 
-        <section class="custom-plan" aria-labelledby="custom-plan-heading">
-            <h2 id="custom-plan-heading">Build your plan</h2>
-            <form id="planForm">
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="name">Name (optional)</label>
-                        <input id="name" name="name" type="text" placeholder="Your name" />
-                    </div>
+        <section class="custom-plan quiz-panel" aria-labelledby="custom-plan-heading">
+            <div class="quiz-head">
+                <h2 id="custom-plan-heading">Build your plan</h2>
+                <span id="quizStep" class="quiz-step"></span>
+            </div>
+            <div class="quiz-bar"><span id="quizBar"></span></div>
 
-                    <div class="field">
-                        <label for="gender">Gender</label>
-                        <select id="gender" name="gender">
-                            <option value="male" selected>Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
+            <div id="quizBody"></div>
 
-                    <div class="field">
-                        <label for="weight">Weight</label>
-                        <input id="weight" name="weight" type="number" min="0" step="0.1" value="0" required />
-                    </div>
+            <div class="quiz-actions">
+                <button type="button" id="quizBack" class="quiz-btn ghost">Back</button>
+                <button type="button" id="quizNext" class="quiz-btn primary">Next</button>
+            </div>
 
-                    <div class="field">
-                        <label for="weightUnit">Weight unit</label>
-                        <select id="weightUnit" name="weightUnit">
-                            <option value="kg" selected>Kgs</option>
-                            <option value="lbs">Lbs</option>
-                        </select>
-                    </div>
+            <div id="planStatus" class="plan-status" aria-live="polite" role="status"></div>
+        </section>
 
-                    <div class="field">
-                        <label for="height">Height (cm)</label>
-                        <input id="height" name="height" type="number" min="0" step="0.1" value="0" required />
-                    </div>
-
-                    <div class="field">
-                        <label for="age">Age</label>
-                        <input id="age" name="age" type="number" min="0" max="80" value="0" required />
-                    </div>
-
-                    <div class="field">
-                        <label for="days">Training days per week</label>
-                        <select id="days" name="days">
-                            <option value="0" selected>Select the amount of days</option>
-                            <option value="2">2 days</option>
-                            <option value="3">3 days</option>
-                            <option value="4">4 days</option>
-                            <option value="5">5 days</option>
-                            <option value="6">6 days</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="goal">Goal</label>
-                        <select id="goal" name="goal">
-                            <option value="" selected>Select goal</option>
-                            <option value="loss">Weight loss</option>
-                            <option value="maintain">Maintain</option>
-                            <option value="gain">Weight gain</option>
-                            <option value="muscle">Muscle gain</option>
-                        </select>
-                    </div>
+        <div id="existingPlanModal" class="plan-modal" hidden>
+            <div class="plan-modal-card" role="dialog" aria-modal="true" aria-labelledby="existingPlanTitle">
+                <h2 id="existingPlanTitle">You already have a plan</h2>
+                <p>Each account keeps one workout plan. Delete the one you have to build a new one, or go and look at it on your profile.</p>
+                <div id="existingPlanStatus" class="plan-status" aria-live="polite"></div>
+                <div class="plan-modal-actions">
+                    <a href="profile.html" class="quiz-btn ghost">See my plan</a>
+                    <button type="button" id="deleteExistingPlan" class="quiz-btn danger">Delete plan</button>
                 </div>
+            </div>
+        </div>
 
-                <button type="button" class="generate-button" aria-label="Generate the plan as PDF">
-                    <svg class="pdf-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M7 2.5h7.5L19.5 7v12.5A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 7 2.5zm7 1.2v4.3h4.3L14 3.7zm-1.1 7.8c-1.1 0-1.8.7-1.8 1.9v1.3h1.3v-1.2c0-.5.2-.8.7-.8h.6c.5 0 .8.3.8.8v1.2H15v-1.3c0-1.2-.7-1.9-1.9-1.9zm-3.4 0h1.7v4.6H9.5v-1.6H8.4v1.6H7.1v-4.6h1.3v1.5h1.1v-1.5zm6.2 0h2.2v.9h-1.2v3.7h-1.2v-3.7h-1.1v-.9z" fill="#D93025"/>
-                        <path d="M7 2.5h7.5L19.5 7v12.5A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 7 2.5Zm7 1.2v4.3h4.3L14 3.7z" fill="#F4B7B0" opacity="0.35"/>
-                    </svg>
-                    <span>Generate the plan</span>
-                </button>
-                <a id="openPdfFallback" href="#" style="display:none; margin-top:12px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#c5f23f; text-decoration:underline;" target="_blank" rel="noreferrer">Can't download? Open pdf</a>
-                <div id="planStatus" class="plan-status" aria-live="polite" role="status"></div>
-                <a id="profilePlanLink" href="profile.html" style="display:none; margin-top:8px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#c5f23f; text-decoration:underline;">Go to your profile</a>
-            </form>
+        <section id="planPreview" class="custom-plan" style="display:none;" aria-label="Your plan">
+            <h2>Your plan</h2>
+            <div id="previewStatus" class="plan-status success" role="status"></div>
+            <div id="planChips" class="plan-summary"></div>
+            <div id="planDays" class="day-rows"></div>
+            <div id="planExtras"></div>
+            <div class="plan-actions">
+                <button type="button" id="downloadPlanAgain" class="generate-button">Download PDF</button>
+                <a href="profile.html" class="quiz-btn ghost" style="text-decoration:none;">See it on your profile</a>
+            </div>
+            <a id="openPdfFallback" href="#" style="display:none; margin-top:12px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#c5f23f; text-decoration:underline;" target="_blank" rel="noreferrer">Can't download? Open pdf</a>
         </section>
 
         <div style="text-align: center; margin-top: 28px;">
@@ -721,36 +1095,98 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
     <script src="questionnaire.js"></script>
-    <script src="plan-builder.js"></script>
+    <script src="plan-engine.js"></script>
     <script>
-        function getSavedProfile() {
-            try {
-                const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
-                return user && user.profile ? user.profile : {};
-            } catch (error) {
-                return {};
-            }
-        }
+        // ---- Questionnaire ----
+        const QUESTIONS = [
+            {
+                id: 'goal', title: "What's your main goal?",
+                hint: 'This sets how heavy, how many sets and whether cardio is included.',
+                options: [
+                    { value: 'muscle', icon: '💪', label: 'Build muscle', note: 'More volume, 6–15 reps' },
+                    { value: 'loss', icon: '🔥', label: 'Lose fat', note: 'Keep muscle, add cardio' },
+                    { value: 'strength', icon: '🏋️', label: 'Get stronger', note: 'Heavier, lower reps' },
+                    { value: 'health', icon: '🧘', label: 'Stay in shape', note: 'Balanced and sustainable' }
+                ]
+            },
+            {
+                id: 'experience', title: 'How long have you trained consistently?',
+                hint: 'Beginners progress faster on less work, with simpler lifts.',
+                options: [
+                    { value: 'beginner', icon: '🌱', label: 'Never or under 6 months' },
+                    { value: 'intermediate', icon: '📈', label: '6 months to 2 years' },
+                    { value: 'advanced', icon: '🏆', label: 'Over 2 years' }
+                ]
+            },
+            {
+                id: 'days', title: 'How many days per week can you train?',
+                hint: 'Your split is built around this.',
+                options: [
+                    { value: '2', icon: '2️⃣', label: '2 days' }, { value: '3', icon: '3️⃣', label: '3 days' },
+                    { value: '4', icon: '4️⃣', label: '4 days' }, { value: '5', icon: '5️⃣', label: '5 days' }, { value: '6', icon: '6️⃣', label: '6 days' }
+                ]
+            },
+            {
+                id: 'sessionMinutes', title: 'How long is one session?',
+                hint: "Sessions are trimmed to fit, so you're never handed a workout you can't finish.",
+                options: [
+                    { value: '30', icon: '⚡', label: '30 minutes' }, { value: '45', icon: '⏱️', label: '45 minutes' },
+                    { value: '60', icon: '🕐', label: '60 minutes' }, { value: '90', icon: '🕰️', label: '90 minutes or more' }
+                ]
+            },
+            {
+                id: 'equipment', title: 'Where do you train?',
+                hint: 'Only exercises you can actually do will appear.',
+                options: [
+                    { value: 'full', icon: '🏟️', label: 'Full gym', note: 'Barbells, machines, cables' },
+                    { value: 'basic', icon: '🏢', label: 'Basic gym', note: 'Machines and dumbbells' },
+                    { value: 'home', icon: '🏠', label: 'Home', note: 'Dumbbells and bands' },
+                    { value: 'bodyweight', icon: '🤸', label: 'Bodyweight only' }
+                ]
+            },
+            {
+                id: 'injuries', title: 'Any pain or injuries to work around?', multi: true, optional: true,
+                hint: 'Pick any that apply. Risky exercises get swapped for safer ones.',
+                options: [
+                    { value: 'back', icon: '🦴', label: 'Lower back' }, { value: 'knee', icon: '🦵', label: 'Knees' },
+                    { value: 'shoulder', icon: '🪃', label: 'Shoulders' }, { value: 'elbow', icon: '🤕', label: 'Elbows or wrists' }
+                ],
+                noneLabel: 'No injuries'
+            },
+            {
+                id: 'priorities', title: 'Anything you want to prioritise?', multi: true, optional: true, max: 2,
+                hint: 'Up to 2. These muscles get extra sets and an extra exercise.',
+                options: [
+                    { value: 'chest', icon: '🫀', label: 'Chest' }, { value: 'back', icon: '🔙', label: 'Back' },
+                    { value: 'arms', icon: '💪', label: 'Arms' }, { value: 'shoulders', icon: '🎯', label: 'Shoulders' },
+                    { value: 'glutes', icon: '🍑', label: 'Glutes' }, { value: 'legs', icon: '🦿', label: 'Legs' },
+                    { value: 'core', icon: '🧱', label: 'Core' }
+                ],
+                noneLabel: 'Nothing specific'
+            },
+            {
+                id: 'recovery', title: "How's your sleep and stress?",
+                hint: 'Recovery decides how much training you can actually absorb.',
+                options: [
+                    { value: 'good', icon: '😴', label: 'Good', note: '7–9h sleep, low stress' },
+                    { value: 'average', icon: '😐', label: 'Average' },
+                    { value: 'poor', icon: '😵', label: 'Poor', note: 'Under 6h or high stress' }
+                ]
+            },
+            {
+                id: 'cardio', title: 'Do you want cardio in the plan?',
+                options: [
+                    { value: 'none', icon: '🚫', label: 'No cardio' },
+                    { value: 'some', icon: '🚶', label: 'A little', note: '2 sessions per week' },
+                    { value: 'lots', icon: '🏃', label: 'A lot', note: '3–4 sessions per week' }
+                ]
+            },
+            { id: 'stats', title: 'Last thing: your stats', hint: 'Used for the plan header and your profile.', stats: true }
+        ];
 
-        function applySavedProfileToPlan() {
-            const user = getCurrentUser();
-            const profile = getSavedProfile();
-
-            if (user && user.name) {
-                const nameInput = document.getElementById('name');
-                if (nameInput && !nameInput.value) nameInput.value = user.name;
-            }
-
-            if (profile.gender) document.getElementById('gender').value = profile.gender;
-            if (typeof profile.weight !== 'undefined') document.getElementById('weight').value = profile.weight;
-            if (profile.weightUnit) document.getElementById('weightUnit').value = profile.weightUnit;
-            if (typeof profile.height !== 'undefined') document.getElementById('height').value = profile.height;
-            if (typeof profile.age !== 'undefined') document.getElementById('age').value = profile.age;
-            if (typeof profile.days !== 'undefined') document.getElementById('days').value = profile.days;
-            if (profile.goal) document.getElementById('goal').value = profile.goal;
-
-            updateGenerateButtonState();
-        }
+        const answers = { injuries: [], priorities: [] };
+        let stepIndex = 0;
+        let builtPlan = null;
 
         function setPlanStatus(message, type = '') {
             const statusEl = document.getElementById('planStatus');
@@ -760,158 +1196,317 @@
             if (type) statusEl.classList.add(type);
         }
 
-        async function isPremiumAccount() {
+        function statsFromProfile() {
             const user = getCurrentUser();
-            if (!user || user.guest) return false;
-
-            if (window.broteinSupabase) {
-                const { data: { session } } = await window.broteinSupabase.auth.getSession();
-                if (session) {
-                    const { data: profile } = await window.broteinSupabase
-                        .from('profiles')
-                        .select('package')
-                        .eq('id', session.user.id)
-                        .maybeSingle();
-
-                    const packageName = String(profile?.package || user.package || 'FREE').toUpperCase();
-                    if (packageName !== String(user.package || 'FREE').toUpperCase()) {
-                        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ ...user, package: packageName }));
-                    }
-                    return packageName === 'PREMIUM';
-                }
-            }
-
-            return String(user?.package || 'FREE').toUpperCase() === 'PREMIUM';
-        }
-
-        function canGeneratePlan() {
-            const weight = Number(document.getElementById('weight')?.value || 0);
-            const height = Number(document.getElementById('height')?.value || 0);
-            const days = Number(document.getElementById('days')?.value || 0);
-            const goal = document.getElementById('goal')?.value || '';
-
-            return weight > 0 && height > 0 && days > 0 && goal !== '';
-        }
-
-        async function updateGenerateButtonState() {
-            const button = document.querySelector('.generate-button');
-            if (!button) return;
-
-            const hasInputs = canGeneratePlan();
-            const isPremium = await isPremiumAccount();
-            const allowed = hasInputs && isPremium && !hasSavedPlan;
-
-            button.disabled = !allowed;
-            button.style.opacity = allowed ? '1' : '0.7';
-            button.style.cursor = allowed ? 'pointer' : 'not-allowed';
-
-            const label = button.querySelector('span');
-            if (label) {
-                label.textContent = isPremium ? 'Generate the plan' : 'ONLY 0.99$';
-            }
-
-            const profileLink = document.getElementById('profilePlanLink');
-            if (profileLink) profileLink.style.display = hasSavedPlan ? 'inline-block' : 'none';
-
-            if (hasSavedPlan) {
-                setPlanStatus('You already have a saved plan. Delete it on your profile to make a new one.', 'error');
-            } else if (!hasInputs && isPremium) {
-                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
-            } else if (!isPremium) {
-                setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
-            } else {
-                setPlanStatus('');
-            }
-        }
-
-        function showOpenPdfFallback(pdfUrl) {
-            const fallback = document.getElementById('openPdfFallback');
-            if (!fallback) return;
-            fallback.href = pdfUrl;
-            fallback.style.display = 'inline-block';
-        }
-
-        async function generatePdf() {
-            if (!(await isPremiumAccount())) {
-                setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
-                updateGenerateButtonState();
-                return;
-            }
-
-            if (!canGeneratePlan()) {
-                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
-                return;
-            }
-
-            const form = document.getElementById('planForm');
-            const formData = new FormData(form);
-            const weight = Number(formData.get('weight'));
-            const weightUnit = formData.get('weightUnit') || 'kg';
-            const weightKg = convertWeightToKg(weight, weightUnit);
-            const payload = {
-                name: formData.get('name').trim(),
-                weight: weightKg,
-                height: Number(formData.get('height')),
-                age: Number(formData.get('age')),
-                days: Number(formData.get('days')),
-                goal: formData.get('goal'),
-                gender: formData.get('gender') || 'male'
+            const profile = (user && user.profile) || {};
+            const weight = Number(profile.weight);
+            const unit = profile.weightUnit || 'kg';
+            return {
+                weight: weight > 0 ? (unit === 'lbs' ? weight / 2.20462 : weight) : '',
+                height: Number(profile.height) || '',
+                age: Number(profile.age) || '',
+                gender: profile.gender || 'male'
             };
+        }
 
-            const db = window.broteinSupabase;
+        function visibleQuestions() {
+            const stats = statsFromProfile();
+            const haveStats = stats.weight > 0 && stats.height > 0 && stats.age > 0;
+            return QUESTIONS.filter((question) => !(question.stats && haveStats));
+        }
+
+        function renderStep() {
+            const questions = visibleQuestions();
+            const question = questions[stepIndex];
+            const body = document.getElementById('quizBody');
+            document.getElementById('quizStep').textContent = `Step ${stepIndex + 1} of ${questions.length}`;
+            document.getElementById('quizBar').style.width = `${((stepIndex) / questions.length) * 100}%`;
+            document.getElementById('quizBack').disabled = stepIndex === 0;
+
+            // Choosing an option already moves you on, so Next is only shown where
+            // it does something: the multi-choice steps and the stats step.
+            const nextButton = document.getElementById('quizNext');
+            const isLast = stepIndex === questions.length - 1;
+            nextButton.textContent = isLast ? 'Build my plan' : 'Next';
+            nextButton.style.display = (question.multi || question.stats || isLast) ? 'inline-flex' : 'none';
+            setPlanStatus('');
+
+            if (question.stats) {
+                const stats = statsFromProfile();
+                body.innerHTML = `
+                    <h3 class="quiz-title">${question.title}</h3>
+                    <p class="quiz-hint">${question.hint}</p>
+                    <div class="form-grid" style="text-align:left; max-width:520px; margin:0 auto;">
+                        <div class="field"><label for="qWeight">Weight (kg)</label><input id="qWeight" type="number" min="1" step="0.1" value="${stats.weight || ''}" /></div>
+                        <div class="field"><label for="qHeight">Height (cm)</label><input id="qHeight" type="number" min="1" max="250" step="0.1" value="${stats.height || ''}" /></div>
+                        <div class="field"><label for="qAge">Age</label><input id="qAge" type="number" min="1" max="100" value="${stats.age || ''}" /></div>
+                        <div class="field"><label for="qGender">Gender</label><select id="qGender">
+                            <option value="male"${stats.gender === 'male' ? ' selected' : ''}>Male</option>
+                            <option value="female"${stats.gender === 'female' ? ' selected' : ''}>Female</option>
+                        </select></div>
+                    </div>`;
+                return;
+            }
+
+            const chosen = answers[question.id];
+            const isChosen = (value) => question.multi ? (chosen || []).includes(value) : chosen === value;
+            const noneActive = question.multi && (chosen || []).length === 0;
+
+            body.innerHTML = `
+                <h3 class="quiz-title">${question.title}</h3>
+                ${question.hint ? `<p class="quiz-hint">${question.hint}</p>` : ''}
+                <div class="quiz-options">
+                    ${question.options.map((option) => `
+                        <button type="button" class="quiz-option${isChosen(option.value) ? ' is-selected' : ''}" data-value="${option.value}">
+                            <span class="quiz-option-icon">${option.icon || '•'}</span>
+                            <span class="quiz-option-text">
+                                <span class="quiz-option-label">${option.label}</span>
+                                ${option.note ? `<span class="quiz-option-note">${option.note}</span>` : ''}
+                            </span>
+                        </button>`).join('')}
+                    ${question.noneLabel ? `<button type="button" class="quiz-option is-none${noneActive ? ' is-selected' : ''}" data-value="__none">
+                            <span class="quiz-option-icon">✅</span>
+                            <span class="quiz-option-text"><span class="quiz-option-label">${question.noneLabel}</span></span>
+                        </button>` : ''}
+                </div>`;
+
+            body.querySelectorAll('.quiz-option').forEach((button) => {
+                button.addEventListener('click', function () {
+                    const value = this.dataset.value;
+                    if (!question.multi) {
+                        answers[question.id] = value;
+                        renderStep();
+                        goNext();
+                        return;
+                    }
+                    if (value === '__none') {
+                        answers[question.id] = [];
+                    } else {
+                        const list = answers[question.id] || [];
+                        const next = list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
+                        answers[question.id] = question.max ? next.slice(-question.max) : next;
+                    }
+                    answers[`${question.id}_touched`] = true;
+                    renderStep();
+                });
+            });
+        }
+
+        function readStats() {
+            const stats = statsFromProfile();
+            const weightInput = document.getElementById('qWeight');
+            if (!weightInput) return stats;
+            return {
+                weight: Number(weightInput.value),
+                height: Number(document.getElementById('qHeight').value),
+                age: Number(document.getElementById('qAge').value),
+                gender: document.getElementById('qGender').value
+            };
+        }
+
+        function currentQuestion() {
+            return visibleQuestions()[stepIndex];
+        }
+
+        async function goNext() {
+            const questions = visibleQuestions();
+            const question = currentQuestion();
+
+            if (question.stats) {
+                const stats = readStats();
+                if (!(stats.weight > 0) || !(stats.height > 0) || !(stats.age > 0)) {
+                    setPlanStatus('Enter your weight, height and age.', 'error');
+                    return;
+                }
+                Object.assign(answers, stats);
+            } else if (!question.multi && !answers[question.id]) {
+                setPlanStatus('Pick one to continue.', 'error');
+                return;
+            }
+
+            if (stepIndex < questions.length - 1) {
+                stepIndex += 1;
+                renderStep();
+                return;
+            }
+
+            await buildAndSave();
+        }
+
+        function renderPlanPreview(plan) {
+            document.getElementById('planChips').innerHTML = planSummaryChips(plan)
+                .map((chip) => `<span>${chip}</span>`).join('');
+
+            document.getElementById('planDays').innerHTML = plan.days.map((day) => `
+                <details class="day-row"${day === plan.days[0] ? ' open' : ''}>
+                    <summary>
+                        <span class="day-tag">${day.day}</span>
+                        <span class="day-title">${day.title}</span>
+                        <span class="day-meta">${day.exercises.length} exercises • ~${day.minutes} min</span>
+                    </summary>
+                    <ul class="day-list">${day.exercises.map((exercise) =>
+                        `<li>${exercise.name} — ${exercise.sets} × ${exercise.reps}${exercise.priority ? ' <em>(priority)</em>' : ''}</li>`).join('')}</ul>
+                </details>`).join('');
+
+            const weekly = Object.entries(plan.weeklySets).sort((a, b) => b[1] - a[1])
+                .map(([muscle, sets]) => `<span>${muscle}: ${sets} sets</span>`).join('');
+
+            document.getElementById('planExtras').innerHTML = `
+                <div class="plan-block">
+                    <h3>Weekly sets</h3>
+                    <div class="plan-summary" style="margin:0;">${weekly}</div>
+                </div>
+                ${plan.cardio ? `
+                <div class="plan-block">
+                    <h3>${plan.cardio.title}</h3>
+                    <p>${plan.cardio.detail}</p>
+                </div>` : ''}
+                <div class="plan-block">
+                    <h3>How to progress</h3>
+                    <ul>${plan.progression.map((line) => `<li>${line}</li>`).join('')}</ul>
+                </div>`;
+
+            document.getElementById('planPreview').style.display = 'block';
+            document.getElementById('planPreview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function downloadPlanPdf(plan) {
+            const doc = createWorkoutPdf(plan);
+            const url = URL.createObjectURL(doc.output('blob'));
+            try {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = getWorkoutPdfFilename(plan.answers);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            } catch (error) {
+                const fallback = document.getElementById('openPdfFallback');
+                fallback.href = url;
+                fallback.style.display = 'inline-block';
+                return;
+            }
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
+
+        function showExistingPlanNotice() {
+            hasSavedPlan = true;
+            document.getElementById('quizNext').disabled = true;
+            document.getElementById('existingPlanModal').hidden = false;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeExistingPlanModal() {
+            document.getElementById('existingPlanModal').hidden = true;
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('deleteExistingPlan').addEventListener('click', async function () {
+            const status = document.getElementById('existingPlanStatus');
+            const session = db ? (await db.auth.getSession()).data.session : null;
+            if (!session) {
+                status.textContent = 'Log in again to delete your plan.';
+                status.className = 'plan-status error';
+                return;
+            }
+
+            this.disabled = true;
+            status.textContent = 'Deleting...';
+            status.className = 'plan-status';
+            const { error } = await db.from('workout_plans').delete().eq('user_id', session.user.id);
+            this.disabled = false;
+
+            if (error) {
+                status.textContent = 'Could not delete your plan: ' + error.message;
+                status.className = 'plan-status error';
+                return;
+            }
+
+            hasSavedPlan = false;
+            document.getElementById('quizNext').disabled = false;
+            status.textContent = '';
+            closeExistingPlanModal();
+            stepIndex = 0;
+            renderStep();
+            setPlanStatus('Old plan deleted. Build your new one.', 'success');
+        });
+
+        async function buildAndSave() {
+            const user = getCurrentUser();
+            if (!user || user.guest) {
+                setPlanStatus('Log in with your account to generate and save a plan.', 'error');
+                return;
+            }
+            if (String(user.package || 'FREE').toUpperCase() !== 'PREMIUM') {
+                setPlanStatus('Premium access required. Unlock your personal plan for only 0.99$.', 'error');
+                return;
+            }
+
             const session = db ? (await db.auth.getSession()).data.session : null;
             if (!session) {
                 setPlanStatus('Log in with your account to generate and save a plan.', 'error');
                 return;
             }
 
-            const generateButton = document.querySelector('.generate-button');
-            if (generateButton) generateButton.disabled = true;
-            setPlanStatus('Saving your plan...', 'success');
+            Object.assign(answers, statsFromProfile(), answers, { name: user.name || 'Athlete' });
+
+            // Save clean answers: numbers as numbers, without the UI's bookkeeping keys.
+            const saved = {};
+            Object.keys(answers).forEach((key) => {
+                if (key.endsWith('_touched')) return;
+                saved[key] = ['days', 'sessionMinutes', 'age', 'weight', 'height'].includes(key)
+                    ? Number(answers[key])
+                    : answers[key];
+            });
+
+            const nextButton = document.getElementById('quizNext');
+            nextButton.disabled = true;
+            setPlanStatus('Building your plan...');
 
             try {
-                const { error: saveError } = await db.from('workout_plans').insert(planToRow(payload, session.user.id));
-                if (saveError) {
-                    if (saveError.code === '23505') {
-                        hasSavedPlan = true;
-                        updateGenerateButtonState();
-                    } else if (saveError.code === '42501') {
-                        setPlanStatus('Premium access required. Unlock the full plan for only 0.99$.', 'error');
+                const plan = buildWorkoutPlan(saved);
+                builtPlan = plan;
+
+                const { error } = await db.from('workout_plans').insert(planToRow(saved, session.user.id));
+                if (error) {
+                    if (error.code === '23505') {
+                        showExistingPlanNotice();
+                    } else if (error.code === '42501') {
+                        setPlanStatus('Premium access required. Unlock your personal plan for only 0.99$.', 'error');
+                        nextButton.disabled = false;
                     } else {
-                        setPlanStatus('Could not save your plan: ' + saveError.message, 'error');
+                        setPlanStatus('Could not save your plan: ' + error.message, 'error');
+                        nextButton.disabled = false;
                     }
                     return;
                 }
+
                 hasSavedPlan = true;
-
-                const doc = createPlanPdf(payload);
-                const filename = getPlanPdfFilename(payload);
-                const pdfBlob = doc.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-
-                try {
-                    const link = document.createElement('a');
-                    link.href = pdfUrl;
-                    link.download = filename;
-                    link.style.display = 'none';
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                    setPlanStatus('Plan saved to your profile and PDF downloaded.', 'success');
-                } catch (error) {
-                    showOpenPdfFallback(pdfUrl);
-                    setPlanStatus('Download blocked by your browser. Use the link below.', 'error');
-                }
-
-                setTimeout(() => URL.revokeObjectURL(pdfUrl), 2000);
+                document.querySelector('.quiz-panel').style.display = 'none';
+                renderPlanPreview(plan);
+                downloadPlanPdf(plan);
+                document.getElementById('previewStatus').textContent = 'Plan saved to your profile and PDF downloaded.';
             } catch (error) {
-                console.error('PDF generation failed:', error);
+                console.error('Plan generation failed:', error);
                 setPlanStatus('Something went wrong. Please try again.', 'error');
-            } finally {
-                if (generateButton) generateButton.disabled = hasSavedPlan;
-                const profileLink = document.getElementById('profilePlanLink');
-                if (profileLink) profileLink.style.display = hasSavedPlan ? 'inline-block' : 'none';
+                nextButton.disabled = false;
             }
+        }
+
+        document.getElementById('quizNext').addEventListener('click', goNext);
+        document.getElementById('quizBack').addEventListener('click', function () {
+            if (stepIndex > 0) {
+                stepIndex -= 1;
+                renderStep();
+            }
+        });
+        document.getElementById('downloadPlanAgain').addEventListener('click', function () {
+            if (builtPlan) downloadPlanPdf(builtPlan);
+        });
+
+        // The questionnaire prefills from the profile, so re-render when stats arrive.
+        function applySavedProfileToPlan() {
+            if (!builtPlan) renderStep();
         }
 
         const CURRENT_USER_KEY = 'brotein_current_user';
@@ -954,8 +1549,7 @@
             const session = db ? (await db.auth.getSession()).data.session : null;
             if (!session) return;
             const { data } = await db.from('workout_plans').select('id').eq('user_id', session.user.id).maybeSingle();
-            hasSavedPlan = Boolean(data);
-            updateGenerateButtonState();
+            if (data) showExistingPlanNotice();
         }
 
         function getCurrentUser() {
@@ -1095,44 +1689,12 @@
             }
         });
 
-        updateGenerateButtonState();
-
-        const planForm = document.getElementById('planForm');
-        const generateButton = document.querySelector('.generate-button');
-
-        ['weight', 'height', 'days', 'goal'].forEach((id) => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('input', updateGenerateButtonState);
-                el.addEventListener('change', updateGenerateButtonState);
-            }
-        });
-
-        planForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-        });
-
-        generateButton.addEventListener('click', async function () {
-            if (!canGeneratePlan()) {
-                setPlanStatus('Enter weight, height, goal, and training days to generate the plan.', 'error');
-                return;
-            }
-
-            try {
-                await generatePdf();
-            } catch (error) {
-                console.error('Plan generation failed:', error);
-                setPlanStatus('Something went wrong. Please try again.', 'error');
-            }
-        });
-
-        updateGenerateButtonState();
         updateAccountMenu();
+        renderStep();
         syncCurrentUserFromProfile().finally(() => {
             updateAccountMenu();
-            updateGenerateButtonState();
+            if (!builtPlan) renderStep();
         });
-        applySavedProfileToPlan();
         checkSavedPlan();
     </script>
     <script src="nav-menu.js"></script>

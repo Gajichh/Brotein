@@ -754,8 +754,6 @@
             list-style: none;
             margin: 0;
             padding: 0 16px 16px 16px;
-            columns: 2;
-            column-gap: 26px;
             color: var(--muted);
         }
 
@@ -784,10 +782,6 @@
         }
 
         @media (max-width: 720px) {
-            .day-list {
-                columns: 1;
-            }
-
             .day-meta {
                 display: none;
             }
@@ -1033,6 +1027,7 @@
     <script src="questionnaire.js"></script>
     <script src="plan-builder.js"></script>
     <script src="food-plan-builder.js"></script>
+    <script src="plan-engine.js"></script>
     <script>
         const CURRENT_USER_KEY = 'brotein_current_user';
         const db = window.broteinSupabase;
@@ -1326,11 +1321,16 @@
                 return;
             }
 
-            const plan = rowToPlan(savedPlan);
-            const goalPlan = getGoalPlan(plan.goal, plan.days, plan.gender);
-
             empty.style.display = 'none';
             details.style.display = 'block';
+
+            if (savedPlan.answers) {
+                renderEnginePlan(buildWorkoutPlan(rowToAnswers(savedPlan)));
+                return;
+            }
+
+            const plan = rowToPlan(savedPlan);
+            const goalPlan = getGoalPlan(plan.goal, plan.days, plan.gender);
 
             document.getElementById('planSummary').innerHTML = [
                 goalPlan.label,
@@ -1347,7 +1347,12 @@
             document.getElementById('planWeekly').textContent = goalPlan.weekly;
             document.getElementById('planNutrition').textContent = goalPlan.nutrition;
 
-            document.getElementById('planSessions').innerHTML = getWeeklySchedule(plan).map((entry) => {
+            renderWeekRows();
+        }
+
+        // Training days with rest days between them; works for both plan formats.
+        function renderWeekRows() {
+            document.getElementById('planSessions').innerHTML = weeklyScheduleFromRow(savedPlan).map((entry) => {
                 if (entry.type === 'rest') {
                     return `
                         <div class="day-row rest-row">
@@ -1362,12 +1367,27 @@
                         <summary>
                             <span class="day-tag">Day ${entry.dayNumber}</span>
                             <span class="day-title">${escapeHtml(session.title)}</span>
-                            <span class="day-meta">${session.exercises.length} exercises</span>
+                            <span class="day-meta">${session.exercises.length} exercises${session.minutes ? ` • ~${session.minutes} min` : ''}</span>
                         </summary>
                         <ul class="day-list">${session.exercises.map((exercise) => `<li>${escapeHtml(exercise)}</li>`).join('')}</ul>
                     </details>
                 `;
             }).join('');
+        }
+
+        // Plans built from the questionnaire: summary chips, day rows, weekly sets and progression.
+        function renderEnginePlan(plan) {
+            document.getElementById('planSummary').innerHTML = planSummaryChips(plan)
+                .concat(`Created ${new Date(savedPlan.created_at).toLocaleDateString()}`)
+                .map((chip) => `<span>${escapeHtml(chip)}</span>`).join('');
+
+            document.getElementById('planFocus').textContent = `Weekly sets per muscle — ` + Object.entries(plan.weeklySets)
+                .sort((a, b) => b[1] - a[1])
+                .map(([muscle, sets]) => `${muscle} ${sets}`).join(', ');
+            document.getElementById('planWeekly').textContent = plan.cardio ? plan.cardio.detail : 'No cardio in this plan.';
+            document.getElementById('planNutrition').innerHTML = '<strong>How to progress:</strong> ' + escapeHtml(plan.progression[1]);
+
+            renderWeekRows();
         }
 
         function setFoodStatus(message, type = '') {
@@ -1528,6 +1548,27 @@
 
         document.getElementById('downloadPlanButton').addEventListener('click', function () {
             if (!savedPlan) return;
+
+            if (savedPlan.answers) {
+                try {
+                    const answers = rowToAnswers(savedPlan);
+                    const doc = createWorkoutPdf(buildWorkoutPlan(answers), new Date(savedPlan.created_at));
+                    const pdfUrl = URL.createObjectURL(doc.output('blob'));
+                    const link = document.createElement('a');
+                    link.href = pdfUrl;
+                    link.download = getWorkoutPdfFilename(answers);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(pdfUrl), 2000);
+                    setPlanStatus('PDF downloaded.', 'success');
+                } catch (error) {
+                    console.error('PDF generation failed:', error);
+                    setPlanStatus('Something went wrong. Please try again.', 'error');
+                }
+                return;
+            }
+
             const plan = rowToPlan(savedPlan);
             try {
                 const doc = createPlanPdf(plan, new Date(savedPlan.created_at));

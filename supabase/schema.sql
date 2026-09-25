@@ -137,6 +137,14 @@ create policy "Premium users create own plan"
         )
     );
 
+-- Questionnaire answers for plans built by plan-engine.js (null for older plans).
+alter table public.workout_plans add column if not exists answers jsonb;
+
+-- The questionnaire adds two goals: 'strength' and 'health'.
+alter table public.workout_plans drop constraint if exists workout_plans_goal_check;
+alter table public.workout_plans add constraint workout_plans_goal_check
+    check (goal in ('loss', 'maintain', 'gain', 'muscle', 'strength', 'health'));
+
 drop policy if exists "Users delete own plan" on public.workout_plans;
 create policy "Users delete own plan"
     on public.workout_plans for delete

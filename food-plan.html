@@ -326,6 +326,75 @@
             box-shadow: 0 0 0 3px rgba(212,248,94,0.12);
         }
 
+        /* ---- "You already have a food plan" popup ---- */
+        .plan-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .plan-modal[hidden] {
+            display: none;
+        }
+
+        .plan-modal-card {
+            width: min(100%, 420px);
+            padding: 24px 22px 20px;
+            border-radius: 22px;
+            background: #151515;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .plan-modal-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.3rem;
+            letter-spacing: -0.02em;
+        }
+
+        .plan-modal-card p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .plan-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 13px 26px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .modal-btn.danger {
+            border-color: rgba(229,77,46,0.5);
+            background: transparent;
+            color: #e54d2e;
+        }
+
         .generate-button {
             display: inline-flex;
             align-items: center;
@@ -660,7 +729,6 @@
                 </button>
 
                 <div id="foodPlanStatus" class="plan-status" aria-live="polite" role="status"></div>
-                <a id="profileFoodPlanLink" href="profile.html" style="display:none; margin-top:8px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:#c5f23f; text-decoration:underline;">Go to your profile</a>
             </form>
         </section>
 
@@ -674,6 +742,18 @@
             <a href="index.html" class="cta" target="_blank" rel="noreferrer">Back to home</a>
         </div>
     </main>
+
+    <div id="existingFoodModal" class="plan-modal" hidden>
+        <div class="plan-modal-card" role="dialog" aria-modal="true" aria-labelledby="existingFoodTitle">
+            <h2 id="existingFoodTitle">You already have a food plan</h2>
+            <p>Each account keeps one food plan. Delete the one you have to build a new one, or go and look at it on your profile.</p>
+            <div id="existingFoodStatus" class="plan-status" aria-live="polite"></div>
+            <div class="plan-modal-actions">
+                <a href="profile.html" class="modal-btn">See my plan</a>
+                <button type="button" id="deleteExistingFoodPlan" class="modal-btn danger">Delete plan</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -960,15 +1040,45 @@
 
         let hasSavedFoodPlan = false;
 
-        // One food plan per account: point the user at their profile to delete the old one.
+        // One food plan per account: offer to delete the old one right here.
         function showExistingPlanNotice() {
             hasSavedFoodPlan = true;
             const button = document.querySelector('.generate-button');
             if (button) button.disabled = true;
-            const link = document.getElementById('profileFoodPlanLink');
-            if (link) link.style.display = 'inline-block';
-            setFoodPlanStatus('You already have a saved food plan. Delete it on your profile to make a new one.', 'error');
+            document.getElementById('existingFoodModal').hidden = false;
+            document.body.style.overflow = 'hidden';
         }
+
+        document.getElementById('deleteExistingFoodPlan')?.addEventListener('click', async function () {
+            const db = window.broteinSupabase;
+            const status = document.getElementById('existingFoodStatus');
+            const session = db ? (await db.auth.getSession()).data.session : null;
+            if (!session) {
+                status.textContent = 'Log in again to delete your food plan.';
+                status.className = 'plan-status error';
+                return;
+            }
+
+            this.disabled = true;
+            status.textContent = 'Deleting...';
+            status.className = 'plan-status';
+            const { error } = await db.from('food_plans').delete().eq('user_id', session.user.id);
+            this.disabled = false;
+
+            if (error) {
+                status.textContent = 'Could not delete your food plan: ' + error.message;
+                status.className = 'plan-status error';
+                return;
+            }
+
+            hasSavedFoodPlan = false;
+            const button = document.querySelector('.generate-button');
+            if (button) button.disabled = false;
+            status.textContent = '';
+            document.getElementById('existingFoodModal').hidden = true;
+            document.body.style.overflow = '';
+            setFoodPlanStatus('Old food plan deleted. Build your new one.', 'success');
+        });
 
         async function preloadSavedPlan() {
             document.getElementById('foodPlanOutput').style.display = 'none';

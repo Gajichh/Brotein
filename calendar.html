@@ -578,6 +578,7 @@
         }
 
         .modal-done-toggle {
+            margin-top: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -607,21 +608,48 @@
             color: #0a0a0a;
         }
 
-        .modal-weight-field {
+        /* Same bordered row as "Workout completed", with the unit inside the box. */
+        .modal-weight-section {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            gap: 14px;
             margin-top: 12px;
+            margin-bottom: 0;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .modal-weight-section h4 {
+            margin: 0;
+            min-width: 0;
+        }
+
+        .modal-weight-field {
+            position: relative;
+            flex-shrink: 0;
         }
 
         .modal-weight-field input {
-            width: 100px;
+            width: 112px;
             border: 1px solid var(--line);
             border-radius: 10px;
             background: rgba(255,255,255,0.03);
             color: var(--text);
-            padding: 8px 10px;
+            padding: 9px 34px 9px 12px;
             font: inherit;
+        }
+
+        .modal-weight-unit {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 0.82rem;
+            pointer-events: none;
         }
 
         .modal-login-hint {
@@ -1056,6 +1084,7 @@
     <script src="supabase-client.js"></script>
     <script src="questionnaire.js"></script>
     <script src="plan-builder.js"></script>
+    <script src="plan-engine.js"></script>
     <script>
         const CURRENT_USER_KEY = 'brotein_current_user';
         const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -1064,6 +1093,7 @@
         const NOTIFY_LAST_SENT_KEY = 'brotein_notif_last_sent';
 
         let currentWorkoutPlan = null;
+        let currentWorkoutRow = null;
         let currentUserId = null;
         let trainingOverrides = null;
         let calendarLogsByDate = {};
@@ -1101,6 +1131,7 @@
 
         function getWeekDates(baseDate, offsetWeeks = 0) {
             const monday = new Date(baseDate);
+            monday.setHours(0, 0, 0, 0);
             monday.setDate(baseDate.getDate() - todayIndex(baseDate) + offsetWeeks * 7);
             return DAY_NAMES.map((_, index) => {
                 const date = new Date(monday);
@@ -1112,7 +1143,7 @@
         // Spreads training days across the week starting Monday, with rest days worked
         // into the middle (via getWeeklyTrainingLayout) unless the user swapped a day.
         function getWorkoutByDayIndex(plan) {
-            const schedule = getWeeklySchedule(plan, trainingOverrides);
+            const schedule = weeklyScheduleFromRow(currentWorkoutRow || {}, trainingOverrides);
             const map = {};
             schedule.forEach((entry, index) => {
                 if (entry.type === 'training') map[index] = entry.session;
@@ -1352,7 +1383,7 @@
                     </div>
                 `;
                 if (currentUserId) {
-                    const isFuture = date > new Date(new Date().setHours(0, 0, 0, 0));
+                    const isFuture = formatDateKey(date) > formatDateKey(new Date());
                     html += `
                         <div class="modal-done-toggle">
                             <span>Workout completed</span>
@@ -1366,11 +1397,11 @@
 
             if (currentUserId) {
                 html += `
-                    <div class="day-modal-section">
+                    <div class="day-modal-section modal-weight-section">
                         <h4>Bodyweight check-in</h4>
                         <div class="modal-weight-field">
-                            <input type="number" min="0" step="0.1" id="modalWeightInput" value="${log.weight_kg ?? ''}" placeholder="kg" />
-                            <span style="color:var(--muted); font-size:0.8rem;">kg</span>
+                            <input type="number" min="0" step="0.1" id="modalWeightInput" value="${log.weight_kg ?? ''}" placeholder="82.5" aria-label="Bodyweight in kilograms" />
+                            <span class="modal-weight-unit">kg</span>
                         </div>
                     </div>
                 `;
@@ -1474,7 +1505,7 @@
             const nudgeKey = `brotein_missed_nudge_${yesterdayKey}`;
             if (localStorage.getItem(nudgeKey) === 'true') return;
 
-            const schedule = getWeeklySchedule(currentWorkoutPlan, trainingOverrides);
+            const schedule = weeklyScheduleFromRow(currentWorkoutRow || {}, trainingOverrides);
             const entry = schedule[todayIndex(yesterday)];
             const title = entry?.session?.title ? friendlyWorkoutName(entry.session.title) : 'workout';
 
@@ -1508,6 +1539,7 @@
                 fetchCalendarLogs(session.user.id)
             ]);
 
+            currentWorkoutRow = workoutRes.data || null;
             currentWorkoutPlan = workoutRes.data ? rowToPlan(workoutRes.data) : null;
             trainingOverrides = Array.isArray(profileRes.data?.training_day_overrides) ? profileRes.data.training_day_overrides : null;
             calendarLogsByDate = logsMap;
