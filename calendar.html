@@ -398,14 +398,16 @@
 
         .edit-schedule-btn {
             border: 1px solid rgba(255,255,255,0.18);
+            padding: 12px 18px;
             border-radius: 999px;
-            background: transparent;
-            color: var(--muted);
-            font-size: 0.68rem;
-            font-weight: 700;
+            font-size: 0.8rem;
+            font-weight: 600;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            padding: 9px 14px;
+            transition: all 0.2s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 18px rgba(0,0,0,0.18);
+            color: var(--text);
             cursor: pointer;
         }
 
@@ -497,6 +499,21 @@
             width: 10px;
             height: 10px;
             fill: var(--gold);
+        }
+
+        .missed-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(255,80,80,0.08);
+            color: #ff6b6b;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,80,80,0.12);
         }
 
         /* ---- Day detail modal ---- */
@@ -669,12 +686,12 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             border: 1px solid var(--line);
             border-radius: 20px;
             background: rgba(255,255,255,0.02);
-            padding: 18px 16px;
-            min-height: 230px;
+            padding: 14px 12px;
+            min-height: 150px;
             transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
         }
 
@@ -1091,6 +1108,7 @@
         let currentWorkoutPlan = null;
         let currentWorkoutRow = null;
         let currentUserId = null;
+        let userRegistrationDate = null;
         let trainingOverrides = null;
         let calendarLogsByDate = {};
         let weekOffset = 0;
@@ -1254,6 +1272,10 @@
                     ? `<span class="done-badge">${todayIcon()} Done</span>`
                     : '';
 
+                const registrationKey = userRegistrationDate ? formatDateKey(userRegistrationDate) : null;
+                const isMissed = workout && !log?.workout_done && formatDateKey(date) < formatDateKey(new Date()) && registrationKey && formatDateKey(date) >= registrationKey;
+                const missedBadge = isMissed ? `<span class="missed-badge">Missed</span>` : '';
+
                 const workoutBody = workout
                     ? `<div class="day-section-body">${escapeHtml(workout.title)}<div class="day-chip">${workout.exercises.length} exercises</div></div>`
                     : workoutPlan
@@ -1272,7 +1294,7 @@
                                 <div class="day-name">${DAY_SHORT[index]}</div>
                                 <div class="day-number">${date.getDate()}</div>
                             </div>
-                            ${isToday ? `<div class="today-badge">${todayIcon()} Today</div>` : doneBadge}
+                            ${isToday ? `<div class="today-badge">${todayIcon()} Today</div>` : (log?.workout_done ? doneBadge : (isMissed ? missedBadge : ''))}
                         </div>
                         <div class="day-section">
                             <div class="day-section-label workout">${workoutIcon()} Workout</div>
@@ -1379,13 +1401,33 @@
                     </div>
                 `;
                 if (currentUserId) {
+                    const today = new Date(); today.setHours(0,0,0,0);
                     const isFuture = formatDateKey(date) > formatDateKey(new Date());
+                    const isBeforeRegistration = userRegistrationDate && formatDateKey(date) < formatDateKey(userRegistrationDate);
+                    const isPast = formatDateKey(date) < formatDateKey(today);
+                    const layout = currentWorkoutPlan ? getWeeklyTrainingLayout(Number(currentWorkoutPlan.days), trainingOverrides) : null;
+                    const scheduled = layout ? Boolean(layout[todayIndex(date)]) : Boolean(workout);
+                    const isMissed = scheduled && !log.workout_done && isPast && (!isBeforeRegistration) && userRegistrationDate && formatDateKey(date) >= formatDateKey(userRegistrationDate);
+
+                    let disabledAttrs = '';
+                    if (isFuture) disabledAttrs = 'disabled title="Can\'t mark a future workout done yet"';
+                    if (isBeforeRegistration) disabledAttrs = 'disabled title="Cannot mark workouts before account registration"';
+                    if (isMissed) disabledAttrs = 'disabled title="This workout is missed and cannot be marked done"';
+
                     html += `
                         <div class="modal-done-toggle">
                             <span>Workout completed</span>
-                            <button type="button" id="modalDoneBtn" class="${log.workout_done ? 'is-done' : ''}" ${isFuture ? 'disabled title="Can\'t mark a future workout done yet"' : ''}>${isFuture ? 'Not yet' : (log.workout_done ? 'Done ✓' : 'Mark done')}</button>
+                            <button type="button" id="modalDoneBtn" class="${log.workout_done ? 'is-done' : ''}" ${disabledAttrs}>${isFuture ? 'Not yet' : (log.workout_done ? 'Done ✓' : (isBeforeRegistration ? 'Unavailable' : (isMissed ? 'Missed' : 'Mark done')))}</button>
                         </div>
                     `;
+
+                    if (isBeforeRegistration) {
+                        const regText = userRegistrationDate ? new Date(userRegistrationDate).toLocaleDateString() : 'your registration';
+                        html += `<div style="margin-top:8px;color:#ff6b6b;font-size:0.9rem;">Cannot mark workouts before account registration (${escapeHtml(regText)}).</div>`;
+                    }
+                    if (isMissed) {
+                        html += `<div style="margin-top:8px;color:#ff6b6b;font-size:0.9rem;">This workout is past and considered <strong>missed</strong>; it can no longer be marked as done.</div>`;
+                    }
                 }
             } else if (currentWorkoutPlan) {
                 html += `<div class="day-modal-section"><h4>Rest day</h4><p style="color:var(--muted); font-size:0.86rem; margin:0;">No training scheduled. Recovery is part of the plan.</p></div>`;
@@ -1470,6 +1512,30 @@
 
         async function upsertCalendarLog(dateKey, patch) {
             if (!currentUserId) return;
+            if (userRegistrationDate && dateKey < formatDateKey(userRegistrationDate)) {
+                console.warn('Attempt to save calendar log before user registration date blocked:', dateKey);
+                return;
+            }
+            // Block saving for missed workouts (past scheduled training days that are not already marked done)
+            try {
+                const today = new Date(); today.setHours(0,0,0,0);
+                const target = new Date(dateKey + 'T00:00:00');
+                const dateKeyOnly = formatDateKey(target);
+                const isPast = dateKeyOnly < formatDateKey(today);
+                if (isPast && currentWorkoutPlan) {
+                    const idx = todayIndex(target);
+                    const layout = getWeeklyTrainingLayout(Number(currentWorkoutPlan.days), trainingOverrides);
+                    const scheduled = Boolean(layout[idx]);
+                    const existing = calendarLogsByDate[dateKey] || { workout_done: false };
+                    if (scheduled && !existing.workout_done) {
+                        console.warn('Attempt to save calendar log for missed workout blocked:', dateKey);
+                        return;
+                    }
+                }
+            } catch (e) {
+                // if anything fails, don't block the save
+                console.error('upsertCalendarLog miss-check failed:', e);
+            }
             const existing = calendarLogsByDate[dateKey] || { workout_done: false, weight_kg: null };
             const merged = { ...existing, ...patch };
             calendarLogsByDate[dateKey] = merged;
@@ -1531,13 +1597,14 @@
 
             const [workoutRes, profileRes, logsMap] = await Promise.all([
                 db.from('workout_plans').select('*').eq('user_id', session.user.id).maybeSingle(),
-                db.from('profiles').select('notifications_enabled, training_day_overrides').eq('id', session.user.id).maybeSingle(),
+                db.from('profiles').select('notifications_enabled, training_day_overrides, created_at').eq('id', session.user.id).maybeSingle(),
                 fetchCalendarLogs(session.user.id)
             ]);
 
             currentWorkoutRow = workoutRes.data || null;
             currentWorkoutPlan = workoutRes.data ? rowToPlan(workoutRes.data) : null;
             trainingOverrides = Array.isArray(profileRes.data?.training_day_overrides) ? profileRes.data.training_day_overrides : null;
+            userRegistrationDate = profileRes.data?.created_at ? new Date(profileRes.data.created_at) : null;
             calendarLogsByDate = logsMap;
 
             localStorage.setItem(NOTIFY_ENABLED_KEY, profileRes.data?.notifications_enabled ? 'true' : 'false');

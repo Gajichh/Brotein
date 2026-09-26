@@ -672,10 +672,23 @@
         .fav-controls { display:flex; align-items:center; gap:8px; flex-shrink:0; }
         .fav-avg { color:var(--muted); font-weight:700; font-size:0.9rem; min-width:72px; text-align:right; }
         .fav-stars { display:inline-flex; gap:6px; }
-        .fav-stars .star { width:18px; height:18px; padding:4px; }
-        .fav-stars .star { color: var(--muted); }
+        .fav-stars .star {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            background: transparent;
+            border: 0;
+            line-height: 0;
+            cursor: pointer;
+            color: var(--muted);
+            border-radius: 6px;
+        }
+        .fav-stars .star:hover { background: rgba(255,255,255,0.02); }
         .fav-stars .star.filled { color: #c5f23f; }
-        .fav-stars .star.disabled { opacity: 0.6; cursor: default; }
+        .fav-stars .star.disabled { opacity: 0.6; cursor: default; background: transparent; }
         .fav-link { color: var(--text); background: rgba(255,255,255,0.02); border:1px solid var(--line); padding:6px 8px; border-radius:8px; font-size:0.82rem; text-decoration:none; color:var(--muted); }
         .fav-link:hover { color: #c5f23f; border-color: rgba(197,242,63,0.2); }
         .fav-remove { border:0; background:transparent; color:var(--muted); cursor:pointer; font-weight:700; }
@@ -1449,24 +1462,32 @@ async function loadFavoritesForProfile() {
     if (!favWrap) return;
     favWrap.innerHTML = '';
     if (!window.broteinSupabase) return;
+    try {
+        const { data: { session } } = await window.broteinSupabase.auth.getSession();
+        if (!session) {
+            favWrap.innerHTML = '<li class="fav-item" style="color:var(--muted)">Log in to see your favorite gyms.</li>';
+            return;
+        }
+        const userId = session.user.id;
 
-    const { data: { session } } = await window.broteinSupabase.auth.getSession();
-    if (!session) {
-        favWrap.innerHTML = '<li class="fav-item" style="color:var(--muted)">Log in to see your favorite gyms.</li>';
-        return;
-    }
-    const userId = session.user.id;
+        const db = window.broteinSupabase;
+        const { data: favs, error: favErr } = await db
+            .from('favorite_gyms')
+            .select('gym_osm_id,name,address,lat,lon')
+            .eq('user_id', userId)
+            .order('name', { ascending: true });
 
-    const { data: favs, error: favErr } = await window.broteinSupabase
-        .from('favorite_gyms')
-        .select('gym_osm_id,name,address,lat,lon,url')
-        .eq('user_id', userId)
-        .order('name', { ascending: true });
+        if (favErr) {
+            console.error('Error loading favorite_gyms:', favErr.message || favErr);
+            favWrap.innerHTML = `<li class="fav-item" style="color:var(--muted)">Could not load favorites: ${escapeHtml(favErr.message || String(favErr))}</li>`;
+            return;
+        }
+        if (!favs || favs.length === 0) {
+            favWrap.innerHTML = '<li class="fav-item" style="color:var(--muted)">No favorite gyms yet.</li>';
+            return;
+        }
 
-    if (favErr || !favs || favs.length === 0) {
-        favWrap.innerHTML = '<li class="fav-item" style="color:var(--muted)">No favorite gyms yet.</li>';
-        return;
-    }
+        // continue below with favs
 
     // fetch ratings for these gyms
     const ids = favs.map(f => f.gym_osm_id);
@@ -1560,6 +1581,10 @@ async function loadFavoritesForProfile() {
             await loadFavoritesForProfile();
         });
     });
+    } catch (err) {
+        console.error('Failed to load favorites for profile:', err);
+        favWrap.innerHTML = '<li class="fav-item" style="color:var(--muted)">Could not load favorites.</li>';
+    }
 }
 
         // Plans built from the questionnaire: summary chips, day rows, weekly sets and progression.
