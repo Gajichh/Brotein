@@ -817,6 +817,33 @@
             }
         }
 
+        /* Mobile-friendly favorites and profile adjustments */
+        @media (max-width: 720px) {
+            .fav-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 10px;
+            }
+            .fav-main { width: 100%; }
+            .fav-name { white-space: normal; overflow: visible; }
+            .fav-address { white-space: normal; overflow: visible; font-size: 0.86rem; }
+            .fav-controls {
+                width: 100%;
+                display: flex;
+                justify-content: flex-start;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            .fav-avg { min-width: 0; text-align: left; order: 2; color: var(--muted); }
+            .fav-link { order: 3; }
+            .fav-remove { order: 4; margin-left: auto; }
+            .fav-stars .star { padding: 2px; width:16px; height:16px; }
+
+            .profile-form-grid { grid-template-columns: 1fr; }
+            .profile-grid { grid-template-columns: 1fr; }
+        }
+
         .session-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
