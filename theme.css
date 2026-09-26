@@ -333,3 +333,26 @@ body::before {
         animation: none;
     }
 }
+
+/* Rating UI — fits the site's dark theme and green accent */
+.gym-rating { display:inline-flex; gap:8px; align-items:center; font-size:0.95rem; }
+.gym-rating .star {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor: pointer;
+  transition: transform .12s ease, opacity .12s ease;
+  color: var(--muted);
+}
+.gym-rating .star:hover { transform: translateY(-3px); color: #c5f23f; }
+.gym-rating .star.filled { color: #c5f23f; }
+.gym-rating .star.disabled { cursor: default; opacity: .6; transform: none; }
+.gym-rating .avg { color: var(--muted); font-weight:700; font-size:0.92rem; margin-left:8px; }
+.gym-rating .user-note { color: var(--muted); font-size:0.82rem; margin-top:4px; text-align:center; }
+
+/* Favorite list small tweaks */
+.gym-favorites-list { display:grid; gap:10px; padding:0; list-style:none; }
+.gym-favorites-list li { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px; border-radius:12px; border:1px solid var(--line); background: rgba(255,255,255,0.01); }

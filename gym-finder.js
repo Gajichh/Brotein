@@ -543,7 +543,228 @@
         await refreshFavoritesList();
     }
 
-    function renderResults(gyms, origin) {
+    // ---- Ratings support ----
+    async function fetchRatingsForGymIds(gymIds = []) {
+        if (!db || !gymIds.length) return {};
+        const { data, error } = await db
+            .from('gym_ratings')
+            .select('gym_osm_id, rating, user_id')
+            .in('gym_osm_id', gymIds);
+        if (error) {
+            console.error('Could not load ratings:', error.message);
+            return {};
+        }
+        const agg = {};
+        (data || []).forEach((r) => {
+            const id = r.gym_osm_id;
+            if (!agg[id]) agg[id] = { sum: 0, count: 0, avg: 0, byUser: null };
+            agg[id].sum += Number(r.rating);
+            agg[id].count += 1;
+            if (r.user_id === currentUserId) agg[id].byUser = Number(r.rating);
+        });
+        Object.keys(agg).forEach((id) => agg[id].avg = agg[id].sum / agg[id].count);
+        return agg;
+    }
+
+    async function submitRating(gymId, rating) {
+        if (!db) return;
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) { alert('Log in to rate gyms'); return; }
+        const uid = session.user.id;
+
+        // disable buttons immediately to avoid double-clicks
+        const btns = document.querySelectorAll(`[data-gym="${gymId}"]`);
+        btns.forEach(b => { b.disabled = true; b.classList.add('disabled'); });
+
+        try {
+            const payload = { gym_osm_id: gymId, user_id: uid, rating: Number(rating) };
+            // server side uniqueness must exist (gym_osm_id,user_id unique)
+            const { error } = await db.from('gym_ratings').upsert(payload, { onConflict: 'gym_osm_id,user_id' });
+            if (error) throw error;
+
+            // re-fetch rating for this gym and update UI
+            const refresh = await fetchRatingsForGymIds([gymId]);
+            const info = refresh[gymId] || { avg: null, count: 0, user_rating: Number(rating) };
+            applyRatingUiState(gymId, info);
+        } catch (err) {
+            console.error('Could not save rating', err);
+            alert('Could not save rating. Try again.');
+            // re-enable on failure
+            btns.forEach(b => { b.disabled = false; b.classList.remove('disabled'); });
+        }
+    }
+
+    // Helpers for rating UI (paste into top-level of gym-finder.js)
+function starSvg(size = 18) {
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false"><path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.788 1.402 8.168L12 18.896l-7.336 3.27 1.402-8.168L.132 9.21l8.2-1.192L12 .587z" fill="currentColor"/></svg>`;
+}
+
+async function fetchRatingsForGymIds(gymIds = []) {
+  if (!window.broteinSupabase || !gymIds?.length) return {};
+  try {
+    const { data: sessionData } = await window.broteinSupabase.auth.getSession();
+    const userId = sessionData?.session?.user?.id ?? null;
+    const { data, error } = await window.broteinSupabase
+      .from('gym_ratings')
+      .select('gym_osm_id,rating,user_id')
+      .in('gym_osm_id', gymIds);
+    if (error) { console.error('fetchRatingsForGymIds', error); return {}; }
+    const map = {};
+    for (const row of data) {
+      const id = row.gym_osm_id;
+      if (!map[id]) map[id] = { sum: 0, count: 0, user_rating: null };
+      map[id].sum += row.rating;
+      map[id].count += 1;
+      if (userId && row.user_id === userId) map[id].user_rating = row.rating;
+    }
+    Object.keys(map).forEach(id => {
+      map[id].avg = +(map[id].sum / map[id].count).toFixed(1);
+    });
+    return map;
+  } catch (err) {
+    console.error(err);
+    return {};
+  }
+}
+
+async function submitRating(gymId, rating, container) {
+  if (!window.broteinSupabase) return;
+  const { data: sessionData } = await window.broteinSupabase.auth.getSession();
+  const userId = sessionData?.session?.user?.id;
+  if (!userId) { window.location.href = 'login.html'; return; }
+  try {
+    const payload = { gym_osm_id: gymId, user_id: userId, rating: rating };
+    const { error } = await window.broteinSupabase
+      .from('gym_ratings')
+      .upsert(payload, { onConflict: 'gym_osm_id,user_id' });
+    if (error) throw error;
+    const ratings = await fetchRatingsForGymIds([gymId]);
+    applyRatingUiStateForFinder(gymId, ratings[gymId], container);
+  } catch (err) {
+    console.error('submitRating', err);
+    alert('Failed to save rating. Try again.');
+  }
+}
+
+function applyRatingUiStateForFinder(gymId, info = {}, containerOverride) {
+  const container = containerOverride || document.querySelector(`.gym-item[data-gym-id="${gymId}"]`);
+  if (!container) return;
+  const stars = container.querySelectorAll('.gym-rating .star');
+  const avgEl = container.querySelector('.gym-rating .avg');
+  const saveBtn = container.querySelector('.save-rating-btn');
+  const userRated = info?.user_rating != null;
+
+  avgEl.textContent = `${info?.avg ?? '—'} / 5 (${info?.count ?? 0})`;
+
+  // Clear all
+  stars.forEach(s => s.classList.remove('filled', 'disabled'));
+  if (userRated) {
+    // Show user's rating as filled and disable further changes
+    stars.forEach(s => {
+      const v = Number(s.dataset.value);
+      if (v <= info.user_rating) s.classList.add('filled');
+      s.classList.add('disabled');
+    });
+    if (saveBtn) saveBtn.hidden = true;
+  } else {
+    // If user hasn't rated, show selection state (if any) else default
+    const selected = Number(container.dataset.selectedRating) || 0;
+    stars.forEach(s => {
+      const v = Number(s.dataset.value);
+      s.classList.toggle('filled', v <= selected);
+    });
+    if (saveBtn) saveBtn.hidden = selected === 0;
+  }
+}
+
+function wireRatingInteractionsInFinder(container) {
+  // container: .gym-item element
+  if (!container) return;
+  const gymId = container.dataset.gymId || container.getAttribute('data-gym-id');
+  const stars = container.querySelectorAll('.gym-rating .star');
+  const saveBtn = container.querySelector('.save-rating-btn');
+
+  // Star click (select, but don't save)
+  stars.forEach(s => {
+    s.onclick = (e) => {
+      if (s.classList.contains('disabled')) return;
+      const val = Number(s.dataset.value);
+      container.dataset.selectedRating = container.dataset.selectedRating == String(val) ? '0' : String(val);
+      applyRatingUiStateForFinder(gymId, {}, container);
+    };
+  });
+
+  if (saveBtn) {
+    saveBtn.onclick = (e) => {
+      e.preventDefault();
+      const val = Number(container.dataset.selectedRating || 0);
+      if (!val) return;
+      submitRating(gymId, val, container);
+    };
+  }
+}
+
+// Usage: inside your renderResults (where each .gym-item is created) include the rating markup
+// Example snippet to insert into each gym item's HTML when rendering:
+const ratingMarkup = (gym) => `
+  <div class="gym-rating" data-gym-id="${gym.osm_id}">
+    <div class="stars" role="radiogroup" aria-label="Rate this gym">
+      <button type="button" class="star" data-value="1" aria-label="1 star">${starSvg(16)}</button>
+      <button type="button" class="star" data-value="2" aria-label="2 stars">${starSvg(16)}</button>
+      <button type="button" class="star" data-value="3" aria-label="3 stars">${starSvg(16)}</button>
+      <button type="button" class="star" data-value="4" aria-label="4 stars">${starSvg(16)}</button>
+      <button type="button" class="star" data-value="5" aria-label="5 stars">${starSvg(16)}</button>
+    </div>
+    <span class="avg">—</span>
+    <button type="button" class="save-rating-btn" hidden>Save</button>
+  </div>
+`;
+
+// After you render the list, run this to fetch & apply ratings and wire interactions:
+async function refreshAndWireRatingsForRenderedList() {
+  const gymEls = Array.from(document.querySelectorAll('.gym-item[data-gym-id]'));
+  const ids = gymEls.map(el => el.getAttribute('data-gym-id'));
+  if (!ids.length) return;
+  const ratings = await fetchRatingsForGymIds(ids);
+  gymEls.forEach(el => {
+    const id = el.getAttribute('data-gym-id');
+    applyRatingUiStateForFinder(id, ratings[id] || {}, el);
+    wireRatingInteractionsInFinder(el);
+  });
+}
+
+    // update rating UI for a single gym element group (for profile/favorites)
+    function applyRatingUiState(gymId, ratingInfo = { avg: null, count: 0, user_rating: null }) {
+        // update avg text if present
+        const avgEl = document.querySelector(`[data-gym-avg="${gymId}"]`);
+        if (avgEl) avgEl.textContent = ratingInfo.avg ? `${ratingInfo.avg} • ${ratingInfo.count}` : '—';
+
+        // update any star buttons (gym-finder results & profile favorites use data attributes)
+        const starButtons = document.querySelectorAll(`[data-gym="${gymId}"]`);
+        starButtons.forEach(btn => {
+            const val = Number(btn.dataset.value);
+            if (ratingInfo.user_rating) {
+                btn.disabled = true;
+                btn.classList.add('disabled');
+                btn.classList.toggle('filled', val <= ratingInfo.user_rating);
+                btn.title = `You rated ${ratingInfo.user_rating} / 5`;
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('disabled');
+                btn.classList.toggle('filled', ratingInfo.avg ? val <= Math.round(ratingInfo.avg) : false);
+                btn.title = `Rate ${val}`;
+            }
+        });
+
+        // optional small "you rated" note element
+        const note = document.querySelector(`[data-gym-note="${gymId}"]`);
+        if (note) {
+            note.textContent = ratingInfo.user_rating ? `You rated ${ratingInfo.user_rating}/5` : '';
+        }
+    }
+
+    // ---- Render results (now async to batch-fetch ratings) ----
+    async function renderResults(gyms, origin) {
         if (mapSkeletonEl) mapSkeletonEl.hidden = true;
         listEl.innerHTML = '';
         resultsLayer.clearLayers();
@@ -571,6 +792,10 @@
             listEl.appendChild(empty);
             return;
         }
+
+        // Batch fetch ratings for all visible gyms
+        const gymIds = gyms.map(g => g.id);
+        const ratingsMap = await fetchRatingsForGymIds(gymIds);
 
         const bounds = [[origin.lat, origin.lon]];
 
@@ -639,7 +864,6 @@
             head.append(nameRow, side);
             item.appendChild(head);
 
-
             [gym.address, gym.hours && `Hours: ${gym.hours}`, gym.phone && `Phone: ${gym.phone}`]
                 .filter(Boolean)
                 .forEach((text) => {
@@ -668,6 +892,68 @@
                 links.appendChild(site);
             }
             item.appendChild(links);
+
+            // Rating UI (SVG stars, styled via CSS)
+            const ratingWrap = document.createElement('div');
+            ratingWrap.className = 'gym-rating';
+            ratingWrap.dataset.gymId = gym.id;
+            ratingWrap.innerHTML = `
+                <div class="stars" role="radiogroup" aria-label="Rate this gym">
+                  <button type="button" class="star" data-value="1" aria-label="1 star">${starSvg(16)}</button>
+                  <button type="button" class="star" data-value="2" aria-label="2 stars">${starSvg(16)}</button>
+                  <button type="button" class="star" data-value="3" aria-label="3 stars">${starSvg(16)}</button>
+                  <button type="button" class="star" data-value="4" aria-label="4 stars">${starSvg(16)}</button>
+                  <button type="button" class="star" data-value="5" aria-label="5 stars">${starSvg(16)}</button>
+                </div>
+                <span class="avg">—</span>
+                <button type="button" class="save-rating-btn" hidden>Save</button>
+            `;
+            item.appendChild(ratingWrap);
+
+            const avgEl = ratingWrap.querySelector('.avg');
+            const starButtons = ratingWrap.querySelectorAll('.star');
+            const saveBtn = ratingWrap.querySelector('.save-rating-btn');
+
+            const ratingInfo = ratingsMap[gym.id];
+            if (ratingInfo && ratingInfo.avg != null) {
+                avgEl.textContent = `${Number(ratingInfo.avg).toFixed(1)} / 5 (${ratingInfo.count})`;
+                if (ratingInfo.byUser != null) {
+                    starButtons.forEach((b) => b.classList.toggle('filled', Number(b.dataset.value) <= Number(ratingInfo.byUser)));
+                    starButtons.forEach((b) => b.classList.add('disabled'));
+                    saveBtn.hidden = true;
+                }
+            } else {
+                avgEl.textContent = 'No ratings';
+            }
+
+            // Selection (client-side) — show save when user chooses and hasn't rated
+            starButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (btn.classList.contains('disabled')) return;
+                    const val = Number(btn.dataset.value);
+                    starButtons.forEach((b) => b.classList.toggle('filled', Number(b.dataset.value) <= val));
+                    ratingWrap.dataset.selected = String(val);
+                    saveBtn.hidden = !currentUserId || (ratingInfo && ratingInfo.byUser != null);
+                });
+            });
+
+            saveBtn.addEventListener('click', async () => {
+                const r = Number(ratingWrap.dataset.selected || 0);
+                if (!r) return;
+                saveBtn.disabled = true;
+                await submitRating(gym.id, r, item);
+                const refreshed = await fetchRatingsForGymIds([gym.id]);
+                const info = refreshed[gym.id];
+                if (info && info.avg != null) {
+                    avgEl.textContent = `${Number(info.avg).toFixed(1)} / 5 (${info.count})`;
+                    if (info.byUser != null) {
+                        starButtons.forEach((b) => b.classList.toggle('filled', Number(b.dataset.value) <= Number(info.byUser)));
+                        starButtons.forEach((b) => b.classList.add('disabled'));
+                        saveBtn.hidden = true;
+                    }
+                }
+                saveBtn.disabled = false;
+            });
 
             listEl.appendChild(item);
         });

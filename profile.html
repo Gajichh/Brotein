@@ -663,6 +663,23 @@
             color: var(--muted);
         }
 
+        /* Compact favorites list styling */
+        .gym-favorites-list.profile, #profileFavoritesList { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+        .fav-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,0.02); }
+        .fav-main { display:flex; flex-direction:column; gap:4px; min-width:0; }
+        .fav-name { font-weight:700; font-size:0.98rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .fav-address { color:var(--muted); font-size:0.88rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .fav-controls { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        .fav-avg { color:var(--muted); font-weight:700; font-size:0.9rem; min-width:72px; text-align:right; }
+        .fav-stars { display:inline-flex; gap:6px; }
+        .fav-stars .star { width:18px; height:18px; padding:4px; }
+        .fav-stars .star { color: var(--muted); }
+        .fav-stars .star.filled { color: #c5f23f; }
+        .fav-stars .star.disabled { opacity: 0.6; cursor: default; }
+        .fav-link { color: var(--text); background: rgba(255,255,255,0.02); border:1px solid var(--line); padding:6px 8px; border-radius:8px; font-size:0.82rem; text-decoration:none; color:var(--muted); }
+        .fav-link:hover { color: #c5f23f; border-color: rgba(197,242,63,0.2); }
+        .fav-remove { border:0; background:transparent; color:var(--muted); cursor:pointer; font-weight:700; }
+
         .plan-text {
             color: var(--muted);
             line-height: 1.7;
@@ -1017,6 +1034,11 @@
                 </div>
 
                 <div id="foodStatus" class="plan-status" aria-live="polite" role="status"></div>
+            </section>
+
+            <section class="profile-panel" aria-labelledby="favorites-heading" style="grid-column: 1 / -1;">
+                <h2 id="favorites-heading">Favorite gyms</h2>
+                <ul id="profileFavoritesList" class="gym-favorites-list" style="margin-top:12px;"></ul>
             </section>
         </div>
     </main>
@@ -1374,6 +1396,171 @@
                 `;
             }).join('');
         }
+        // Paste into profile.html's script area (duplicates because gym-finder.js isn't loaded there)
+function starSvg(size = 16) {
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.788 1.402 8.168L12 18.896l-7.336 3.27 1.402-8.168L.132 9.21l8.2-1.192L12 .587z" fill="currentColor"/></svg>`;
+}
+
+async function submitRatingFromProfile(gymId, rating, listItem) {
+  if (!window.broteinSupabase) return;
+  const { data: sessionData } = await window.broteinSupabase.auth.getSession();
+  const userId = sessionData?.session?.user?.id;
+  if (!userId) { window.location.href = 'login.html'; return; }
+  try {
+    const payload = { gym_osm_id: gymId, user_id: userId, rating: rating };
+    const { error } = await window.broteinSupabase
+      .from('gym_ratings')
+      .upsert(payload, { onConflict: 'gym_osm_id,user_id' });
+    if (error) throw error;
+    // refresh this single favorite's UI by re-fetching ratings
+    const ratings = await (async (ids) => {
+      const { data } = await window.broteinSupabase.from('gym_ratings').select('gym_osm_id,rating,user_id').in('gym_osm_id', ids);
+      const map = {};
+      for (const r of data || []) {
+        if (!map[r.gym_osm_id]) map[r.gym_osm_id] = { sum: 0, count: 0, user_rating: null };
+        map[r.gym_osm_id].sum += r.rating; map[r.gym_osm_id].count += 1;
+        if (r.user_id === userId) map[r.gym_osm_id].user_rating = r.rating;
+      }
+      Object.keys(map).forEach(k => map[k].avg = +(map[k].sum / map[k].count).toFixed(1));
+      return map;
+    })([gymId]);
+    const info = ratings[gymId] || {};
+    // apply UI: fill stars, disable if user rated
+    const stars = listItem.querySelectorAll('.gym-rating .star');
+    const avgEl = listItem.querySelector('.gym-rating .avg');
+    avgEl.textContent = `${info.avg ?? '—'} / 5 (${info.count ?? 0})`;
+    stars.forEach(s => s.classList.remove('filled','disabled'));
+    if (info.user_rating != null) {
+      stars.forEach(s => {
+        const v = Number(s.dataset.value);
+        if (v <= info.user_rating) s.classList.add('filled');
+        s.classList.add('disabled');
+      });
+      listItem.querySelector('.save-rating-btn')?.setAttribute('hidden','');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Failed to save rating');
+  }
+}
+
+async function loadFavoritesForProfile() {
+    const favWrap = document.getElementById('profileFavoritesList');
+    if (!favWrap) return;
+    favWrap.innerHTML = '';
+    if (!window.broteinSupabase) return;
+
+    const { data: { session } } = await window.broteinSupabase.auth.getSession();
+    if (!session) {
+        favWrap.innerHTML = '<li class="fav-item" style="color:var(--muted)">Log in to see your favorite gyms.</li>';
+        return;
+    }
+    const userId = session.user.id;
+
+    const { data: favs, error: favErr } = await window.broteinSupabase
+        .from('favorite_gyms')
+        .select('gym_osm_id,name,address,lat,lon,url')
+        .eq('user_id', userId)
+        .order('name', { ascending: true });
+
+    if (favErr || !favs || favs.length === 0) {
+        favWrap.innerHTML = '<li class="fav-item" style="color:var(--muted)">No favorite gyms yet.</li>';
+        return;
+    }
+
+    // fetch ratings for these gyms
+    const ids = favs.map(f => f.gym_osm_id);
+    const { data: ratingsData } = await window.broteinSupabase
+        .from('gym_ratings')
+        .select('gym_osm_id,rating,user_id')
+        .in('gym_osm_id', ids);
+
+    const ratingsMap = {};
+    (ratingsData || []).forEach(r => {
+        if (!ratingsMap[r.gym_osm_id]) ratingsMap[r.gym_osm_id] = { sum: 0, count: 0, byUser: null };
+        ratingsMap[r.gym_osm_id].sum += Number(r.rating);
+        ratingsMap[r.gym_osm_id].count += 1;
+        if (r.user_id === userId) ratingsMap[r.gym_osm_id].byUser = Number(r.rating);
+    });
+    Object.keys(ratingsMap).forEach(k => ratingsMap[k].avg = +(ratingsMap[k].sum / ratingsMap[k].count).toFixed(1));
+
+    favWrap.innerHTML = favs.map(f => {
+        const info = ratingsMap[f.gym_osm_id] || {};
+        const avgText = info.avg ? `${info.avg.toFixed(1)} / 5 (${info.count || 0})` : '—';
+        const directions = f.lat && f.lon ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(f.lat + ',' + f.lon)}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(f.name)}`;
+        const siteLink = f.url ? `<a class="fav-link" href="${escapeHtml(f.url)}" target="_blank" rel="noopener">Site</a>` : '';
+        return `<li class="fav-item" data-gym-id="${f.gym_osm_id}">
+            <div class="fav-main">
+                <div class="fav-name">${escapeHtml(f.name)}</div>
+                <div class="fav-address">${escapeHtml(f.address || '')}</div>
+            </div>
+            <div class="fav-controls">
+                <div class="fav-avg">${avgText}</div>
+                <div class="fav-stars">
+                    <button type="button" class="star" data-value="1" aria-label="1">${starSvg(14)}</button>
+                    <button type="button" class="star" data-value="2" aria-label="2">${starSvg(14)}</button>
+                    <button type="button" class="star" data-value="3" aria-label="3">${starSvg(14)}</button>
+                    <button type="button" class="star" data-value="4" aria-label="4">${starSvg(14)}</button>
+                    <button type="button" class="star" data-value="5" aria-label="5">${starSvg(14)}</button>
+                </div>
+                <a class="fav-link" href="${directions}" target="_blank" rel="noopener" title="Directions">Directions</a>
+                ${siteLink}
+                <button type="button" class="save-rating-btn" hidden style="font-size:0.8rem;padding:6px 8px;border-radius:8px;">Save</button>
+                <button type="button" class="fav-remove" title="Remove">✕</button>
+            </div>
+        </li>`;
+    }).join('');
+
+    // wire interactions
+    const items = Array.from(favWrap.querySelectorAll('.fav-item'));
+    items.forEach(item => {
+        const id = item.getAttribute('data-gym-id');
+        const info = ratingsMap[id] || {};
+        const stars = item.querySelectorAll('.star');
+        const saveBtn = item.querySelector('.save-rating-btn');
+        const avgEl = item.querySelector('.fav-avg');
+        const removeBtn = item.querySelector('.fav-remove');
+
+        // initialize star state
+        if (info.byUser != null) {
+            stars.forEach(s => s.classList.toggle('filled', Number(s.dataset.value) <= Number(info.byUser)));
+            stars.forEach(s => s.classList.add('disabled'));
+            if (saveBtn) saveBtn.hidden = true;
+        } else if (info.avg) {
+            stars.forEach(s => s.classList.toggle('filled', Number(s.dataset.value) <= Math.round(info.avg)));
+        }
+
+        stars.forEach(s => {
+            s.addEventListener('click', () => {
+                if (s.classList.contains('disabled')) return;
+                const v = Number(s.dataset.value);
+                stars.forEach(b => b.classList.toggle('filled', Number(b.dataset.value) <= v));
+                item.dataset.selected = String(v);
+                if (saveBtn) saveBtn.hidden = !(item.dataset.selected && !info.byUser);
+            });
+        });
+
+        if (saveBtn) saveBtn.addEventListener('click', async () => {
+            const v = Number(item.dataset.selected || 0);
+            if (!v) return;
+            saveBtn.disabled = true;
+            await submitRatingFromProfile(id, v, item);
+            // refresh favorites UI after save
+            await loadFavoritesForProfile();
+        });
+
+        removeBtn.addEventListener('click', async () => {
+            removeBtn.disabled = true;
+            const { error } = await window.broteinSupabase.from('favorite_gyms').delete().eq('user_id', userId).eq('gym_osm_id', id);
+            removeBtn.disabled = false;
+            if (error) {
+                console.error('Could not remove favorite:', error.message);
+                return;
+            }
+            await loadFavoritesForProfile();
+        });
+    });
+}
 
         // Plans built from the questionnaire: summary chips, day rows, weekly sets and progression.
         function renderEnginePlan(plan) {
@@ -1544,6 +1731,7 @@
             renderFoodPlan(profile);
             savedPlan = plan || null;
             renderPlan(profile);
+            await loadFavoritesForProfile();
         }
 
         document.getElementById('downloadPlanButton').addEventListener('click', function () {
@@ -1614,6 +1802,9 @@
             const { data: profile } = await db.from('profiles').select('package').eq('id', (await db.auth.getSession()).data.session.user.id).maybeSingle();
             renderPlan(profile);
             setPlanStatus('Plan deleted. You can now generate a new one.', 'success');
+
+
+
         });
 
         updateAccountMenu();
